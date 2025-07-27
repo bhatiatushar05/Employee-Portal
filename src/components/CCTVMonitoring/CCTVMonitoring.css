@@ -1,0 +1,62 @@
+.cctv-monitoring-container {
+  flex: 1;
+  padding: 32px 40px;
+  background-color: #f9fafb;
+  overflow-y: auto;
+}
+
+.cctv-monitoring-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.cctv-monitoring-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.1;
+}
+
+.cctv-monitoring-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.cctv-monitoring-time {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.cctv-monitoring-icon {
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.cctv-monitoring-icon:hover {
+  color: #374151;
+}
+
+.cctv-monitoring-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.cctv-monitoring-left {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cctv-monitoring-right {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
