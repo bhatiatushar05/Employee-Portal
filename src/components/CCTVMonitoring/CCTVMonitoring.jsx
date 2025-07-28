@@ -3,29 +3,27 @@ import { Search, User } from 'lucide-react';
 import CCTVFeed from '../CCTVFeed/CCTVFeed';
 import MotionEvents from '../MotionEvents/MotionEvents';
 import EmployeeCheckTabs from '../EmployeeCheckTabs/EmployeeCheckTabs';
-import './CCTVMonitoring.css';
+// Removed: import './CCTVMonitoring.css';
 
 const CCTVMonitoring = ({ activeTab, setActiveTab }) => {
   return (
-    <div className="cctv-monitoring-container">
-      <div className="cctv-monitoring-header">
-        <h1 className="cctv-monitoring-title">CCTV Real-Time Monitoring</h1>
-        <div className="cctv-monitoring-header-actions">
-          <span className="cctv-monitoring-time">25 Apr 10:14 AM</span>
-          <Search size={24} className="cctv-monitoring-icon" />
-          <User size={24} className="cctv-monitoring-icon" />
+    <div className="flex-1 p-8 bg-gray-50 overflow-y-auto">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold text-gray-800 leading-tight">CCTV Real-Time Monitoring</h1>
+        <div className="flex items-center gap-5">
+          <span className="text-gray-500 text-sm font-medium">25 Apr 10:14 AM</span>
+          <Search size={24} className="text-gray-500 hover:text-gray-700 cursor-pointer transition-colors" />
+          <User size={24} className="text-gray-500 hover:text-gray-700 cursor-pointer transition-colors" />
         </div>
       </div>
-
-      <div className="cctv-monitoring-grid">
+      <div className="grid grid-cols-[2fr_1fr] gap-8 max-w-[1400px] mx-auto">
         {/* Left Column - CCTV Feed and Motion Events */}
-        <div className="cctv-monitoring-left">
+        <div className="flex flex-col gap-6">
           <CCTVFeed />
           <MotionEvents />
         </div>
-
         {/* Right Sidebar */}
-        <div className="cctv-monitoring-right">
+        <div className="flex flex-col gap-6">
           <EmployeeCheckTabs activeTab={activeTab} setActiveTab={setActiveTab} />
           <MotionEvents sidebar={true} />
         </div>

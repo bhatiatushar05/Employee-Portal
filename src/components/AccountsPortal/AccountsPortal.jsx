@@ -1,77 +1,115 @@
 import React from 'react';
 import StatusProgress from '../StatusProgress/StatusProgress';
 import { employeeReimbursements } from '../../data/mockData';
-import './AccountsPortal.css';
 
 const AccountsPortal = () => {
   const getStatusButton = (status) => {
     switch(status) {
       case 'reimbursed':
-        return { text: 'Reimbursed', class: 'accounts-table-btn-reimbursed' };
+        return { text: 'View Receipt', class: 'bg-emerald-600 hover:bg-emerald-700' };
       case 'payment-initiated':
-        return { text: 'Initiate Payment', class: 'accounts-table-btn-payment' };
+        return { text: 'Mark Reimbursed', class: 'bg-emerald-600 hover:bg-emerald-600' };
       case 'approved':
-        return { text: 'Approve Payment', class: 'accounts-table-btn-approve' };
+        return { text: 'Initiate Payment', class: 'bg-emerald-600 hover:bg-emerald-600' };
       case 'verification':
-        return { text: 'Under Review', class: 'accounts-table-btn-review' };
+        return { text: 'Verify', class: 'bg-emerald-600 hover:bg-emerald-600' };
       default:
-        return { text: 'Pending', class: 'accounts-table-btn-pending' };
+        return { text: 'Pending', class: 'bg-emerald-600 hover:bg-emerald-600' };
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    switch(status) {
+      case 'reimbursed':
+        return 'bg-emerald-100 text-emerald-800';
+      case 'payment-initiated':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'approved':
+        return 'bg-blue-100 text-blue-800';
+      case 'verification':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <div className="accounts-portal-container">
-      <div className="accounts-portal-content">
-        <h1 className="accounts-portal-title">Accounts Portal</h1>
-        <p className="accounts-portal-subtitle">Employee Bills and Reimbursements</p>
+    <div className="h-full flex flex-col bg-gray-50">
+      {/* Header - Fixed */}
+      <div className="flex-shrink-0 p-4 md:p-6 lg:p-8 bg-gray-50">
+        <div className="max-w-[1400px] mx-auto">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-1 md:mb-2 leading-tight">
+            Accounts Portal
+          </h1>
+          <p className="text-gray-500 text-sm md:text-base">
+            Employee Bills and Reimbursements
+          </p>
+        </div>
+      </div>
 
-        <div className="accounts-table-container">
-          <table className="accounts-table">
-            <thead className="accounts-table-header">
-              <tr>
-                <th className="accounts-table-th">Employee Name</th>
-                <th className="accounts-table-th">Expense Type</th>
-                <th className="accounts-table-th">Amount</th>
-                <th className="accounts-table-th">Date Submitted</th>
-                <th className="accounts-table-th">Status</th>
-                <th className="accounts-table-th">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {employeeReimbursements.map((employee) => {
-                const statusButton = getStatusButton(employee.status);
-                return (
-                  <tr key={employee.id} className="accounts-table-row">
-                    <td className="accounts-table-td accounts-table-name">
-                      {employee.name}
-                    </td>
-                    <td className="accounts-table-td">
-                      {employee.type}
-                    </td>
-                    <td className="accounts-table-td accounts-table-amount">
-                      ${employee.amount.toFixed(2)}
-                    </td>
-                    <td className="accounts-table-td">
-                      {employee.date}
-                    </td>
-                    <td className="accounts-table-td">
-                      <span className={`accounts-table-status ${employee.status === 'reimbursed' ? 'accounts-table-status-complete' : 
-                                       employee.status === 'payment-initiated' ? 'accounts-table-status-payment' :
-                                       employee.status === 'approved' ? 'accounts-table-status-approved' :
-                                       'accounts-table-status-pending'}`}>
-                        {employee.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                      </span>
-                    </td>
-                                       <td className="accounts-table-td">
-                      <button className={`accounts-table-btn ${statusButton.class}`}>
-                        {statusButton.text}
-                      </button>
-                    </td>
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-auto px-4 md:px-6 lg:px-8 pb-4 md:pb-6 lg:pb-8">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse min-w-[800px] lg:min-w-[1000px]">
+                <thead className="bg-gray-50 border-b-2 border-gray-200 sticky top-0">
+                  <tr>
+                    <th className="px-3 md:px-4 lg:px-6 py-3 md:py-4 text-left font-semibold text-xs text-gray-700 uppercase tracking-wider">
+                      Employee Name
+                    </th>
+                    <th className="px-3 md:px-4 lg:px-6 py-3 md:py-4 text-left font-semibold text-xs text-gray-700 uppercase tracking-wider">
+                      Expense Type
+                    </th>
+                    <th className="px-3 md:px-4 lg:px-6 py-3 md:py-4 text-left font-semibold text-xs text-gray-700 uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="px-3 md:px-4 lg:px-6 py-3 md:py-4 text-left font-semibold text-xs text-gray-700 uppercase tracking-wider">
+                      Date Submitted
+                    </th>
+                    <th className="px-3 md:px-4 lg:px-6 py-3 md:py-4 text-left font-semibold text-xs text-gray-700 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-3 md:px-4 lg:px-6 py-3 md:py-4 text-left font-semibold text-xs text-gray-700 uppercase tracking-wider">
+                      Action
+                    </th>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                </thead>
+                <tbody>
+                  {employeeReimbursements.map((employee) => {
+                    const statusButton = getStatusButton(employee.status);
+                    const statusBadge = getStatusBadge(employee.status);
+                    return (
+                      <tr key={employee.id} className="border-b border-gray-100 transition-colors hover:bg-gray-50 last:border-b-0">
+                        <td className="px-3 md:px-4 lg:px-6 py-3 md:py-4 lg:py-5 font-semibold text-gray-900 text-sm md:text-base">
+                          {employee.name}
+                        </td>
+                        <td className="px-3 md:px-4 lg:px-6 py-3 md:py-4 lg:py-5 text-gray-700 text-sm md:text-base">
+                          {employee.type}
+                        </td>
+                        <td className="px-3 md:px-4 lg:px-6 py-3 md:py-4 lg:py-5 font-semibold text-teal-600 text-base md:text-lg">
+                          ${employee.amount.toFixed(2)}
+                        </td>
+                        <td className="px-3 md:px-4 lg:px-6 py-3 md:py-4 lg:py-5 text-gray-700 text-sm md:text-base">
+                          {employee.date}
+                        </td>
+                        <td className="px-3 md:px-4 lg:px-6 py-3 md:py-4 lg:py-5">
+                          <span className={`inline-block px-2 md:px-3 py-1 rounded-full text-[10px] md:text-[11px] font-semibold uppercase tracking-wider min-w-[80px] md:min-w-[100px] text-center ${statusBadge}`}>
+                            {employee.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </span>
+                        </td>
+                        <td className="px-3 md:px-4 lg:px-6 py-3 md:py-4 lg:py-5">
+                          <button className={`px-3 md:px-4 py-2 rounded-md font-medium text-xs md:text-sm border-none cursor-pointer transition-colors text-white w-[100px] md:w-[132px] h-8 md:h-10 inline-flex items-center justify-center text-center whitespace-nowrap ${statusButton.class}`}>
+                            {statusButton.text}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

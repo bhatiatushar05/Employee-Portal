@@ -1,46 +1,43 @@
 import React from 'react';
 import { MoreVertical } from 'lucide-react';
 import { checkedInEmployees, checkedOutEmployees } from '../../data/mockData';
-import './EmployeeCheckTabs.css';
+// Removed: import './EmployeeCheckTabs.css';
 
 const EmployeeCheckTabs = ({ activeTab, setActiveTab }) => {
   const currentEmployees = activeTab === 'checkin' ? checkedInEmployees : checkedOutEmployees;
 
   return (
     <div>
-      <div className="employee-check-tabs-header">
+      <div className="flex border-b border-gray-200">
         <button 
           onClick={() => setActiveTab('checkin')}
-          className={`employee-check-tab ${activeTab === 'checkin' ? 'employee-check-tab-active' : ''}`}
+          className={`px-4 py-3 border-b-2 text-gray-500 font-medium bg-transparent border-none cursor-pointer text-base outline-none ${activeTab === 'checkin' ? 'border-teal-600 text-teal-600' : 'border-transparent'}`}
         >
           Check-In
         </button>
         <button 
           onClick={() => setActiveTab('checkout')}
-          className={`employee-check-tab ${activeTab === 'checkout' ? 'employee-check-tab-active' : ''}`}
+          className={`px-4 py-3 border-b-2 text-gray-500 font-medium bg-transparent border-none cursor-pointer text-base outline-none ${activeTab === 'checkout' ? 'border-teal-600 text-teal-600' : 'border-transparent'}`}
         >
           Check-Out
         </button>
       </div>
-      
       {/* Employee List */}
-      <div className="employee-check-list">
+      <div className="mt-4 flex flex-col gap-3 max-h-[400px] overflow-y-auto">
         {currentEmployees.map((employee, index) => (
-          <div key={index} className="employee-check-item">
-            <div className="employee-check-item-content">
-              <div className="employee-check-avatar">
+          <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-base">
                 {employee.avatar}
               </div>
-              <div className="employee-check-info">
-                <div className="employee-check-name">{employee.name}</div>
-                <div className="employee-check-datetime">{employee.fullDateTime}</div>
+              <div>
+                <div className="font-medium text-gray-800">{employee.name}</div>
+                <div className="text-sm text-gray-500">{employee.fullDateTime}</div>
               </div>
             </div>
-            <div className="employee-check-actions">
-              <div className={`employee-check-status ${activeTab === 'checkin' ? 'employee-check-status-in' : 'employee-check-status-out'}`}>
-                {activeTab === 'checkin' ? 'IN' : 'OUT'}
-              </div>
-              <MoreVertical size={16} className="employee-check-menu" />
+            <div className="flex items-center gap-2">
+              <div className={`px-2 py-1 rounded-xl text-xs font-medium ${activeTab === 'checkin' ? 'bg-emerald-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>{activeTab === 'checkin' ? 'IN' : 'OUT'}</div>
+              <MoreVertical size={16} className="text-gray-400" />
             </div>
           </div>
         ))}
