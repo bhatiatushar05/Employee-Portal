@@ -1,11 +1,26 @@
 import React from 'react';
 import { Search, User } from 'lucide-react';
-import CCTVFeed from '../CCTVFeed/CCTVFeed';
+import FaceRecognitionAttendance from '../CCTVFeed/FaceRecognitionAttendance';
 import MotionEvents from '../MotionEvents/MotionEvents';
 import EmployeeCheckTabs from '../EmployeeCheckTabs/EmployeeCheckTabs';
 // Removed: import './CCTVMonitoring.css';
 
 const CCTVMonitoring = ({ activeTab, setActiveTab }) => {
+  // Attendance log state
+  const [attendanceLogs, setAttendanceLogs] = React.useState([]);
+
+  // Handler for check-in/out
+  const handleCheckInOut = (photo) => {
+    setAttendanceLogs((prev) => [
+      {
+        name: 'User',
+        time: new Date().toLocaleString(),
+        photo,
+      },
+      ...prev,
+    ]);
+  };
+
   return (
     <div className="flex-1 p-8 bg-gray-50 overflow-y-auto">
       <div className="flex justify-between items-center mb-8">
@@ -17,14 +32,14 @@ const CCTVMonitoring = ({ activeTab, setActiveTab }) => {
         </div>
       </div>
       <div className="grid grid-cols-[2fr_1fr] gap-8 max-w-[1400px] mx-auto">
-        {/* Left Column - CCTV Feed and Motion Events */}
+        {/* Left Column - Face Recognition Attendance */}
         <div className="flex flex-col gap-6">
-          <CCTVFeed />
+          <FaceRecognitionAttendance onCheckInOut={handleCheckInOut} />
           <MotionEvents />
         </div>
         {/* Right Sidebar */}
         <div className="flex flex-col gap-6">
-          <EmployeeCheckTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+          <EmployeeCheckTabs activeTab={activeTab} setActiveTab={setActiveTab} attendanceLogs={attendanceLogs} />
           <MotionEvents sidebar={true} />
         </div>
       </div>

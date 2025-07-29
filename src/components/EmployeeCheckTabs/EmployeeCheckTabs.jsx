@@ -3,7 +3,7 @@ import { MoreVertical } from 'lucide-react';
 import { checkedInEmployees, checkedOutEmployees } from '../../data/mockData';
 // Removed: import './EmployeeCheckTabs.css';
 
-const EmployeeCheckTabs = ({ activeTab, setActiveTab }) => {
+const EmployeeCheckTabs = ({ activeTab, setActiveTab, attendanceLogs = [] }) => {
   const currentEmployees = activeTab === 'checkin' ? checkedInEmployees : checkedOutEmployees;
 
   return (
@@ -22,6 +22,23 @@ const EmployeeCheckTabs = ({ activeTab, setActiveTab }) => {
           Check-Out
         </button>
       </div>
+      {/* Attendance Logs with Photos */}
+      {attendanceLogs.length > 0 && (
+        <div className="mt-4 flex flex-col gap-3">
+          {attendanceLogs.map((log, idx) => (
+            <div key={idx} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200 shadow-sm">
+              <div className="flex items-center gap-3">
+                <img src={log.photo} alt="Attendance" className="w-10 h-10 rounded-full object-cover border-2 border-blue-400" />
+                <div>
+                  <div className="font-medium text-gray-800">{log.name}</div>
+                  <div className="text-sm text-gray-500">{log.time}</div>
+                </div>
+              </div>
+              <div className="px-2 py-1 rounded-xl text-xs font-medium bg-blue-100 text-blue-800">Photo Log</div>
+            </div>
+          ))}
+        </div>
+      )}
       {/* Employee List */}
       <div className="mt-4 flex flex-col gap-3 max-h-[400px] overflow-y-auto">
         {currentEmployees.map((employee, index) => (

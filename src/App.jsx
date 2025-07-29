@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import HomePage from './components/HomePage';
+import HomePage from './components/HomePage/HomePage';
 import Sidebar from './components/Sidebar/Sidebar';
 import EmployeePortal from './components/EmployeePortal/EmployeePortal';
 import AccountsPortal from './components/AccountsPortal/AccountsPortal';
 import CCTVMonitoring from './components/CCTVMonitoring/CCTVMonitoring';
+import ChatBot from './components/ChatBot/ChatBot'
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -87,6 +88,7 @@ const App = () => {
         setSidebarOpen={setSidebarOpen}
         onLogout={handleLogout}
       />
+      <ChatBot/>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col pt-16 md:pt-0 min-h-0">
