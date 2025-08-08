@@ -54,6 +54,22 @@ export const expenseRequests = [
     submittedDate: 'Aug 18, 2024',
     status: 'approved',
     stages: ['request', 'verification', 'approved', 'payment', 'reimbursed']
+  },
+  {
+    id: 8,
+    type: 'Meals & Entertainment',
+    amount: 99.99,
+    submittedDate: 'Feb 1, 2025',
+    status: 'approved',
+    stages: ['request', 'verification', 'approved', 'payment', 'reimbursed']
+  },
+  {
+    id: 9,
+    type: 'Travel Expenses',
+    amount: 210.00,
+    submittedDate: 'Feb 2, 2025',
+    status: 'payment',
+    stages: ['request', 'verification', 'approved', 'payment', 'reimbursed']
   }
 ];
 
