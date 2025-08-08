@@ -7,7 +7,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import EmployeePortal from './components/EmployeePortal/EmployeePortal';
 import AccountsPortal from './components/AccountsPortal/AccountsPortal';
 import CCTVMonitoring from './components/CCTVMonitoring/CCTVMonitoring';
-import ChatBot from './components/ChatBot/ChatBot';
+
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -139,8 +139,6 @@ const App = () => {
             {renderContent()}
           </div>
         </div>
-
-        <ChatBot/>
       </div>
     </SkeletonTheme>
   );

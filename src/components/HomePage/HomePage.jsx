@@ -26,7 +26,7 @@ const HomePage = ({ onLogin }) => {
     };
   }, []);
 
-  const handleSignIn = async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     
@@ -124,9 +124,9 @@ const HomePage = ({ onLogin }) => {
             </div>
           </div>
 
-          {/* Right Side - Sign In Form Skeleton */}
+          {/* Right Side - Sign Up Form Skeleton */}
           <div className="w-full lg:w-1/2 flex items-center justify-center px-8 py-16">
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-sm">
               {/* Mobile Logo Skeleton */}
               <div className="lg:hidden text-center mb-8">
                 <div className="flex items-center justify-center mb-4">
@@ -136,10 +136,10 @@ const HomePage = ({ onLogin }) => {
                 <Skeleton height={16} width="200px" />
               </div>
 
-              {/* Sign In Card Skeleton */}
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl">
+              {/* Sign Up Card Skeleton */}
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-2xl">
                 <div className="text-center mb-8">
-                  <Skeleton height={32} width="60%" className="mb-2 mx-auto" />
+                  <Skeleton height={28} width="70%" className="mb-2 mx-auto" />
                   <Skeleton height={16} width="50%" className="mx-auto" />
                 </div>
 
@@ -147,22 +147,19 @@ const HomePage = ({ onLogin }) => {
                   {/* Form Fields Skeleton */}
                   {[...Array(3)].map((_, index) => (
                     <div key={index} className="space-y-2">
-                      <Skeleton height={16} width="30%" />
-                      <Skeleton height={48} width="100%" className="rounded-xl" />
+                      <Skeleton height={14} width="35%" />
+                      <Skeleton height={44} width="100%" className="rounded-xl" />
                     </div>
                   ))}
 
                   {/* Remember Me & Forgot Password Skeleton */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <Skeleton height={16} width={16} className="mr-2" />
-                      <Skeleton height={14} width="80px" />
-                    </div>
-                    <Skeleton height={14} width="100px" />
+                  <div className="flex items-center">
+                    <Skeleton height={16} width={16} className="mr-2" />
+                    <Skeleton height={14} width="150px" />
                   </div>
 
-                  {/* Sign In Button Skeleton */}
-                  <Skeleton height={48} width="100%" className="rounded-xl" />
+                  {/* Sign Up Button Skeleton */}
+                  <Skeleton height={44} width="100%" className="rounded-xl" />
 
                   {/* Demo Credentials Skeleton */}
               <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
@@ -259,9 +256,9 @@ const HomePage = ({ onLogin }) => {
           </div>
         </div>
 
-        {/* Right Side - Sign In Form */}
+        {/* Right Side - Sign Up Form */}
         <div className="w-full lg:w-1/2 flex items-center justify-center px-8 py-16">
-          <div className="w-full max-w-md">
+          <div className="w-full max-w-sm">
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8 opacity-0 animate-fade-in" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
               <div className="flex items-center justify-center mb-4">
@@ -271,11 +268,11 @@ const HomePage = ({ onLogin }) => {
               <p className="text-slate-300">Employee Management System</p>
             </div>
 
-            {/* Sign In Card */}
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-2xl opacity-0 animate-fade-in" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
+            {/* Sign Up Card */}
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-2xl opacity-0 animate-fade-in" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-                <p className="text-slate-300">Sign in to access your portal</p>
+                <h2 className="text-2xl font-bold text-white mb-2">Create your account</h2>
+                <p className="text-slate-300">Sign up to access your portal</p>
               </div>
 
               <div className="space-y-6">
@@ -343,32 +340,29 @@ const HomePage = ({ onLogin }) => {
                   </div>
                 </div>
 
-                {/* Remember Me & Forgot Password */}
-                <div className="flex items-center justify-between text-sm">
+                {/* Terms consent */}
+                <div className="flex items-center text-sm">
                   <label className="flex items-center text-slate-300">
                     <input type="checkbox" className="w-4 h-4 text-orange-400 bg-transparent border border-white/20 rounded focus:ring-orange-400 focus:ring-2" />
-                    <span className="ml-2">Remember me</span>
+                    <span className="ml-2">I agree to the Terms</span>
                   </label>
-                  <a href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-200">
-                    Forgot password?
-                  </a>
                 </div>
 
-                {/* Sign In Button */}
+                {/* Sign Up Button */}
                 <button
                   type="button"
-                  onClick={handleSignIn}
+                  onClick={handleSignUp}
                   disabled={isLoading}
                   className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
                 >
                   {isLoading ? (
                     <div className="flex items-center">
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                      Signing In...
+                      Creating account...
                     </div>
                   ) : (
                     <div className="flex items-center">
-                      Sign In
+                      Sign Up
                       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
                     </div>
                   )}
@@ -389,10 +383,8 @@ const HomePage = ({ onLogin }) => {
             {/* Bottom Links */}
             <div className="text-center mt-6 opacity-0 animate-fade-in" style={{ animationDelay: '600ms', animationFillMode: 'forwards' }}>
               <p className="text-slate-400 text-sm">
-                Don't have an account? 
-                <a href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-200 ml-1">
-                  Contact IT Support
-                </a>
+                Already have an account?
+                <a href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-200 ml-1">Sign in</a>
               </p>
             </div>
           </div>

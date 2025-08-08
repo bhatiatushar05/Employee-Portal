@@ -73,13 +73,6 @@ const Dashboard = ({ user }) => {
 
   const upcomingFeatures = [
     {
-      icon: <MessageCircle className="w-6 h-6" />,
-      title: "AI Chat Assistant",
-      description: "Smart chatbot for instant support and queries",
-      status: "Coming Soon",
-      color: "from-blue-500 to-cyan-500"
-    },
-    {
       icon: <Video className="w-6 h-6" />,
       title: "Video Calling",
       description: "Integrated video conferencing for team meetings",
