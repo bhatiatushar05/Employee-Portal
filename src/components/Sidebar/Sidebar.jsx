@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, PieChart, Camera, CheckCircle, FolderOpen, Settings, X, LogOut, Building2, LayoutDashboard, User, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, PieChart, Camera, CheckCircle, FolderOpen, Settings, X, LogOut, Building2, LayoutDashboard, User, ChevronLeft, ChevronRight, Clock, Users } from 'lucide-react';
 
 const Sidebar = ({ 
   activeSection, 
@@ -71,48 +71,52 @@ const Sidebar = ({
           </button>
         </div>
 
-        <div className="flex-1 flex flex-col p-4 md:p-5 pt-2 md:pt-4 pb-3 min-h-0">
-          {/* Enhanced Logo Section - Compact */}
-          <div className="flex items-center gap-3 mb-4 pl-1 animate-slide-in-left flex-shrink-0">
-            <div className="relative">
-              <Building2 className="w-7 h-7 text-blue-300" />
-              <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-400 rounded-full animate-pulse"></div>
-            </div>
-            <div>
-              <div className="text-lg md:text-xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                Portal
+        {/* Main Content Container - Fixed height and scrollable */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          {/* Top Section - Fixed */}
+          <div className="flex-shrink-0 p-4 md:p-5 pt-2 md:pt-4">
+            {/* Enhanced Logo Section - Compact */}
+            <div className="flex items-center gap-3 mb-4 pl-1 animate-slide-in-left">
+              <div className="relative">
+                <Building2 className="w-7 h-7 text-blue-300" />
+                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-400 rounded-full animate-pulse"></div>
               </div>
-              <div className="text-xs text-blue-300 font-medium">Employee System</div>
+              <div>
+                <div className="text-lg md:text-xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                  Portal
+                </div>
+                <div className="text-xs text-blue-300 font-medium">Employee System</div>
+              </div>
             </div>
-          </div>
 
-          {/* User Welcome Section - Compact */}
-          {user && (
-            <div className="bg-blue-700/30 backdrop-blur-sm border border-blue-600/20 rounded-xl p-3 mb-4 animate-slide-in-left flex-shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="p-1.5 bg-blue-600/50 rounded-lg">
-                  <User size={14} className="text-blue-200" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold text-white">
-                    {user.fullName ? `Welcome, ${user.fullName.split(' ')[0]}!` : 'Welcome!'}
+            {/* User Welcome Section - Compact */}
+            {user && (
+              <div className="bg-blue-700/30 backdrop-blur-sm border border-blue-600/20 rounded-xl p-3 mb-4 animate-slide-in-left">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 bg-blue-600/50 rounded-lg">
+                    <User size={14} className="text-blue-200" />
                   </div>
-                  <div className="text-xs text-blue-300">
-                    {user.email || 'Employee Portal'}
+                  <div>
+                    <div className="text-sm font-semibold text-white">
+                      {user.fullName ? `Welcome, ${user.fullName.split(' ')[0]}!` : 'Welcome!'}
+                    </div>
+                    <div className="text-xs text-blue-300">
+                      {user.email || 'Employee Portal'}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
           
-          {/* Navigation - Flexible container */}
-          <div className="flex-1 flex flex-col min-h-0">
-            <div className="text-xs font-bold text-blue-200 mb-3 pl-3 uppercase tracking-wider animate-slide-in-left-delay flex-shrink-0">
+          {/* Scrollable Navigation Section */}
+          <div className="flex-1 px-4 md:px-5 overflow-y-auto min-h-0">
+            <div className="text-xs font-bold text-blue-200 mb-3 pl-3 uppercase tracking-wider animate-slide-in-left-delay">
               MAIN NAVIGATION
             </div>
             
             {/* Navigation buttons - Compact spacing */}
-            <div className="flex flex-col gap-1.5 flex-1">
+            <div className="flex flex-col gap-1.5">
               {/* Dashboard Button */}
               <button 
                 onClick={() => handleSectionChange('dashboard')}
@@ -120,7 +124,7 @@ const Sidebar = ({
                   group w-full flex items-center gap-3 p-3 rounded-xl 
                   bg-transparent border-none text-white cursor-pointer 
                   text-sm font-medium transition-all duration-300 text-left
-                  hover:scale-105T
+                  hover:scale-105
                   ${activeSection === 'dashboard' 
                     ? 'bg-gradient-to-r from-blue-600 to-sky-600 shadow-lg shadow-blue-500/25' 
                     : 'hover:bg-blue-700/50 hover:shadow-md'
@@ -156,6 +160,54 @@ const Sidebar = ({
                 </div>
                 <span className="font-semibold">Employee Portal</span>
                 {activeSection === 'employee' && (
+                  <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                )}
+              </button>
+
+              {/* Attendance Section */}
+              <button 
+                onClick={() => handleSectionChange('attendance')}
+                className={`
+                  group w-full flex items-center gap-3 p-3 rounded-xl 
+                  bg-transparent border-none text-white cursor-pointer 
+                  text-sm font-medium transition-all duration-300 text-left
+                  hover:scale-105
+                  ${activeSection === 'attendance' 
+                    ? 'bg-gradient-to-r from-blue-600 to-sky-600 shadow-lg shadow-blue-500/25' 
+                    : 'hover:bg-blue-700/50 hover:shadow-md'
+                  }
+                  animate-slide-in-left-delay-2
+                `}
+              >
+                <div className={`p-1.5 rounded-lg transition-all duration-300 ${activeSection === 'attendance' ? 'bg-white/20' : 'group-hover:bg-white/10'}`}>
+                  <Clock size={18} />
+                </div>
+                <span className="font-semibold">Attendance</span>
+                {activeSection === 'attendance' && (
+                  <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                )}
+              </button>
+
+              {/* Visitor Management Section */}
+              <button 
+                onClick={() => handleSectionChange('visitor')}
+                className={`
+                  group w-full flex items-center gap-3 p-3 rounded-xl 
+                  bg-transparent border-none text-white cursor-pointer 
+                  text-sm font-medium transition-all duration-300 text-left
+                  hover:scale-105
+                  ${activeSection === 'visitor' 
+                    ? 'bg-gradient-to-r from-blue-600 to-sky-600 shadow-lg shadow-blue-500/25' 
+                    : 'hover:bg-blue-700/50 hover:shadow-md'
+                  }
+                  animate-slide-in-left-delay-2
+                `}
+              >
+                <div className={`p-1.5 rounded-lg transition-all duration-300 ${activeSection === 'visitor' ? 'bg-white/20' : 'group-hover:bg-white/10'}`}>
+                  <Users size={18} />
+                </div>
+                <span className="font-semibold">Visitor Management</span>
+                {activeSection === 'visitor' && (
                   <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse"></div>
                 )}
               </button>
@@ -206,7 +258,7 @@ const Sidebar = ({
                 )}
               </button>
               
-              <div className="text-xs font-bold text-blue-200 mb-3 mt-4 pl-3 uppercase tracking-wider animate-slide-in-left-delay flex-shrink-0">
+              <div className="text-xs font-bold text-blue-200 mb-3 mt-4 pl-3 uppercase tracking-wider animate-slide-in-left-delay">
                 TOOLS
               </div>
               
@@ -245,7 +297,7 @@ const Sidebar = ({
           </div>
           
           {/* Bottom section - Fixed at bottom */}
-          <div className="pt-3 border-t border-blue-200/20 flex-shrink-0">
+          <div className="flex-shrink-0 px-4 md:px-5 pb-3 md:pb-4 pt-3 border-t border-blue-200/20">
             <button 
               onClick={() => handleSectionChange('settings')}
               className="

@@ -319,7 +319,7 @@ const Dashboard = ({ user }) => {
             </div>
             
             <div className="flex items-center space-x-4">
-              <div className="bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer">
+              <div className="bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:shadow-lg hover:scale-[1.035] transition-all duration-300 cursor-pointer">
                 <div className="flex items-center space-x-3">
                   <Calendar className="w-5 h-5 text-gray-500" />
                   <span className="text-sm font-medium text-gray-700">
@@ -333,7 +333,7 @@ const Dashboard = ({ user }) => {
                 </div>
               </div>
               
-              <div className="bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer">
+              <div className="bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 hover:shadow-lg hover:scale-[1.035] transition-all duration-300 cursor-pointer">
                 <div className="flex items-center space-x-3">
                   <Clock className="w-5 h-5 text-gray-500" />
                   <span className="text-sm font-medium text-gray-700 font-mono">
@@ -354,7 +354,7 @@ const Dashboard = ({ user }) => {
             {quickStats.map((stat, index) => (
               <div
                 key={index}
-                className={`${stat.color} rounded-xl p-6 border-2 hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group relative overflow-hidden`}
+                className={`${stat.color} rounded-xl p-6 border-2 hover:shadow-lg transition-all duration-300 hover:scale-[1.035] cursor-pointer group relative overflow-hidden`}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="relative z-10">
@@ -376,9 +376,9 @@ const Dashboard = ({ user }) => {
           {/* Left Column - Recent Activity & Updates */}
           <div className="xl:col-span-2 space-y-6">
             {/* Upcoming Features */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer group">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.014] cursor-pointer group">
               <div className="flex items-center mb-6">
-                <div className="p-2 bg-gradient-to-r from-blue-500 to-orange-500 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-300">
+                <div className="p-2 bg-gradient-to-r from-blue-500 to-orange-500 rounded-lg mr-3 group-hover:scale-[1.077] transition-transform duration-300">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">Coming Soon</h2>
@@ -388,10 +388,10 @@ const Dashboard = ({ user }) => {
                 {upcomingFeatures.map((feature, index) => (
                   <div
                     key={index}
-                    className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all duration-300 hover:scale-105 cursor-pointer group"
+                    className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all duration-300 hover:scale-[1.035] cursor-pointer group"
                   >
                     <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${feature.color} opacity-10 rounded-full -mr-10 -mt-10 group-hover:opacity-20 transition-opacity duration-300`}></div>
-                    <div className={`p-2 bg-gradient-to-r ${feature.color} rounded-lg inline-block mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                    <div className={`p-2 bg-gradient-to-r ${feature.color} rounded-lg inline-block mb-3 group-hover:scale-[1.077] transition-transform duration-300`}>
                       <div className="text-white">
                         {feature.icon}
                       </div>
@@ -407,10 +407,10 @@ const Dashboard = ({ user }) => {
             </div>
 
             {/* Recent Employee Requests */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer group flex flex-col min-h-[607px]">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.014] cursor-pointer group flex flex-col min-h-[607px]">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center">
-                  <div className="p-2 bg-orange-100 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-300">
+                  <div className="p-2 bg-orange-100 rounded-lg mr-3 group-hover:scale-[1.077] transition-transform duration-300">
                     <FileText className="w-5 h-5 text-orange-600" />
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">Recent Requests</h2>
@@ -425,10 +425,10 @@ const Dashboard = ({ user }) => {
                   {dashboardData.employeePortal.recentRequests.map((request, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all duration-200 hover:scale-[1.02] cursor-pointer group"
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all duration-200 hover:scale-[1.014] cursor-pointer group"
                     >
                       <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center group-hover:scale-[1.077] transition-transform duration-300">
                           <span className="text-orange-600 font-semibold text-sm">
                             {request.id.replace('#', '')}
                           </span>
@@ -477,34 +477,34 @@ const Dashboard = ({ user }) => {
           {/* Right Column - Quick Access & System Status */}
           <div className="space-y-7">
             {/* System Overview */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer group">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.014] cursor-pointer group">
               <div className="flex items-center mb-6">
-                <div className="p-2 bg-blue-100 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-300">
+                <div className="p-2 bg-blue-100 rounded-lg mr-3 group-hover:scale-[1.077] transition-transform duration-300">
                   <LayoutDashboard className="w-5 h-5 text-blue-600" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">System Overview</h2>
               </div>
               
               <div className="space-y-6">
-                <div className="flex items-center justify-between p-4 bg-orange-50 rounded-xl hover:bg-orange-100 transition-all duration-300 hover:scale-[1.02] cursor-pointer group">
+                <div className="flex items-center justify-between p-4 bg-orange-50 rounded-xl hover:bg-orange-100 transition-all duration-300 hover:scale-[1.014] cursor-pointer group">
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 text-orange-600 group-hover:scale-110 transition-transform duration-300" />
+                    <CheckCircle className="w-5 h-5 text-orange-600 group-hover:scale-[1.077] transition-transform duration-300" />
                     <span className="font-medium text-gray-900">Employee Portal</span>
                   </div>
                   <span className="text-sm text-orange-600 font-medium">Active</span>
                 </div>
                 
-                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 hover:scale-[1.02] cursor-pointer group">
+                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 hover:scale-[1.014] cursor-pointer group">
                   <div className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 text-blue-600 group-hover:scale-110 transition-transform duration-300" />
+                    <CheckCircle className="w-5 h-5 text-blue-600 group-hover:scale-[1.077] transition-transform duration-300" />
                     <span className="font-medium text-gray-900">Accounts Portal</span>
                   </div>
                   <span className="text-sm text-blue-600 font-medium">Active</span>
                 </div>
                 
-                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-all duration-300 hover:scale-[1.02] cursor-pointer group">
+                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-all duration-300 hover:scale-[1.014] cursor-pointer group">
                   <div className="flex items-center space-x-3">
-                    <Eye className="w-5 h-5 text-purple-600 group-hover:scale-110 transition-transform duration-300" />
+                    <Eye className="w-5 h-5 text-purple-600 group-hover:scale-[1.077] transition-transform duration-300" />
                     <span className="font-medium text-gray-900">CCTV System</span>
                   </div>
                   <span className="text-sm text-purple-600 font-medium">Monitoring</span>
@@ -513,9 +513,9 @@ const Dashboard = ({ user }) => {
             </div>
 
             {/* Account Summary */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer group">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.014] cursor-pointer group">
               <div className="flex items-center mb-6">
-                <div className="p-2 bg-green-100 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-300">
+                <div className="p-2 bg-green-100 rounded-lg mr-3 group-hover:scale-[1.077] transition-transform duration-300">
                   <DollarSign className="w-5 h-5 text-green-600" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">Account Summary</h2>
@@ -552,9 +552,9 @@ const Dashboard = ({ user }) => {
             </div>
 
             {/* Security Status */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer group">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.014] cursor-pointer group">
               <div className="flex items-center mb-6">
-                <div className="p-2 bg-indigo-100 rounded-lg mr-3 group-hover:scale-110 transition-transform duration-300">
+                <div className="p-2 bg-indigo-100 rounded-lg mr-3 group-hover:scale-[1.077] transition-transform duration-300">
                   <Shield className="w-5 h-5 text-indigo-600" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">Security Status</h2>

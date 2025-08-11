@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import { User, Lock, Eye, EyeOff, Building2, Users, CreditCard, Monitor, CheckCircle, ArrowRight, Sparkles, Mail } from 'lucide-react';
 
 const HomePage = ({ onLogin }) => {
@@ -9,19 +8,19 @@ const HomePage = ({ onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [animateCards, setAnimateCards] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
-    // Simulate initial page load
-    const initialTimer = setTimeout(() => {
-      setInitialLoading(false);
-    }, 2000);
+    // Show content immediately with a smooth fade-in
+    const contentTimer = setTimeout(() => {
+      setShowContent(true);
+    }, 100);
 
-    // Trigger card animations after component mounts
-    const animationTimer = setTimeout(() => setAnimateCards(true), 2300);
+    // Trigger card animations after content shows
+    const animationTimer = setTimeout(() => setAnimateCards(true), 600);
     
     return () => {
-      clearTimeout(initialTimer);
+      clearTimeout(contentTimer);
       clearTimeout(animationTimer);
     };
   }, []);
@@ -71,10 +70,10 @@ const HomePage = ({ onLogin }) => {
     }
   ];
 
-  if (initialLoading) {
+  // Simple loading overlay instead of skeleton
+  if (!showContent) {
     return (
-      <SkeletonTheme baseColor="#3a1f0a" highlightColor="#a16207">
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-orange-950 to-orange-900 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-orange-950 to-orange-900 relative overflow-hidden flex items-center justify-center">
         {/* Animated Background Elements */}
         <div className="absolute inset-0">
           <div className="absolute top-10 left-10 w-72 h-72 bg-orange-500/15 rounded-full blur-3xl animate-pulse"></div>
@@ -82,106 +81,20 @@ const HomePage = ({ onLogin }) => {
           <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-amber-500/15 rounded-full blur-3xl animate-pulse delay-2000"></div>
         </div>
 
-        <div className="relative z-10 flex min-h-screen max-w-7xl mx-auto">
-          {/* Left Side - Skeleton for Branding & Features */}
-          <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-12 py-16">
-            <div className="max-w-md mx-auto">
-              {/* Logo & Title Skeleton */}
-              <div className="mb-12">
-                <div className="flex items-center mb-6">
-                  <div className="relative">
-                    <Skeleton height={48} width={48} className="rounded-lg" />
-                  </div>
-                  <div className="ml-4 flex-1">
-                    <Skeleton height={32} width="60%" className="mb-2" />
-                    <Skeleton height={16} width="80%" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Skeleton height={16} width="100%" />
-                  <Skeleton height={16} width="90%" />
-                  <Skeleton height={16} width="95%" />
-                </div>
-              </div>
-
-              {/* Feature Cards Skeleton */}
-              <div className="space-y-4">
-                {[...Array(4)].map((_, index) => (
-                  <div key={index} className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-                    <div className="flex items-start space-x-4">
-                      <Skeleton height={32} width={32} className="rounded-lg flex-shrink-0 mt-1" />
-                      <div className="flex-1">
-                        <Skeleton height={20} width="70%" className="mb-2" />
-                        <div className="space-y-1">
-                          <Skeleton height={14} width="100%" />
-                          <Skeleton height={14} width="80%" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+        {/* Simple loading indicator */}
+        <div className="relative z-10 text-center">
+          <div className="flex items-center justify-center mb-6">
+            <Building2 className="w-16 h-16 text-orange-400 animate-pulse" />
+            <Sparkles className="w-8 h-8 text-amber-300 animate-spin ml-2" />
           </div>
-
-          {/* Right Side - Sign Up Form Skeleton */}
-          <div className="w-full lg:w-1/2 flex items-center justify-center px-8 py-16">
-            <div className="w-full max-w-sm">
-              {/* Mobile Logo Skeleton */}
-              <div className="lg:hidden text-center mb-8">
-                <div className="flex items-center justify-center mb-4">
-                  <Skeleton height={40} width={40} className="rounded-lg mr-3" />
-                  <Skeleton height={32} width="120px" />
-                </div>
-                <Skeleton height={16} width="200px" />
-              </div>
-
-              {/* Sign Up Card Skeleton */}
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-2xl">
-                <div className="text-center mb-8">
-                  <Skeleton height={28} width="70%" className="mb-2 mx-auto" />
-                  <Skeleton height={16} width="50%" className="mx-auto" />
-                </div>
-
-                <div className="space-y-6">
-                  {/* Form Fields Skeleton */}
-                  {[...Array(3)].map((_, index) => (
-                    <div key={index} className="space-y-2">
-                      <Skeleton height={14} width="35%" />
-                      <Skeleton height={44} width="100%" className="rounded-xl" />
-                    </div>
-                  ))}
-
-                  {/* Remember Me & Forgot Password Skeleton */}
-                  <div className="flex items-center">
-                    <Skeleton height={16} width={16} className="mr-2" />
-                    <Skeleton height={14} width="150px" />
-                  </div>
-
-                  {/* Sign Up Button Skeleton */}
-                  <Skeleton height={44} width="100%" className="rounded-xl" />
-
-                  {/* Demo Credentials Skeleton */}
-              <div className="mt-6 p-4 bg-orange-500/10 border border-orange-500/20 rounded-xl">
-                    <Skeleton height={16} width="40%" className="mb-2 mx-auto" />
-                    <div className="space-y-1">
-                      <Skeleton height={12} width="60%" />
-                      <Skeleton height={12} width="70%" />
-                      <Skeleton height={12} width="55%" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Links Skeleton */}
-              <div className="text-center mt-6">
-                <Skeleton height={14} width="80%" className="mx-auto" />
-              </div>
-            </div>
+          <h1 className="text-4xl font-bold text-white mb-2 animate-fade-in">HITS Portal</h1>
+          <div className="flex items-center justify-center space-x-2">
+            <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce delay-100"></div>
+            <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce delay-200"></div>
           </div>
         </div>
       </div>
-      </SkeletonTheme>
     );
   }
 
@@ -210,7 +123,7 @@ const HomePage = ({ onLogin }) => {
         ))}
       </div>
 
-      <div className="relative z-10 flex min-h-screen">
+      <div className="relative z-10 flex min-h-screen opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
         {/* Left Side - Branding & Features */}
         <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-12 py-16">
           <div className="max-w-md mx-auto">
