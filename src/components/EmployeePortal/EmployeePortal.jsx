@@ -1,296 +1,544 @@
-import React, { useState, useEffect } from 'react';
-
-// Mock data for demonstration
-const expenseRequests = [
-  { id: 1, type: 'Travel Expenses', amount: 150.00, description: 'Business trip to New York', submittedDate: 'Apr 5, 2025', status: 'payment' },
-  { id: 2, type: 'Office Supplies', amount: 45.00, description: 'Notebooks and pens', submittedDate: 'Apr 3, 2025', status: 'verification' },
-  { id: 3, type: 'Travel Expenses', amount: 320.00, description: 'Flight tickets for conference', submittedDate: 'Jul 28, 2025', status: 'verification' },
-  { id: 4, type: 'Mileage', amount: 127.00, description: 'Client visits', submittedDate: 'Oct 28, 2024', status: 'approved' },
-  { id: 5, type: 'Equipment Rental', amount: 220.00, description: 'Projector rental', submittedDate: 'Sep 28, 2024', status: 'approved' },
-  { id: 6, type: 'Meals & Entertainment', amount: 120.00, description: 'Client dinner', submittedDate: 'Jan 2, 2024', status: 'approved' },
-  { id: 7, type: 'Transportation', amount: 440.00, description: 'Taxi expenses', submittedDate: 'Aug 18, 2024', status: 'approved' },
-  { id: 8, type: 'Conference Fees', amount: 890.00, description: 'Tech conference registration', submittedDate: 'Mar 15, 2025', status: 'reimbursed' },
-  { id: 9, type: 'Training Materials', amount: 75.00, description: 'Online course materials', submittedDate: 'Feb 10, 2025', status: 'reimbursed' }
-];
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import {
+  Plus, Search, Download,
+  Calendar, DollarSign, Clock, CheckCircle,
+  AlertCircle, XCircle, Banknote, TrendingUp,
+  FileText, Eye, Edit, Trash2, X, MoreVertical, LayoutGrid, List
+} from 'lucide-react';
 
 const EmployeePortal = () => {
-  const [requests, setRequests] = useState(expenseRequests);
-  const [showModal, setShowModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showDescriptionModal, setShowDescriptionModal] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewingRequest, setViewingRequest] = useState(null);
+  const [editingRequestId, setEditingRequestId] = useState(null);
+  const [viewMode, setViewMode] = useState('list');
+  const [openMenuForId, setOpenMenuForId] = useState(null);
+
+  // Close row action menu on Escape
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') setOpenMenuForId(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const toggleRowMenu = useCallback((id) => {
+    setOpenMenuForId((prev) => (prev === id ? null : id));
+  }, []);
+
+  // Initial data (used if no saved data is present)
+  const initialRequests = [
+    {
+      id: '#001',
+      type: 'Travel Expenses',
+      amount: 150.00,
+      submittedDate: '2025-04-05',
+      status: 'payment_processing',
+      description: 'Business trip to New York',
+      category: 'travel'
+    },
+    {
+      id: '#002',
+      type: 'Office Supplies',
+      amount: 45.00,
+      submittedDate: '2025-04-03',
+      status: 'under_verification',
+      description: 'Stationery and printing materials',
+      category: 'office'
+    },
+    {
+      id: '#003',
+      type: 'Travel Expenses',
+      amount: 320.00,
+      submittedDate: '2025-07-28',
+      status: 'under_verification',
+      description: 'Client meeting in Chicago',
+      category: 'travel'
+    },
+    {
+      id: '#004',
+      type: 'Mileage',
+      amount: 127.00,
+      submittedDate: '2024-10-28',
+      status: 'approved',
+      description: 'Monthly mileage reimbursement',
+      category: 'travel'
+    },
+    {
+      id: '#005',
+      type: 'Equipment Rental',
+      amount: 220.00,
+      submittedDate: '2024-09-28',
+      status: 'approved',
+      description: 'Laptop rental for project',
+      category: 'equipment'
+    },
+    {
+      id: '#006',
+      type: 'Meals & Entertainment',
+      amount: 120.00,
+      submittedDate: '2024-01-02',
+      status: 'approved',
+      description: 'Client dinner',
+      category: 'meals'
+    },
+    {
+      id: '#007',
+      type: 'Transportation',
+      amount: 440.00,
+      submittedDate: '2024-08-18',
+      status: 'approved',
+      description: 'Taxi and flight expenses',
+      category: 'travel'
+    },
+    {
+      id: '#008',
+      type: 'Conference Fees',
+      amount: 890.00,
+      submittedDate: '2025-03-15',
+      status: 'reimbursed',
+      description: 'Tech conference registration',
+      category: 'education'
+    }
+  ];
+
+  // Requests state with localStorage persistence
+  const [requests, setRequests] = useState(() => {
+    try {
+      const saved = localStorage.getItem('employee_portal_requests');
+      return saved ? JSON.parse(saved) : initialRequests;
+    } catch (_) {
+      return initialRequests;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('employee_portal_requests', JSON.stringify(requests));
+    } catch (_) {
+      // ignore storage errors to avoid crashing UI
+    }
+  }, [requests]);
+
+  // New request form state
   const [newRequest, setNewRequest] = useState({
     type: '',
     amount: '',
-    description: ''
+    submittedDate: new Date().toISOString().slice(0, 10),
+    status: 'under_verification',
+    description: '',
+    category: 'other'
   });
-  const [updateRequest, setUpdateRequest] = useState({
-    type: '',
-    amount: '',
-    description: ''
-  });
-  const [openMenuId, setOpenMenuId] = useState(null);
 
-  const getStatusBadge = (status) => {
-    switch(status) {
-      case 'reimbursed':
-        return { text: 'Reimbursed', class: 'bg-emerald-100 text-emerald-800' };
-      case 'payment':
-        return { text: 'Payment Processing', class: 'bg-yellow-100 text-yellow-800' };
-      case 'approved':
-        return { text: 'Approved', class: 'bg-blue-100 text-blue-800' };
-      case 'verification':
-        return { text: 'Under Verification', class: 'bg-red-100 text-red-800' };
-      default:
-        return { text: 'Submitted', class: 'bg-gray-100 text-gray-600' };
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewRequest(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmitRequest = (e) => {
-    e.preventDefault();
-    if (newRequest.type && newRequest.amount) {
-      const request = {
-        id: requests.length > 0 ? Math.max(...requests.map(r => r.id)) + 1 : 1,
-        type: newRequest.type,
-        amount: parseFloat(newRequest.amount),
-        description: newRequest.description,
-        submittedDate: new Date().toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric', 
-          year: 'numeric' 
-        }),
-        status: 'verification',
-        stages: ['request', 'verification', 'approved', 'payment', 'reimbursed']
-      };
-      setRequests(prev => [...prev, request].sort((a, b) => {
-        const dateA = new Date(a.submittedDate);
-        const dateB = new Date(b.submittedDate);
-        if (dateB.getTime() !== dateA.getTime()) {
-          return dateB.getTime() - dateA.getTime();
-        }
-        return b.id - a.id;
-      }));
-      setNewRequest({ type: '', amount: '', description: '' });
-      setShowModal(false);
-    }
-  };
-
-  const handleDeleteRequest = (requestId) => {
-    setRequests(prev => prev.filter(request => request.id !== requestId));
-    setOpenMenuId(null);
-  };
-
-  const handleUpdateRequest = (request) => {
-    setSelectedRequest(request);
-    setUpdateRequest({
-      type: request.type,
-      amount: request.amount.toString(),
-      description: request.description || ''
+  const resetNewRequest = useCallback(() => {
+    setNewRequest({
+      type: '',
+      amount: '',
+      submittedDate: new Date().toISOString().slice(0, 10),
+      status: 'under_verification',
+      description: '',
+      category: 'other'
     });
-    setShowUpdateModal(true);
-    setOpenMenuId(null);
-  };
+  }, []);
 
-  const handleViewDescription = (request) => {
-    setSelectedRequest(request);
-    setShowDescriptionModal(true);
-    setOpenMenuId(null);
-  };
-
-  const handleUpdateSubmit = (e) => {
-    e.preventDefault();
-    if (updateRequest.type && updateRequest.amount) {
-      setRequests(prev => prev.map(request => 
-        request.id === selectedRequest.id 
-          ? {
-              ...request,
-              type: updateRequest.type,
-              amount: parseFloat(updateRequest.amount),
-              description: updateRequest.description
-            }
-          : request
-      ));
-      setShowUpdateModal(false);
-      setSelectedRequest(null);
-      setUpdateRequest({ type: '', amount: '', description: '' });
-    }
-  };
-
-  const handleUpdateInputChange = (e) => {
-    const { name, value } = e.target;
-    setUpdateRequest(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const toggleMenu = (requestId) => {
-    setOpenMenuId(openMenuId === requestId ? null : requestId);
-  };
-
-  // Close menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (openMenuId && !event.target.closest('.menu-container')) {
-        setOpenMenuId(null);
+  const getStatusConfig = (status) => {
+    const configs = {
+      payment_processing: {
+        label: 'Payment Processing',
+        className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        icon: Clock
+      },
+      under_verification: {
+        label: 'Under Verification',
+        className: 'bg-orange-100 text-orange-800 border-orange-200',
+        icon: AlertCircle
+      },
+      approved: {
+        label: 'Approved',
+        className: 'bg-blue-100 text-blue-800 border-blue-200',
+        icon: CheckCircle
+      },
+      reimbursed: {
+        label: 'Reimbursed',
+        className: 'bg-green-100 text-green-800 border-green-200',
+        icon: Banknote
+      },
+      rejected: {
+        label: 'Rejected',
+        className: 'bg-red-100 text-red-800 border-red-200',
+        icon: XCircle
       }
     };
+    return configs[status] || configs.under_verification;
+  };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [openMenuId]);
+  // Memoized filtered and sorted data
+  const filteredAndSortedRequests = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    let filtered = requests.filter(request => {
+      const typeLower = String(request.type || '').toLowerCase();
+      const idLower = String(request.id || '').toLowerCase();
+      const descLower = String(request.description || '').toLowerCase();
+      const matchesSearch = !term || typeLower.includes(term) || idLower.includes(term) || descLower.includes(term);
+      const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
 
-  const expenseTypes = [
-    'Travel Expenses',
-    'Office Supplies',
-    'Mileage',
-    'Meals & Entertainment',
-    'Conference Fees',
-    'Transportation',
-    'Training Materials',
-    'Equipment Rental'
-  ];
+    filtered.sort((a, b) => {
+      let compareValue = 0;
+      
+      switch (sortBy) {
+        case 'amount':
+          compareValue = a.amount - b.amount;
+          break;
+        case 'date':
+          compareValue = new Date(a.submittedDate) - new Date(b.submittedDate);
+          break;
+        case 'status':
+          compareValue = a.status.localeCompare(b.status);
+          break;
+        case 'type':
+          compareValue = a.type.localeCompare(b.type);
+          break;
+        default:
+          compareValue = 0;
+      }
+      
+      return sortOrder === 'desc' ? -compareValue : compareValue;
+    });
+
+    return filtered;
+  }, [requests, searchTerm, statusFilter, sortBy, sortOrder]);
+
+  // Calculate summary stats
+  const summaryStats = useMemo(() => {
+    const total = requests.reduce((sum, req) => sum + req.amount, 0);
+    const pending = requests
+      .filter(req => req.status === 'payment_processing' || req.status === 'under_verification')
+      .reduce((sum, req) => sum + req.amount, 0);
+    const approved = requests.filter(req => req.status === 'approved').length;
+    const reimbursed = requests
+      .filter(req => req.status === 'reimbursed')
+      .reduce((sum, req) => sum + req.amount, 0);
+
+    return { total, pending, approved, reimbursed };
+  }, [requests]);
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const openNewRequestModal = useCallback(() => {
+    resetNewRequest();
+    setViewingRequest(null);
+    setEditingRequestId(null);
+    setIsModalOpen(true);
+  }, [resetNewRequest]);
+
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false);
+    setViewingRequest(null);
+    setEditingRequestId(null);
+  }, []);
+
+  const handleNewRequestChange = useCallback((field, value) => {
+    setNewRequest(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  const generateNextId = useCallback(() => {
+    const maxId = requests.reduce((max, r) => {
+      const num = parseInt(String(r.id).replace('#', ''), 10);
+      return Number.isFinite(num) && num > max ? num : max;
+    }, 0);
+    const next = String(maxId + 1).padStart(3, '0');
+    return `#${next}`;
+  }, [requests]);
+
+  const handleCreateRequest = useCallback((e) => {
+    e?.preventDefault?.();
+    const type = newRequest.type.trim();
+    const description = newRequest.description.trim();
+    const amountNumber = Number(newRequest.amount);
+    if (!type || !Number.isFinite(amountNumber) || amountNumber <= 0) return;
+
+    if (editingRequestId) {
+      // update existing
+      setRequests(prev => prev.map(r => r.id === editingRequestId ? {
+        ...r,
+        type,
+        amount: Math.round(amountNumber * 100) / 100,
+        submittedDate: newRequest.submittedDate,
+        status: newRequest.status,
+        description,
+        category: newRequest.category || 'other'
+      } : r));
+    } else {
+      // create new
+      const request = {
+        id: generateNextId(),
+        type,
+        amount: Math.round(amountNumber * 100) / 100,
+        submittedDate: newRequest.submittedDate,
+        status: newRequest.status,
+        description,
+        category: newRequest.category || 'other'
+      };
+      setRequests(prev => [request, ...prev]);
+    }
+    closeModal();
+  }, [newRequest, generateNextId, closeModal, editingRequestId]);
+
+  const handleDelete = useCallback((id) => {
+    setRequests(prev => prev.filter(r => r.id !== id));
+  }, []);
+
+  const exportCsv = useCallback(() => {
+    const header = ['Request ID', 'Expense Type', 'Amount', 'Submitted Date', 'Status', 'Description', 'Category'];
+    const rows = filteredAndSortedRequests.map(r => [
+      r.id,
+      r.type,
+      r.amount,
+      r.submittedDate,
+      r.status,
+      r.description.replace(/\n|\r/g, ' '),
+      r.category
+    ]);
+    const csv = [header, ...rows].map(cols => cols.map(String).map(s => `"${s.replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'employee_requests.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [filteredAndSortedRequests]);
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50">
-      {/* Header - Fixed */}
-      <div className="flex-shrink-0 p-4 md:p-6 lg:p-8 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-100">
-        <div className="max-w-[1400px] mx-auto">
-          <div className="flex justify-between items-start">
-            <div className="space-y-2">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-gray-800 via-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2 leading-tight">
-                Employee Portal
+    <div className="flex-1 min-h-0 h-full overflow-y-auto bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100">
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Header Section */}
+        <div className="mb-12">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Employee <span className="text-orange-600">Portal</span>
               </h1>
-              <p className="text-gray-600 text-lg font-medium">
-                Your Expense Requests & Reimbursements
-              </p>
-              <div className="flex items-center space-x-4 mt-4">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-gray-600 font-medium">Active Portal</span>
-                </div>
-                <div className="w-px h-4 bg-gray-300"></div>
-                <span className="text-sm text-gray-500">{requests.length} Total Requests</span>
+              <p className="text-gray-600 mt-3 text-lg">Manage your expense requests and reimbursements</p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <button onClick={exportCsv} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+                <Download size={16} />
+                <span className="hidden sm:inline">Export</span>
+              </button>
+              <button onClick={openNewRequestModal} className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-blue-600 text-white rounded-lg hover:from-orange-600 hover:to-blue-700 shadow hover:shadow-md transition-all text-sm font-medium">
+                <Plus size={16} />
+                New Request
+              </button>
+              <div className="hidden sm:flex items-center border border-gray-200 rounded-lg overflow-hidden ml-1">
+                <button
+                  aria-label="List view"
+                  onClick={() => setViewMode('list')}
+                  className={`px-2.5 py-1.5 text-xs flex items-center gap-1.5 ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-800'}`}
+                >
+                  <List size={14} />
+                </button>
+                <button
+                  aria-label="Grid view"
+                  onClick={() => setViewMode('grid')}
+                  className={`px-2.5 py-1.5 text-xs flex items-center gap-1.5 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-800'}`}
+                >
+                  <LayoutGrid size={14} />
+                </button>
               </div>
             </div>
-            <button 
-              className="group relative bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-3 md:px-8 md:py-4 rounded-2xl font-semibold border-none cursor-pointer text-sm transition-all duration-300 shadow-lg hover:shadow-2xl hover:scale-105 transform"
-              onClick={() => setShowModal(true)}
-            >
-              <div className="flex items-center space-x-2">
-                <svg className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                <span>New Request</span>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+            <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Total Submitted</p>
+                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(summaryStats.total)}</p>
+                </div>
+                <div className="p-2.5 bg-blue-100 rounded-lg shrink-0">
+                  <DollarSign className="w-5 h-5 text-blue-600" />
+                </div>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </button>
+            </div>
+            
+            <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Pending Amount</p>
+                  <p className="text-2xl font-bold text-orange-600">{formatCurrency(summaryStats.pending)}</p>
+                </div>
+                <div className="p-2.5 bg-orange-100 rounded-lg shrink-0">
+                  <Clock className="w-5 h-5 text-orange-600" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Approved Items</p>
+                  <p className="text-2xl font-bold text-blue-600">{summaryStats.approved}</p>
+                </div>
+                <div className="p-2.5 bg-blue-100 rounded-lg shrink-0">
+                  <CheckCircle className="w-5 h-5 text-blue-600" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Reimbursed</p>
+                  <p className="text-2xl font-bold text-green-600">{formatCurrency(summaryStats.reimbursed)}</p>
+                </div>
+                <div className="p-2.5 bg-green-100 rounded-lg shrink-0">
+                  <TrendingUp className="w-5 h-5 text-green-600" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-auto px-4 md:px-6 lg:px-8 pb-4 md:pb-6 lg:pb-8">
-        <div className="max-w-[1400px] mx-auto">
-          <div className="bg-white/80 backdrop-blur-sm rounded-3xl overflow-hidden shadow-2xl border border-white/20">
+        {/* Filters and Search */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mb-6">
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search requests..."
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Status Filter */}
+            <div className="lg:w-52">
+              <select
+                className="w-full px-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option value="all">All Status</option>
+                <option value="payment_processing">Payment Processing</option>
+                <option value="under_verification">Under Verification</option>
+                <option value="approved">Approved</option>
+                <option value="reimbursed">Reimbursed</option>
+              </select>
+            </div>
+
+            {/* Sort */}
+            <div className="lg:w-52">
+              <select
+                className="w-full px-3 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm"
+                value={`${sortBy}-${sortOrder}`}
+                onChange={(e) => {
+                  const [field, order] = e.target.value.split('-');
+                  setSortBy(field);
+                  setSortOrder(order);
+                }}
+              >
+                <option value="date-desc">Latest First</option>
+                <option value="date-asc">Oldest First</option>
+                <option value="amount-desc">Highest Amount</option>
+                <option value="amount-asc">Lowest Amount</option>
+                <option value="status-asc">Status A-Z</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Requests: List or Grid */}
+        {viewMode === 'list' ? (
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-6">
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse min-w-[800px] lg:min-w-[1000px]">
-                <thead className="bg-gradient-to-r from-emerald-50 to-teal-50 border-b-2 border-emerald-100 sticky top-0">
+              <table className="w-full">
+                <thead className="bg-gradient-to-r from-orange-50 to-blue-50 border-b border-gray-100">
                   <tr>
-                    <th className="px-6 py-6 text-left font-bold text-xs text-emerald-700 uppercase tracking-wider">Request ID</th>
-                    <th className="px-6 py-6 text-left font-bold text-xs text-emerald-700 uppercase tracking-wider">Expense Type</th>
-                    <th className="px-6 py-6 text-left font-bold text-xs text-emerald-700 uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-6 text-left font-bold text-xs text-emerald-700 uppercase tracking-wider">Submitted Date</th>
-                    <th className="px-6 py-6 text-left font-bold text-xs text-emerald-700 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-6 text-left font-bold text-xs text-emerald-700 uppercase tracking-wider">Actions</th>
+                    <th className="text-left py-3 px-5 font-semibold text-gray-900 text-xs">Request ID</th>
+                    <th className="text-left py-3 px-5 font-semibold text-gray-900 text-xs">Expense Type</th>
+                    <th className="text-left py-3 px-5 font-semibold text-gray-900 text-xs">Amount</th>
+                    <th className="text-left py-3 px-5 font-semibold text-gray-900 text-xs">Submitted Date</th>
+                    <th className="text-left py-3 px-5 font-semibold text-gray-900 text-xs">Status</th>
+                    <th className="text-left py-3 px-5 font-semibold text-gray-900 text-xs">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {requests.map((request) => {
-                    const statusBadge = getStatusBadge(request.status);
+                <tbody className="divide-y divide-gray-100">
+                  {filteredAndSortedRequests.map((request) => {
+                    const statusConfig = getStatusConfig(request.status);
+                    const StatusIcon = statusConfig.icon;
                     return (
-                      <tr 
-                        key={request.id} 
-                        className="border-b border-emerald-50 transition-all duration-300 hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-teal-50/50 last:border-b-0 group"
-                      >
-                        <td className="px-6 py-6 font-bold text-emerald-600 font-mono group-hover:text-emerald-700 transition-colors">
-                          #{request.id.toString().padStart(3, '0')}
-                        </td>
-                        <td className="px-6 py-6 font-semibold text-gray-800 group-hover:text-gray-900 transition-colors">
-                          {request.type}
-                        </td>
-                        <td className="px-6 py-6 font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 text-xl group-hover:from-emerald-700 group-hover:to-teal-700 transition-all duration-300">
-                          ${request.amount.toFixed(2)}
-                        </td>
-                        <td className="px-6 py-6 text-gray-600 group-hover:text-gray-700 transition-colors">
-                          {request.submittedDate}
-                        </td>
-                        <td className="px-6 py-6">
-                          <span className={`inline-block px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider min-w-[140px] text-center shadow-sm transition-all duration-300 group-hover:scale-105 ${statusBadge.class}`}>
-                            {statusBadge.text}
-                          </span>
-                        </td>
-                        <td className="px-6 py-6 relative">
-                          <button
-                            onClick={() => toggleMenu(request.id)}
-                            className="p-3 rounded-xl text-emerald-500 hover:text-emerald-600 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 transition-all duration-300 group-hover:scale-110"
-                            title="Actions"
-                          >
-                            <svg className="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" fill="currentColor" viewBox="0 0 20 20">
-                              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                            </svg>
-                          </button>
-                          
-                          {/* Dropdown Menu */}
-                          {openMenuId === request.id && (
-                            <div className="absolute right-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-emerald-100 z-50 menu-container">
-                              <div className="py-2">
-                                {/* Actions */}
-                                <button
-                                  onClick={() => handleUpdateRequest(request)}
-                                  className="w-full text-left px-4 py-3 text-sm text-emerald-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 flex items-center transition-all duration-200 rounded-xl mx-2"
-                                >
-                                  <svg className="w-4 h-4 mr-3 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                  </svg>
-                                  Update Request
-                                </button>
-                                
-                                {request.description && (
-                                  <button
-                                    onClick={() => handleViewDescription(request)}
-                                    className="w-full text-left px-4 py-3 text-sm text-blue-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 flex items-center transition-all duration-200 rounded-xl mx-2"
-                                  >
-                                    <svg className="w-4 h-4 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                    View Description
-                                  </button>
-                                )}
-                                
-                                <button
-                                  onClick={() => handleDeleteRequest(request.id)}
-                                  className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 flex items-center transition-all duration-200 rounded-xl mx-2"
-                                >
-                                  <svg className="w-4 h-4 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                  </svg>
-                                  Delete Request
-                                </button>
-                              </div>
+                      <tr key={request.id} className="hover:bg-orange-50/40 transition-colors">
+                        <td className="py-3 px-5">
+                          <div className="flex items-center gap-2.5">
+                            <div className="p-2 bg-orange-100 rounded-md shrink-0">
+                              <FileText className="w-3.5 h-3.5 text-orange-600" />
                             </div>
-                          )}
+                            <span className="font-medium text-orange-600 text-xs">{request.id}</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-5">
+                          <div>
+                            <div className="font-medium text-gray-900 text-sm">{request.type}</div>
+                            <div className="text-xs text-gray-500 truncate max-w-56">{request.description}</div>
+                          </div>
+                        </td>
+                        <td className="py-3 px-5">
+                          <span className="font-semibold text-gray-900 text-sm">{formatCurrency(request.amount)}</span>
+                        </td>
+                        <td className="py-3 px-5">
+                          <div className="flex items-center gap-1.5 text-gray-600 text-xs">
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span>{formatDate(request.submittedDate)}</span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-5">
+                          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border ${statusConfig.className}`}>
+                            <StatusIcon className="w-3 h-3" />
+                            {statusConfig.label}
+                          </div>
+                        </td>
+                        <td className="py-3 px-5">
+                          <div className="relative inline-block text-left">
+                            <button onClick={() => toggleRowMenu(request.id)} className="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-50 rounded-md">
+                              <MoreVertical size={14} />
+                            </button>
+                            {openMenuForId === request.id && (
+                              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                                <button onClick={() => { setEditingRequestId(null); setViewingRequest(request); setIsModalOpen(true); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">View</button>
+                                <button onClick={() => { setViewingRequest(null); setEditingRequestId(request.id); setNewRequest({ type: request.type, amount: String(request.amount), submittedDate: request.submittedDate, status: request.status, description: request.description, category: request.category || 'other' }); setIsModalOpen(true); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Edit</button>
+                                <button onClick={() => { handleDelete(request.id); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">Delete</button>
+                              </div>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -298,229 +546,209 @@ const EmployeePortal = () => {
                 </tbody>
               </table>
             </div>
+            {filteredAndSortedRequests.length === 0 && (
+              <div className="text-center py-12">
+                <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-base font-medium text-gray-900 mb-2">No requests found</h3>
+                <p className="text-gray-500 text-sm">Try adjusting your search or filters</p>
+              </div>
+            )}
           </div>
+        ) : (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filteredAndSortedRequests.map((request) => {
+                const statusConfig = getStatusConfig(request.status);
+                const StatusIcon = statusConfig.icon;
+                return (
+                  <div key={request.id} className="border border-gray-100 rounded-xl p-4 hover:shadow-sm transition-shadow relative">
+                    <button onClick={() => toggleRowMenu(request.id)} className="absolute top-2 right-2 p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-50 rounded-lg">
+                      <MoreVertical size={16} />
+                    </button>
+                    {openMenuForId === request.id && (
+                      <div className="absolute top-8 right-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                        <button onClick={() => { setEditingRequestId(null); setViewingRequest(request); setIsModalOpen(true); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">View</button>
+                        <button onClick={() => { setViewingRequest(null); setEditingRequestId(request.id); setNewRequest({ type: request.type, amount: String(request.amount), submittedDate: request.submittedDate, status: request.status, description: request.description, category: request.category || 'other' }); setIsModalOpen(true); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Edit</button>
+                        <button onClick={() => { handleDelete(request.id); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">Delete</button>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="p-2 bg-orange-100 rounded-lg">
+                        <FileText className="w-4 h-4 text-orange-600" />
+                      </div>
+                      <span className="font-medium text-orange-600 text-sm">{request.id}</span>
+                    </div>
+                    <div className="font-medium text-gray-900 text-sm">{request.type}</div>
+                    <div className="text-xs text-gray-500 line-clamp-2 mb-2">{request.description}</div>
+                    <div className="flex items-center justify-between text-sm mt-2">
+                      <span className="font-semibold">{formatCurrency(request.amount)}</span>
+                      <span className="flex items-center gap-1 text-gray-600">
+                        <Calendar className="w-3.5 h-3.5" />
+                        {formatDate(request.submittedDate)}
+                      </span>
+                    </div>
+                    <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[11px] font-medium border mt-3 ${statusConfig.className}`}>
+                      <StatusIcon className="w-3.5 h-3.5" />
+                      {statusConfig.label}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {filteredAndSortedRequests.length === 0 && (
+              <div className="text-center py-10">
+                <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <h3 className="text-base font-medium text-gray-900 mb-1">No requests found</h3>
+                <p className="text-gray-500 text-sm">Try adjusting your search or filters</p>
+              </div>
+            )}
+          </div>
+        )
+        }
+
+        {/* Results Info */}
+        <div className="mt-6 flex items-center justify-between text-base text-gray-500">
+          <span>
+            Showing {filteredAndSortedRequests.length} of {requests.length} requests
+          </span>
+          <span>
+            Total Amount: <strong className="text-gray-900">{formatCurrency(summaryStats.total)}</strong>
+          </span>
         </div>
       </div>
 
-      {/* New Request Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[1000]" onClick={() => setShowModal(false)}>
-          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-[90%] max-w-[500px] max-h-[90vh] overflow-y-auto border border-white/20" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center px-8 pt-8 pb-0 border-b border-emerald-100 mb-8">
-              <div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent m-0">Submit New Expense Request</h2>
-                <p className="text-gray-500 text-sm mt-1">Create a new expense request for reimbursement</p>
-              </div>
-              <button 
-                className="bg-none border-none text-2xl text-gray-400 cursor-pointer p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-all duration-200 hover:scale-110"
-                onClick={() => setShowModal(false)}
-              >
-                ×
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={closeModal} />
+          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-orange-500 to-blue-600">
+              <h3 className="text-white font-semibold text-lg">{
+                viewingRequest ? 'Request Details' : (editingRequestId ? 'Edit Expense Request' : 'New Expense Request')
+              }</h3>
+              <button onClick={closeModal} className="p-3 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                <X size={18} />
               </button>
             </div>
-            <form onSubmit={handleSubmitRequest} className="px-8 pb-8">
-              <div className="mb-6">
-                <label htmlFor="type" className="block font-bold text-gray-700 mb-2 text-sm">Expense Type *</label>
-                <select
-                  id="type"
-                  name="type"
-                  value={newRequest.type}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl text-sm text-gray-800 bg-white/50 backdrop-blur-sm focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all duration-300"
-                >
-                  <option value="">Select expense type</option>
-                  {expenseTypes.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="mb-6">
-                <label htmlFor="amount" className="block font-bold text-gray-700 mb-2 text-sm">Amount *</label>
-                <input
-                  type="number"
-                  id="amount"
-                  name="amount"
-                  value={newRequest.amount}
-                  onChange={handleInputChange}
-                  placeholder="Enter amount"
-                  min="0"
-                  step="0.01"
-                  required
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl text-sm text-gray-800 bg-white/50 backdrop-blur-sm focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all duration-300"
-                />
-              </div>
-              <div className="mb-6">
-                <label htmlFor="description" className="block font-bold text-gray-700 mb-2 text-sm">Description (Optional)</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={newRequest.description}
-                  onChange={handleInputChange}
-                  placeholder="Add any additional details about this expense..."
-                  rows="4"
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl text-sm text-gray-800 bg-white/50 backdrop-blur-sm focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 resize-vertical font-sans transition-all duration-300"
-                />
-              </div>
-              <div className="flex gap-4 justify-end mt-8 pt-6 border-t border-emerald-100">
-                <button 
-                  type="button" 
-                  className="px-6 py-3 border-2 border-gray-300 bg-white text-gray-700 rounded-xl font-semibold cursor-pointer transition-all duration-300 hover:bg-gray-50 hover:border-gray-400 hover:scale-105"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-none rounded-xl font-semibold cursor-pointer transition-all duration-300 hover:from-emerald-600 hover:to-teal-600 hover:scale-105 shadow-lg hover:shadow-xl"
-                >
-                  Submit Request
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
-      {/* Update Request Modal */}
-      {showUpdateModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[1000]" onClick={() => setShowUpdateModal(false)}>
-          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-[90%] max-w-[500px] max-h-[90vh] overflow-y-auto border border-white/20" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center px-8 pt-8 pb-0 border-b border-emerald-100 mb-8">
-              <div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent m-0">Update Expense Request</h2>
-                <p className="text-gray-500 text-sm mt-1">Modify your expense request details</p>
-              </div>
-              <button 
-                className="bg-none border-none text-2xl text-gray-400 cursor-pointer p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-all duration-200 hover:scale-110"
-                onClick={() => setShowUpdateModal(false)}
-              >
-                ×
-              </button>
-            </div>
-            <form onSubmit={handleUpdateSubmit} className="px-8 pb-8">
-              <div className="mb-6">
-                <label htmlFor="update-type" className="block font-bold text-gray-700 mb-2 text-sm">Expense Type *</label>
-                <select
-                  id="update-type"
-                  name="type"
-                  value={updateRequest.type}
-                  onChange={handleUpdateInputChange}
-                  required
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl text-sm text-gray-800 bg-white/50 backdrop-blur-sm focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all duration-300"
-                >
-                  <option value="">Select expense type</option>
-                  {expenseTypes.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="mb-6">
-                <label htmlFor="update-amount" className="block font-bold text-gray-700 mb-2 text-sm">Amount *</label>
-                <input
-                  type="number"
-                  id="update-amount"
-                  name="amount"
-                  value={updateRequest.amount}
-                  onChange={handleUpdateInputChange}
-                  placeholder="Enter amount"
-                  min="0"
-                  step="0.01"
-                  required
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl text-sm text-gray-800 bg-white/50 backdrop-blur-sm focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition-all duration-300"
-                />
-              </div>
-              <div className="mb-6">
-                <label htmlFor="update-description" className="block font-bold text-gray-700 mb-2 text-sm">Description (Optional)</label>
-                <textarea
-                  id="update-description"
-                  name="description"
-                  value={updateRequest.description}
-                  onChange={handleUpdateInputChange}
-                  placeholder="Add any additional details about this expense..."
-                  rows="4"
-                  className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl text-sm text-gray-800 bg-white/50 backdrop-blur-sm focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 resize-vertical font-sans transition-all duration-300"
-                />
-              </div>
-              <div className="flex gap-4 justify-end mt-8 pt-6 border-t border-emerald-100">
-                <button 
-                  type="button" 
-                  className="px-6 py-3 border-2 border-gray-300 bg-white text-gray-700 rounded-xl font-semibold cursor-pointer transition-all duration-300 hover:bg-gray-50 hover:border-gray-400 hover:scale-105"
-                  onClick={() => setShowUpdateModal(false)}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-none rounded-xl font-semibold cursor-pointer transition-all duration-300 hover:from-emerald-600 hover:to-teal-600 hover:scale-105 shadow-lg hover:shadow-xl"
-                >
-                  Update Request
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* View Description Modal */}
-      {showDescriptionModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[1000]" onClick={() => setShowDescriptionModal(false)}>
-          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl w-[90%] max-w-[500px] max-h-[90vh] overflow-y-auto border border-white/20" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center px-8 pt-8 pb-0 border-b border-emerald-100 mb-8">
-              <div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent m-0">Request Description</h2>
-                <p className="text-gray-500 text-sm mt-1">View detailed information about this request</p>
-              </div>
-              <button 
-                className="bg-none border-none text-2xl text-gray-400 cursor-pointer p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-all duration-200 hover:scale-110"
-                onClick={() => setShowDescriptionModal(false)}
-              >
-                ×
-              </button>
-            </div>
-            <div className="px-8 pb-8">
-              <div className="mb-6">
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block font-semibold text-gray-700 mb-1 text-sm">Request ID</label>
-                    <p className="text-gray-900 font-mono">#{selectedRequest.id.toString().padStart(3, '0')}</p>
-                  </div>
-                  <div>
-                    <label className="block font-semibold text-gray-700 mb-1 text-sm">Expense Type</label>
-                    <p className="text-gray-900">{selectedRequest.type}</p>
-                  </div>
-                  <div>
-                    <label className="block font-semibold text-gray-700 mb-1 text-sm">Amount</label>
-                    <p className="text-emerald-600 font-bold text-lg">${selectedRequest.amount.toFixed(2)}</p>
-                  </div>
-                  <div>
-                    <label className="block font-semibold text-gray-700 mb-1 text-sm">Status</label>
-                    <span className={`inline-block px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider ${getStatusBadge(selectedRequest.status).class}`}>
-                      {getStatusBadge(selectedRequest.status).text}
-                    </span>
+            <div className="p-8">
+              {viewingRequest ? (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <div className="text-sm text-gray-500 mb-2">Request ID</div>
+                      <div className="font-medium text-gray-900 text-base">{viewingRequest.id}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-2">Submitted</div>
+                      <div className="font-medium text-gray-900 text-base">{formatDate(viewingRequest.submittedDate)}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-2">Type</div>
+                      <div className="font-medium text-gray-900 text-base">{viewingRequest.type}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-2">Amount</div>
+                      <div className="font-medium text-gray-900 text-base">{formatCurrency(viewingRequest.amount)}</div>
+                    </div>
+                    <div className="col-span-2">
+                      <div className="text-sm text-gray-500 mb-2">Description</div>
+                      <div className="font-medium text-gray-900 text-base">{viewingRequest.description || '—'}</div>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <label className="block font-semibold text-gray-700 mb-2 text-sm">Description</label>
-                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <p className="text-gray-700 leading-relaxed">{selectedRequest.description}</p>
+              ) : (
+                <form onSubmit={handleCreateRequest} className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-base text-gray-600 mb-2">Expense Type</label>
+                      <input
+                        type="text"
+                        value={newRequest.type}
+                        onChange={(e) => handleNewRequestChange('type', e.target.value)}
+                        placeholder="e.g. Travel Expenses"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-base text-gray-600 mb-2">Amount</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={newRequest.amount}
+                        onChange={(e) => handleNewRequestChange('amount', e.target.value)}
+                        placeholder="0.00"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-base text-gray-600 mb-2">Date</label>
+                      <input
+                        type="date"
+                        value={newRequest.submittedDate}
+                        onChange={(e) => handleNewRequestChange('submittedDate', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-base text-gray-600 mb-2">Status</label>
+                      <select
+                        value={newRequest.status}
+                        onChange={(e) => handleNewRequestChange('status', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
+                      >
+                        <option value="under_verification">Under Verification</option>
+                        <option value="payment_processing">Payment Processing</option>
+                        <option value="approved">Approved</option>
+                        <option value="reimbursed">Reimbursed</option>
+                        <option value="rejected">Rejected</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-base text-gray-600 mb-2">Category</label>
+                      <select
+                        value={newRequest.category}
+                        onChange={(e) => handleNewRequestChange('category', e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
+                      >
+                        <option value="travel">Travel</option>
+                        <option value="office">Office</option>
+                        <option value="equipment">Equipment</option>
+                        <option value="meals">Meals & Entertainment</option>
+                        <option value="education">Education</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-base text-gray-600 mb-2">Description</label>
+                      <textarea
+                        value={newRequest.description}
+                        onChange={(e) => handleNewRequestChange('description', e.target.value)}
+                        rows={3}
+                        placeholder="Optional details"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-y text-base"
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div className="flex justify-end">
-                <button 
-                  type="button" 
-                  className="px-5 py-2 bg-emerald-500 text-white border-none rounded-md font-medium cursor-pointer transition-colors hover:bg-emerald-600"
-                  onClick={() => setShowDescriptionModal(false)}
-                >
-                  Close
-                </button>
-              </div>
+
+                  <div className="flex items-center justify-end gap-4 pt-4">
+                    <button type="button" onClick={closeModal} className="px-6 py-3 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 text-base">Cancel</button>
+                    <button type="submit" className="px-8 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-blue-600 text-white hover:from-orange-600 hover:to-blue-700 shadow text-base font-medium">
+                      {editingRequestId ? 'Update Request' : 'Create Request'}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </div>
       )}
     </div>
   );
-}
-export default EmployeePortal
+};
+
+export default EmployeePortal;
