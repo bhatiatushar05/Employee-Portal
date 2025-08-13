@@ -182,7 +182,7 @@ const HomePage = ({ onLogin }) => {
             </div>
 
             {/* Sign Up Card */}
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-2xl opacity-0 animate-fade-in" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 shadow-2xl opacity-0 animate-fade-in" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
               <div className="text-center mb-8">
                 <h2 className="text-2xl font-bold text-white mb-2">Create your account</h2>
                 <p className="text-slate-300">Sign up to access your portal</p>

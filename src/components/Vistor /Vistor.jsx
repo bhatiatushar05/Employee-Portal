@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Users, UserPlus, QrCode, Clock, MapPin, Phone, Mail, Building, CheckCircle, XCircle, Download, Camera, Grid, List, Filter, Calendar, TrendingUp, X } from 'lucide-react';
+import { Users, UserPlus, QrCode, Clock, MapPin, Phone, Mail, Building, CheckCircle, XCircle, Download, Camera, Grid, List, Filter, Calendar, TrendingUp, X, User } from 'lucide-react';
 import QRCode from 'qrcode';
+import TopRightHeader from '../TopRightHeader/TopRightHeader';
 
 const VisitorManagement = ({ user }) => {
   const [visitors, setVisitors] = useState([]);
@@ -13,6 +14,9 @@ const VisitorManagement = ({ user }) => {
   const [showCamera, setShowCamera] = useState(false);
   const [capturedPhoto, setCapturedPhoto] = useState(null);
   const [cameraStream, setCameraStream] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedVisitorForDetails, setSelectedVisitorForDetails] = useState(null);
+  const [openActionMenu, setOpenActionMenu] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   
@@ -80,6 +84,18 @@ const VisitorManagement = ({ user }) => {
       }
     };
   }, [cameraStream]);
+
+  // Close action menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (openActionMenu && !event.target.closest('.action-menu')) {
+        setOpenActionMenu(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openActionMenu]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -159,18 +175,34 @@ const VisitorManagement = ({ user }) => {
     setFormData(prev => ({ ...prev, photo: '' }));
   };
 
-  const generateQRCode = (visitorData) => {
+  const generateQRCode = async (visitorData) => {
     const qrData = {
       visitorId: visitorData.id,
       name: visitorData.name,
       company: visitorData.company,
       checkInTime: visitorData.checkInTime,
-      validUntil: visitorData.validUntil
+      validUntil: visitorData.validUntil,
+      hostEmployee: visitorData.hostEmployee
     };
-    return `data:text/plain;base64,${btoa(JSON.stringify(qrData))}`;
+    
+    try {
+      // Generate actual QR code data URL
+      const qrCodeUrl = await QRCode.toDataURL(JSON.stringify(qrData), {
+        width: 200,
+        margin: 1,
+        color: {
+          dark: '#1e293b',
+          light: '#ffffff'
+        }
+      });
+      return qrCodeUrl;
+    } catch (error) {
+      console.error('QR Code generation error:', error);
+      return null;
+    }
   };
 
-  const handleCheckIn = () => {
+  const handleCheckIn = async () => {
     if (!formData.name || !formData.phone || !formData.purpose) {
       alert('Please fill in all required fields (Name, Phone, Purpose)');
       return;
@@ -194,7 +226,9 @@ const VisitorManagement = ({ user }) => {
       createdBy: user?.email || 'admin@company.com'
     };
 
-    newVisitor.qrCode = generateQRCode(newVisitor);
+    // Generate actual QR code
+    const qrCodeUrl = await generateQRCode(newVisitor);
+    newVisitor.qrCode = qrCodeUrl;
 
     const updatedVisitors = [newVisitor, ...visitors];
     setVisitors(updatedVisitors);
@@ -225,6 +259,27 @@ const VisitorManagement = ({ user }) => {
         : visitor
     );
     setVisitors(updatedVisitors);
+  };
+
+  const handleViewPass = (visitor) => {
+    setSelectedVisitor(visitor);
+    setShowQRCode(true);
+    setOpenActionMenu(null);
+  };
+
+  const handleDownloadPass = (visitor) => {
+    downloadQRCode(visitor);
+    setOpenActionMenu(null);
+  };
+
+  const handleViewDetails = (visitor) => {
+    setSelectedVisitorForDetails(visitor);
+    setShowDetailsModal(true);
+    setOpenActionMenu(null);
+  };
+
+  const closeActionMenu = () => {
+    setOpenActionMenu(null);
   };
 
   const getStatusColor = (status) => {
@@ -283,80 +338,156 @@ const VisitorManagement = ({ user }) => {
     return visitors.filter(visitor => visitor.status === 'checked-in');
   };
 
-  // PNG download for QR code and photo
+  // PNG download for QR code and photo - Professional Visitor Pass
   const downloadQRCode = async (visitor) => {
-    const size = 320;
     const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size + 80;
+    canvas.width = 400;
+    canvas.height = 600;
     const ctx = canvas.getContext('2d');
 
-    // Fill background
-    ctx.fillStyle = "#fff";
+    // Fill background with gradient-like effect
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#f8fafc');
+    gradient.addColorStop(1, '#e2e8f0');
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Generate QR code image
-    const qrData = {
-      visitorId: visitor.id,
-      name: visitor.name,
-      company: visitor.company,
-      checkInTime: visitor.checkInTime,
-      validUntil: visitor.validUntil
-    };
-    const qrCodeUrl = await QRCode.toDataURL(JSON.stringify(qrData), { width: 128, margin: 1 });
+    // Header bar with HITS branding
+    ctx.fillStyle = '#1e40af'; // Blue color matching your UI
+    ctx.fillRect(0, 0, canvas.width, 60);
+    
+    // Header text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 20px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('VISITOR PASS', canvas.width / 2, 35);
 
-    // Draw photo if available
+    // Company/Organization info
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 16px Arial, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(visitor.company || 'Individual', 30, 100);
+    
+    // Subtitle
+    ctx.fillStyle = '#64748b';
+    ctx.font = '14px Arial, sans-serif';
+    ctx.fillText('HITS Portal', 30, 120);
+
+    // Separator line
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(30, 140);
+    ctx.lineTo(canvas.width - 30, 140);
+    ctx.stroke();
+
+    // Photo section (left side)
     if (visitor.photo) {
       const img = new window.Image();
       img.onload = () => {
+        // Draw photo in a rounded rectangle effect
         ctx.save();
         ctx.beginPath();
-        ctx.arc(size / 2, 48, 36, 0, 2 * Math.PI);
-        ctx.closePath();
+        ctx.rect(30, 160, 120, 120);
         ctx.clip();
-        ctx.drawImage(img, size / 2 - 36, 12, 72, 72);
+        ctx.drawImage(img, 30, 160, 120, 120);
         ctx.restore();
-
-        // Draw QR code below photo
-        const qrImg = new window.Image();
-        qrImg.onload = () => {
-          ctx.drawImage(qrImg, size / 2 - 64, 100, 128, 128);
-
-          // Draw visitor name
-          ctx.font = "bold 16px sans-serif";
-          ctx.fillStyle = "#222";
-          ctx.textAlign = "center";
-          ctx.fillText(visitor.name, size / 2, 250);
-
-          // Save as PNG
-          const pngUrl = canvas.toDataURL("image/png");
-          const a = document.createElement('a');
-          a.href = pngUrl;
-          a.download = `visitor-pass-${visitor.name.replace(/\s+/g, '-')}.png`;
-          a.click();
-        };
-        qrImg.src = qrCodeUrl;
+        
+        // Continue with QR code generation after photo is loaded
+        generateQRAndCompletePass();
       };
       img.src = visitor.photo;
     } else {
-      // Only QR code
-      const qrImg = new window.Image();
-      qrImg.onload = () => {
-        ctx.drawImage(qrImg, size / 2 - 64, 40, 128, 128);
+      // Placeholder if no photo
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillRect(30, 160, 120, 120);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '12px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('No Photo', 90, 220);
+      
+      // Continue with QR code generation
+      generateQRAndCompletePass();
+    }
 
-        ctx.font = "bold 16px sans-serif";
-        ctx.fillStyle = "#222";
-        ctx.textAlign = "center";
-        ctx.fillText(visitor.name, size / 2, 190);
-
-        const pngUrl = canvas.toDataURL("image/png");
+    // Function to generate QR code and complete the pass
+    const generateQRAndCompletePass = () => {
+      const qrData = {
+        visitorId: visitor.id,
+        name: visitor.name,
+        company: visitor.company,
+        checkInTime: visitor.checkInTime,
+        validUntil: visitor.validUntil,
+        hostEmployee: visitor.hostEmployee
+      };
+      
+      // Generate QR code on a separate canvas
+      const qrCanvas = document.createElement('canvas');
+      QRCode.toCanvas(qrCanvas, JSON.stringify(qrData), {
+        width: 120,
+        margin: 1,
+        color: {
+          dark: '#1e293b',
+          light: '#ffffff'
+        }
+      }, (qrError) => {
+        if (qrError) {
+          console.error('QR Code generation error:', qrError);
+          return;
+        }
+        
+        // Draw QR code on the right side
+        ctx.drawImage(qrCanvas, canvas.width - 150, 160, 120, 120);
+        
+        // Date
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 14px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(new Date().toLocaleDateString(), canvas.width - 90, 300);
+        
+        // Visitor details section
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 18px Arial, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(visitor.name, 30, 320);
+        
+        // Contact info
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px Arial, sans-serif';
+        ctx.fillText(`Phone: ${visitor.phone}`, 30, 345);
+        
+        if (visitor.email) {
+          ctx.fillText(`Email: ${visitor.email}`, 30, 365);
+        }
+        
+        ctx.fillText(`Host: ${visitor.hostEmployee}`, 30, 385);
+        ctx.fillText(`Check-In: ${visitor.checkInTime}`, 30, 405);
+        if (visitor.checkOutTime) {
+          ctx.fillText(`Check-Out: ${visitor.checkOutTime}`, 30, 425);
+          ctx.fillText(`Purpose: ${visitor.purpose}`, 30, 445);
+        } else {
+          ctx.fillText(`Purpose: ${visitor.purpose}`, 30, 425);
+        }
+        
+        // Footer with HITS branding
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('powered by', canvas.width / 2, 570);
+        
+        // HITS logo text
+        ctx.fillStyle = '#1e40af';
+        ctx.font = 'bold 16px Arial, sans-serif';
+        ctx.fillText('HITS', canvas.width / 2, 590);
+        
+        // Download the final image
+        const pngUrl = canvas.toDataURL("image/png", 1.0);
         const a = document.createElement('a');
         a.href = pngUrl;
-        a.download = `visitor-pass-${visitor.name.replace(/\s+/g, '-')}.png`;
+        a.download = `visitor-pass-${visitor.name.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.png`;
         a.click();
-      };
-      qrImg.src = qrCodeUrl;
-    }
+      });
+    };
   };
 
   const filteredVisitors = getFilteredVisitors();
@@ -371,7 +502,6 @@ const VisitorManagement = ({ user }) => {
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Company</th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Purpose</th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Host Employee</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Check In Time</th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
           </tr>
@@ -420,39 +550,64 @@ const VisitorManagement = ({ user }) => {
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="text-xs text-gray-900">
-                    {new Date(visitor.checkInTime).toLocaleString()}
-                  </div>
-                </td>
-                <td className="px-4 py-3">
                   <span className={`px-2 py-1 text-xs font-semibold rounded-lg ${getStatusColor(visitor.status)}`}>
                     {visitor.status === 'checked-in' ? 'In Building' : 'Checked Out'}
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="flex gap-2">
-                    {visitor.status === 'checked-in' && (
-                      <button
-                        onClick={() => handleCheckOut(visitor.id)}
-                        className="bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 font-medium text-xs"
-                      >
-                        Check Out
-                      </button>
-                    )}
+                  <div className="relative action-menu">
                     <button
-                      onClick={() => downloadQRCode(visitor)}
-                      className="bg-gradient-to-r from-blue-500 to-orange-500 text-white px-2 py-1 rounded-lg hover:from-blue-600 hover:to-orange-600 transition-all duration-300 font-medium text-xs flex items-center gap-1"
+                      onClick={() => setOpenActionMenu(openActionMenu === visitor.id ? null : visitor.id)}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                     >
-                      <QrCode size={12} />
-                      Pass
+                      <div className="w-1 h-1 bg-gray-600 rounded-full mb-1"></div>
+                      <div className="w-1 h-1 bg-gray-600 rounded-full mb-1"></div>
+                      <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
                     </button>
+                    
+                    {openActionMenu === visitor.id && (
+                      <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                        <div className="py-1">
+                          <button
+                            onClick={() => handleViewPass(visitor)}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                          >
+                            <QrCode size={14} />
+                            View Pass
+                          </button>
+                          <button
+                            onClick={() => handleDownloadPass(visitor)}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                          >
+                            <Download size={14} />
+                            Download Pass
+                          </button>
+                          <button
+                            onClick={() => handleViewDetails(visitor)}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                          >
+                            <User size={14} />
+                            Details
+                          </button>
+                          {visitor.status === 'checked-in' && (
+                            <button
+                              onClick={() => handleCheckOut(visitor.id)}
+                              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                            >
+                              <XCircle size={14} />
+                              Check Out
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
+              <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
                 <div className="flex flex-col items-center gap-2">
                   <Users size={32} className="text-gray-300" />
                   <div>
@@ -487,9 +642,59 @@ const VisitorManagement = ({ user }) => {
                     <h3 className="text-lg font-semibold text-gray-900">{visitor.name}</h3>
                     <p className="text-sm text-gray-600">{visitor.company || 'Individual'}</p>
                   </div>
-                  <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(visitor.status)}`}>
-                    {visitor.status === 'checked-in' ? 'In Building' : 'Checked Out'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(visitor.status)}`}>
+                      {visitor.status === 'checked-in' ? 'In Building' : 'Checked Out'}
+                    </span>
+                    {/* Action Menu */}
+                    <div className="relative action-menu">
+                      <button
+                        onClick={() => setOpenActionMenu(openActionMenu === visitor.id ? null : visitor.id)}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <div className="w-1 h-1 bg-gray-600 rounded-full mb-1"></div>
+                        <div className="w-1 h-1 bg-gray-600 rounded-full mb-1"></div>
+                        <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+                      </button>
+                      
+                      {openActionMenu === visitor.id && (
+                        <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                          <div className="py-1">
+                            <button
+                              onClick={() => handleViewPass(visitor)}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            >
+                              <QrCode size={14} />
+                              View Pass
+                            </button>
+                            <button
+                              onClick={() => handleDownloadPass(visitor)}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            >
+                              <Download size={14} />
+                              Download Pass
+                            </button>
+                            <button
+                              onClick={() => handleViewDetails(visitor)}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            >
+                              <User size={14} />
+                              Details
+                            </button>
+                            {visitor.status === 'checked-in' && (
+                              <button
+                                onClick={() => handleCheckOut(visitor.id)}
+                                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                              >
+                                <XCircle size={14} />
+                                Check Out
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
@@ -512,23 +717,6 @@ const VisitorManagement = ({ user }) => {
                   </div>
                 </div>
                 <p className="mt-2 text-sm text-gray-700">{visitor.purpose}</p>
-                <div className="mt-3 flex gap-2">
-                  {visitor.status === 'checked-in' && (
-                    <button
-                      onClick={() => handleCheckOut(visitor.id)}
-                      className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 font-medium text-sm"
-                    >
-                      Check Out
-                    </button>
-                  )}
-                  <button
-                    onClick={() => downloadQRCode(visitor)}
-                    className="bg-gradient-to-r from-blue-500 to-orange-500 text-white px-3 py-1 rounded-lg hover:from-blue-600 hover:to-orange-600 transition-all duration-300 font-medium text-sm flex items-center gap-1"
-                  >
-                    <QrCode size={14} />
-                    Download Pass
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -548,7 +736,7 @@ const VisitorManagement = ({ user }) => {
       {filteredVisitors.length > 0 ? (
         filteredVisitors.map((visitor) => (
           <div key={visitor.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
-            <div className="text-center">
+            <div className="text-center relative">
               {visitor.photo ? (
                 <img src={visitor.photo} alt={visitor.name} className="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-2 border-gray-200" />
               ) : (
@@ -558,9 +746,59 @@ const VisitorManagement = ({ user }) => {
               )}
               <h3 className="text-lg font-semibold text-gray-900 mb-1">{visitor.name}</h3>
               <p className="text-sm text-gray-600 mb-2">{visitor.company || 'Individual'}</p>
-              <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(visitor.status)} mb-3`}>
-                {visitor.status === 'checked-in' ? 'In Building' : 'Checked Out'}
-              </span>
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(visitor.status)}`}>
+                  {visitor.status === 'checked-in' ? 'In Building' : 'Checked Out'}
+                </span>
+                {/* Action Menu */}
+                <div className="relative action-menu">
+                  <button
+                    onClick={() => setOpenActionMenu(openActionMenu === visitor.id ? null : visitor.id)}
+                    className="p-1 hover:bg-gray-100 rounded transition-colors"
+                  >
+                    <div className="w-1 h-1 bg-gray-600 rounded-full mb-0.5"></div>
+                    <div className="w-1 h-1 bg-gray-600 rounded-full mb-0.5"></div>
+                    <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+                  </button>
+                  
+                  {openActionMenu === visitor.id && (
+                    <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                      <div className="py-1">
+                        <button
+                          onClick={() => handleViewPass(visitor)}
+                          className="w-full px-3 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                        >
+                          <QrCode size={12} />
+                          View Pass
+                        </button>
+                        <button
+                          onClick={() => handleDownloadPass(visitor)}
+                          className="w-full px-3 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                        >
+                          <Download size={12} />
+                          Download Pass
+                        </button>
+                        <button
+                          onClick={() => handleViewDetails(visitor)}
+                          className="w-full px-3 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                        >
+                          <User size={12} />
+                          Details
+                        </button>
+                        {visitor.status === 'checked-in' && (
+                          <button
+                            onClick={() => handleCheckOut(visitor.id)}
+                            className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50 flex items-center gap-2"
+                          >
+                            <XCircle size={12} />
+                            Check Out
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
             <div className="space-y-2 text-sm text-gray-600 mb-4">
               <div className="flex items-center gap-2">
@@ -583,23 +821,6 @@ const VisitorManagement = ({ user }) => {
               </div>
             </div>
             <p className="text-sm text-gray-700 mb-4 line-clamp-2">{visitor.purpose}</p>
-            <div className="flex gap-2">
-              {visitor.status === 'checked-in' && (
-                <button
-                  onClick={() => handleCheckOut(visitor.id)}
-                  className="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white px-2 py-1 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 font-medium text-xs"
-                >
-                  Check Out
-                </button>
-              )}
-              <button
-                onClick={() => downloadQRCode(visitor)}
-                className="flex-1 bg-gradient-to-r from-blue-500 to-orange-500 text-white px-2 py-1 rounded-lg hover:from-blue-600 hover:to-orange-600 transition-all duration-300 font-medium text-xs flex items-center justify-center gap-1"
-              >
-                <QrCode size={12} />
-                Pass
-              </button>
-            </div>
           </div>
         ))
       ) : (
@@ -613,8 +834,12 @@ const VisitorManagement = ({ user }) => {
   );
 
   return (
-    <div className="flex-1 min-h-0 h-full bg-gradient-to-br from-blue-50 to-orange-50 p-4 md:p-8 overflow-y-auto">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="flex-1 min-h-0 h-full bg-gradient-to-br from-blue-50 to-orange-50 overflow-y-auto">
+      {/* Top right header */}
+      <TopRightHeader user={user} />
+      
+      {/* Main Content with proper spacing */}
+      <div className="pt-20 pb-2 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1042,52 +1267,215 @@ const VisitorManagement = ({ user }) => {
 
         {/* QR Code Modal */}
         {showQRCode && selectedVisitor && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2">
-            <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full">
-              <div className="p-4 border-b border-gray-200 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-t-3xl">
-                <QrCode size={48} className="mx-auto text-blue-600 mb-2" />
-                <h2 className="text-xl font-bold text-gray-900">Visitor Pass Generated</h2>
-                <p className="text-base text-gray-600 mt-2">Digital pass for {selectedVisitor.name}</p>
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md relative">
+              {/* Close Button - Top Right */}
+              <button
+                onClick={() => {
+                  setShowQRCode(false);
+                  setSelectedVisitor(null);
+                }}
+                className="absolute top-4 right-4 z-10 p-2 bg-white/80 hover:bg-white rounded-full shadow-lg transition-all duration-300"
+              >
+                <X size={20} className="text-gray-600" />
+              </button>
+              
+              <div className="p-5 border-b border-gray-200 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-t-3xl">
+                <QrCode size={36} className="mx-auto text-blue-600 mb-2" />
+                <h2 className="text-lg font-bold text-gray-900">Visitor Pass Generated</h2>
+                <p className="text-sm text-gray-600 mt-1">Digital pass for {selectedVisitor.name}</p>
               </div>
               
-              <div className="p-4 text-center">
-                <div className="bg-gradient-to-r from-blue-50 to-orange-50 p-4 rounded-xl mb-4">
-                  {selectedVisitor.photo && (
-                    <img src={selectedVisitor.photo} alt={selectedVisitor.name} className="w-16 h-16 rounded-full object-cover mx-auto mb-3 border-2 border-gray-200" />
-                  )}
-                  <QrCode size={60} className="mx-auto text-blue-600 mb-2" />
-                  <p className="text-sm text-gray-600 font-semibold">
-                    Visitor ID: {selectedVisitor.id}
-                  </p>
-                  <p className="text-sm text-gray-600 font-semibold mt-1">
-                    Valid until: {new Date(selectedVisitor.validUntil).toLocaleString()}
-                  </p>
+              <div className="p-5">
+                {/* Pass Preview - Compact design */}
+                <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-4 rounded-xl border border-gray-200">
+                  {/* Header */}
+                  <div className="bg-blue-600 text-white text-center py-2 rounded-lg -mt-4 -mx-4 mb-3">
+                    <h3 className="font-bold text-base">VISITOR PASS</h3>
+                  </div>
+                  
+                  {/* Company Info */}
+                  <div className="mb-3">
+                    <p className="font-bold text-gray-800 text-base">{selectedVisitor.company || 'Individual'}</p>
+                    <p className="text-gray-600 text-xs">HITS Portal</p>
+                  </div>
+                  
+                  {/* Separator */}
+                  <div className="border-t border-gray-300 mb-3"></div>
+                  
+                  {/* Photo and QR Code Row */}
+                  <div className="flex gap-4 mb-3">
+                    {/* Photo */}
+                    <div className="flex-1">
+                      {selectedVisitor.photo ? (
+                        <img 
+                          src={selectedVisitor.photo} 
+                          alt={selectedVisitor.name} 
+                          className="w-20 h-20 rounded-lg object-cover mx-auto border-2 border-gray-300" 
+                        />
+                      ) : (
+                        <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center mx-auto">
+                          <User size={24} className="text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* QR Code */}
+                    <div className="flex-1 text-center">
+                      {selectedVisitor.qrCode ? (
+                        <img 
+                          src={selectedVisitor.qrCode} 
+                          alt="QR Code" 
+                          className="w-20 h-20 mx-auto border border-gray-300 rounded-lg" 
+                        />
+                      ) : (
+                        <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center mx-auto">
+                          <QrCode size={24} className="text-gray-400" />
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-600 mt-1">{new Date().toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Visitor Details - Compact */}
+                  <div className="space-y-1.5 text-xs text-gray-700 bg-white p-3 rounded-lg border border-gray-200">
+                    <p className="font-bold text-base text-gray-800">{selectedVisitor.name}</p>
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+                      <p><span className="font-semibold">Phone:</span> {selectedVisitor.phone}</p>
+                      {selectedVisitor.email && (
+                        <p><span className="font-semibold">Email:</span> {selectedVisitor.email}</p>
+                      )}
+                      <p><span className="font-semibold">Host:</span> {selectedVisitor.hostEmployee}</p>
+                      <p><span className="font-semibold">Check-In:</span> {selectedVisitor.checkInTime}</p>
+                      {selectedVisitor.checkOutTime && (
+                        <p><span className="font-semibold">Check-Out:</span> {selectedVisitor.checkOutTime}</p>
+                      )}
+                      <p className="col-span-2"><span className="font-semibold">Purpose:</span> {selectedVisitor.purpose}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Footer */}
+                  <div className="text-center mt-3 pt-2 border-t border-gray-200">
+                    <p className="text-xs text-gray-500">powered by</p>
+                    <p className="font-bold text-blue-600 text-xs">HITS</p>
+                  </div>
                 </div>
                 
-                <div className="space-y-2 text-sm text-gray-700 mb-4 bg-gray-50 p-3 rounded-xl">
-                  <p><span className="font-semibold">Name:</span> {selectedVisitor.name}</p>
-                  <p><span className="font-semibold">Company:</span> {selectedVisitor.company || 'Individual'}</p>
-                  <p><span className="font-semibold">Purpose:</span> {selectedVisitor.purpose}</p>
-                  <p><span className="font-semibold">Host:</span> {selectedVisitor.hostEmployee}</p>
-                </div>
-                
-                <div className="flex gap-4">
+                {/* Action Buttons */}
+                <div className="flex gap-3 mt-4">
                   <button
                     onClick={() => downloadQRCode(selectedVisitor)}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-orange-500 text-white py-2 px-4 rounded-xl font-bold hover:from-blue-700 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-orange-500 text-white py-2.5 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm"
                   >
                     <div className="flex items-center justify-center gap-2">
                       <Download size={16} />
                       Download Pass
                     </div>
                   </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Details Modal */}
+        {showDetailsModal && selectedVisitorForDetails && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+              <div className="p-4 border-b border-gray-200 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-t-2xl">
+                <User size={48} className="mx-auto text-blue-600 mb-2" />
+                <h2 className="text-xl font-bold text-gray-900">Visitor Details</h2>
+                <p className="text-base text-gray-600 mt-1">Complete information for {selectedVisitorForDetails.name}</p>
+              </div>
+              
+              <div className="p-6">
+                {/* Photo and Basic Info */}
+                <div className="flex items-center gap-4 mb-6">
+                  {selectedVisitorForDetails.photo ? (
+                    <img 
+                      src={selectedVisitorForDetails.photo} 
+                      alt={selectedVisitorForDetails.name} 
+                      className="w-20 h-20 rounded-full object-cover border-2 border-gray-200" 
+                    />
+                  ) : (
+                    <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
+                      <User size={32} className="text-gray-400" />
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-900">{selectedVisitorForDetails.name}</h3>
+                    <p className="text-gray-600">{selectedVisitorForDetails.company || 'Individual'}</p>
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <div className="space-y-3 mb-6">
+                  <h4 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Contact Information</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <Phone size={16} className="text-gray-500" />
+                      <span className="text-gray-700">{selectedVisitorForDetails.phone}</span>
+                    </div>
+                    {selectedVisitorForDetails.email && (
+                      <div className="flex items-center gap-3">
+                        <Mail size={16} className="text-gray-500" />
+                        <span className="text-gray-700">{selectedVisitorForDetails.email}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Visit Information */}
+                <div className="space-y-3 mb-6">
+                  <h4 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Visit Information</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <Building size={16} className="text-gray-500" />
+                      <span className="text-gray-700">Host: {selectedVisitorForDetails.hostEmployee}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Clock size={16} className="text-gray-500" />
+                      <span className="text-gray-700">Check-In: {selectedVisitorForDetails.checkInTime}</span>
+                    </div>
+                    {selectedVisitorForDetails.checkOutTime && (
+                      <div className="flex items-center gap-3">
+                        <Clock size={16} className="text-gray-500" />
+                        <span className="text-gray-700">Check-Out: {selectedVisitorForDetails.checkOutTime}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3">
+                      <User size={16} className="text-gray-500" />
+                      <span className="text-gray-700">Purpose: {selectedVisitorForDetails.purpose}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div className="space-y-3 mb-6">
+                  <h4 className="font-semibold text-gray-800 text-sm uppercase tracking-wider">Status</h4>
+                  <span className={`inline-block px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(selectedVisitorForDetails.status)}`}>
+                    {selectedVisitorForDetails.status === 'checked-in' ? 'In Building' : 'Checked Out'}
+                  </span>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleViewPass(selectedVisitorForDetails)}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-orange-500 text-white py-2 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-orange-600 transition-all duration-300"
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <QrCode size={16} />
+                      View Pass
+                    </div>
+                  </button>
                   
                   <button
                     onClick={() => {
-                      setShowQRCode(false);
-                      setSelectedVisitor(null);
+                      setShowDetailsModal(false);
+                      setSelectedVisitorForDetails(null);
                     }}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition-all duration-300 text-sm"
+                    className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all duration-300"
                   >
                     Close
                   </button>

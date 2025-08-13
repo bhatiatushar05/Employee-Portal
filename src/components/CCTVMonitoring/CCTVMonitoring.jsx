@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Search, User, Menu, X, Camera, MapPin, Settings, Eye } from 'lucide-react';
+import TopRightHeader from '../TopRightHeader/TopRightHeader';
 
 // Mock camera data
 const CAMERAS = [
@@ -321,7 +322,7 @@ const CameraMenu = ({ cameras, currentCamera, onCameraSelect, isOpen, onClose })
   );
 };
 
-const CCTVMonitoring = () => {
+const CCTVMonitoring = ({ user }) => {
   const [activeTab, setActiveTab] = useState('Check-In');
   const [attendanceLogs, setAttendanceLogs] = useState([]);
   const [currentCamera, setCurrentCamera] = useState(CAMERAS[0]);
@@ -341,8 +342,11 @@ const CCTVMonitoring = () => {
 
   return (
     <div className="flex-1 bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 overflow-hidden">
+      {/* Top right header */}
+      <TopRightHeader user={user} />
+      
       {/* Fixed Header */}
-      <div className="bg-white/90 backdrop-blur-md border-b border-white/20 p-6">
+      <div className="bg-white/90 backdrop-blur-md border-b border-white/20 p-6 pt-24">
         <div className="max-w-[1400px] mx-auto">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">

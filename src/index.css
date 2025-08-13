@@ -131,3 +131,50 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
+
+/* Hide Scrollbars */
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Hide scrollbar for specific overflow containers */
+.overflow-y-auto::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar-track,
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  display: none;
+}
+
+.overflow-auto::-webkit-scrollbar,
+.overflow-auto::-webkit-scrollbar-track,
+.overflow-auto::-webkit-scrollbar-thumb {
+  display: none;
+}
+
+/* Ensure smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  scroll-behavior: smooth;
+}

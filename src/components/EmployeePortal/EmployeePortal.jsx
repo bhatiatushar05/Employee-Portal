@@ -5,8 +5,9 @@ import {
   AlertCircle, XCircle, Banknote, TrendingUp,
   FileText, Eye, Edit, Trash2, X, MoreVertical, LayoutGrid, List
 } from 'lucide-react';
+import TopRightHeader from '../TopRightHeader/TopRightHeader';
 
-const EmployeePortal = () => {
+const EmployeePortal = ({ user }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date');
@@ -332,7 +333,11 @@ const EmployeePortal = () => {
 
   return (
     <div className="flex-1 min-h-0 h-full overflow-y-auto bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100">
-      <div className="max-w-7xl mx-auto p-6">
+      {/* Top right header */}
+      <TopRightHeader user={user} />
+      
+      {/* Main Content with proper spacing */}
+      <div className="pt-20 pb-2 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="mb-12">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">

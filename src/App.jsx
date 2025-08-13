@@ -44,11 +44,11 @@ const App = () => {
       case 'dashboard':
         return <Dashboard user={user} />;
       case 'employee':
-        return <EmployeePortal />;
+        return <EmployeePortal user={user} />;
       case 'accounts':
-        return <AccountsPortal />;
+        return <AccountsPortal user={user} />;
       case 'cctv':
-        return <CCTVMonitoring activeTab={activeTab} setActiveTab={setActiveTab} />;
+        return <CCTVMonitoring activeTab={activeTab} setActiveTab={setActiveTab} user={user} />;
       case 'attendance':
         return <EmployeeAttendance user={user} />;
       case 'visitor':
