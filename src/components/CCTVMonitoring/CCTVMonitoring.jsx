@@ -147,46 +147,7 @@ const FaceRecognitionAttendance = ({ onCheckInOut, currentCamera }) => {
   );
 };
 
-const MotionEvents = ({ sidebar = false }) => {
-  const events = [
-    { id: 1, time: '10:12 AM', type: 'person', progress: 75 },
-    { id: 2, time: '9:25 AM', type: 'motion', progress: 100 },
-    { id: 3, time: '8:45 AM', type: 'person', progress: 60 },
-    { id: 4, time: '8:12 AM', type: 'motion', progress: 90 }
-  ];
 
-  return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">Motion Events</h3>
-      <div className="space-y-0">
-        {events.slice(0, sidebar ? 2 : 4).map((event) => (
-          <div key={event.id} className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-              {event.type === 'person' ? 
-                <User size={16} className="text-blue-600" /> : 
-                <Eye size={16} className="text-yellow-600" />
-              }
-            </div>
-            <div className="flex-1">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-900">{event.time}</span>
-                <button className="text-gray-400 hover:text-gray-600">
-                  <Settings size={14} />
-                </button>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-green-500 h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${event.progress}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 const EmployeeCheckTabs = ({ activeTab, setActiveTab, attendanceLogs }) => {
   const tabs = ['Check-In', 'Check-Out'];
@@ -404,7 +365,7 @@ const CCTVMonitoring = ({ user }) => {
                 onCheckInOut={handleCheckInOut} 
                 currentCamera={currentCamera}
               />
-              <MotionEvents />
+
             </div>
             {/* Right Sidebar */}
             <div className="flex flex-col gap-6">
@@ -413,7 +374,7 @@ const CCTVMonitoring = ({ user }) => {
                 setActiveTab={setActiveTab} 
                 attendanceLogs={attendanceLogs} 
               />
-              <MotionEvents sidebar={true} />
+
             </div>
           </div>
         </div>

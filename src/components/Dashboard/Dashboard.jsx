@@ -58,12 +58,7 @@ const Dashboard = ({ user }) => {
         { id: "#003", type: "Travel Expenses", amount: "$320.00", status: "Under Review" }
       ]
     },
-    accountsPortal: {
-      totalBalance: "$2,847.50",
-      monthlyExpenses: "$1,245.80",
-      savedThisMonth: "$456.20",
-      lastTransaction: "Yesterday"
-    },
+
     cctvFeed: {
       activeCameras: 12,
       totalCameras: 15,
@@ -99,8 +94,8 @@ const Dashboard = ({ user }) => {
     },
     {
       icon: <DollarSign className="w-8 h-8 text-blue-600" />,
-      title: "Account Balance",
-      value: dashboardData.accountsPortal.totalBalance,
+      title: "Total Expenses",
+      value: "$1,245.80",
       change: "+$456 this month",
       color: "bg-blue-50 border-blue-200"
     },
@@ -487,13 +482,7 @@ const Dashboard = ({ user }) => {
                   <span className="text-sm text-orange-600 font-medium px-3 py-1 bg-orange-100 rounded-full">Active</span>
                 </div>
                 
-                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all duration-300 hover:scale-[1.01] cursor-pointer group">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 text-blue-600 group-hover:scale-[1.05] transition-transform duration-300" />
-                    <span className="font-medium text-gray-900">Accounts Portal</span>
-                  </div>
-                  <span className="text-sm text-blue-600 font-medium px-3 py-1 bg-blue-100 rounded-full">Active</span>
-                </div>
+
                 
                 <div className="flex items-center justify-between p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-all duration-300 hover:scale-[1.01] cursor-pointer group">
                   <div className="flex items-center space-x-3">
@@ -505,44 +494,7 @@ const Dashboard = ({ user }) => {
               </div>
             </div>
 
-            {/* Account Summary */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.01] cursor-pointer group">
-              <div className="flex items-center mb-6">
-                <div className="p-3 bg-green-100 rounded-lg mr-4 group-hover:scale-[1.05] transition-transform duration-300">
-                  <DollarSign className="w-6 h-6 text-green-600" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-900">Account Summary</h2>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex justify-between items-center hover:bg-gray-50 p-3 rounded-lg transition-colors duration-300">
-                  <span className="text-gray-600 font-medium">Current Balance</span>
-                  <span className="font-bold text-xl text-gray-900">
-                    {dashboardData.accountsPortal.totalBalance}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between items-center hover:bg-gray-50 p-3 rounded-lg transition-colors duration-300">
-                  <span className="text-gray-600 font-medium">Monthly Expenses</span>
-                  <span className="font-semibold text-red-600 text-lg">
-                    -{dashboardData.accountsPortal.monthlyExpenses}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between items-center hover:bg-gray-50 p-3 rounded-lg transition-colors duration-300">
-                  <span className="text-gray-600 font-medium">Saved This Month</span>
-                  <span className="font-semibold text-green-600 text-lg">
-                    +{dashboardData.accountsPortal.savedThisMonth}
-                  </span>
-                </div>
-                
-                <div className="pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-500">
-                    Last transaction: {dashboardData.accountsPortal.lastTransaction}
-                  </p>
-                </div>
-              </div>
-            </div>
+
 
             {/* Security Status */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-all duration-300 hover:scale-[1.01] cursor-pointer group">

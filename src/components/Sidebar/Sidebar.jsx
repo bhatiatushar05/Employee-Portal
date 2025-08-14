@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { Home, PieChart, Camera, CheckCircle, FolderOpen, Settings, X, LogOut, Building2, LayoutDashboard, User, ChevronLeft, ChevronRight, Clock, Users, Menu } from 'lucide-react';
+import { Home, Camera, CheckCircle, FolderOpen, Settings, X, LogOut, Building2, LayoutDashboard, User, ChevronLeft, ChevronRight, Clock, Users, Menu, Bell, Search } from 'lucide-react';
 import HLogo from '../../assets/H logo.png'; // Make sure the file is in src/assets/
+import { useAuth } from '../../contexts/AuthContext';
 
 const Sidebar = ({ 
   activeSection, 
@@ -12,17 +13,30 @@ const Sidebar = ({
   onLogout, 
   user 
 }) => {
-  // Memoized navigation items to prevent re-creation on every render
-  const navigationItems = useMemo(() => [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, category: 'main' },
-    { id: 'employee', label: 'Employee Portal', icon: Home, category: 'main' },
-    { id: 'attendance', label: 'Attendance', icon: Clock, category: 'main' },
-    { id: 'visitor', label: 'Visitor Management', icon: Users, category: 'main' },
-    { id: 'accounts', label: 'Accounts Portal', icon: PieChart, category: 'main' },
-    { id: 'cctv', label: 'CCTV Monitoring', icon: Camera, category: 'main' },
-    { id: 'checkin', label: 'Check-In', icon: CheckCircle, category: 'tools' },
-    { id: 'files', label: 'File Manager', icon: FolderOpen, category: 'tools' },
-  ], []);
+  const { isAdmin, isEmployee } = useAuth();
+  const [showProfile, setShowProfile] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Role-based navigation items
+  const navigationItems = useMemo(() => {
+    const baseItems = [
+      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, category: 'main', permission: 'dashboard' },
+      { id: 'employee', label: isAdmin() ? 'Request Management' : 'Employee Portal', icon: Home, category: 'main', permission: 'employee-portal' },
+      { id: 'attendance', label: 'Attendance', icon: Clock, category: 'main', permission: 'attendance' },
+    ];
+
+    // Admin-only items
+    if (isAdmin()) {
+      baseItems.push(
+        { id: 'visitor', label: 'Visitor Management', icon: Users, category: 'main', permission: 'visitor-management' },
+        { id: 'cctv', label: 'CCTV Monitoring', icon: Camera, category: 'main', permission: 'cctv-monitoring' },
+        { id: 'files', label: 'File Manager', icon: FolderOpen, category: 'tools', permission: 'file-manager' },
+        { id: 'checkin', label: 'Check-In', icon: CheckCircle, category: 'tools', permission: 'checkin' }
+      );
+    }
+
+    return baseItems;
+  }, [isAdmin]);
 
   // Memoized filtered items
   const { mainNavItems, toolItems } = useMemo(() => ({
@@ -203,8 +217,26 @@ const Sidebar = ({
 
         {/* Footer */}
         <div className={`p-4 border-t border-blue-700/40 space-y-1 ${sidebarCollapsed ? 'px-2' : ''}`}>
+          {/* Profile Button */}
           <button 
-            onClick={() => handleSectionChange('settings')}
+            onClick={() => setShowProfile(true)}
+            className={`
+              group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+              text-sm font-medium transition-all duration-200 text-left
+              text-blue-100 hover:text-white hover:bg-white/10
+              ${sidebarCollapsed ? 'justify-center px-2' : ''}
+            `}
+            title={sidebarCollapsed ? 'Profile' : ''}
+          >
+            <div className="flex-shrink-0 p-1.5 rounded-md transition-all duration-200 group-hover:bg-white/10">
+              <User size={16} />
+            </div>
+            {!sidebarCollapsed && <span>Profile</span>}
+          </button>
+
+          {/* Settings Button */}
+          <button 
+            onClick={() => setShowSettings(true)}
             className={`
               group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
               text-sm font-medium transition-all duration-200 text-left
@@ -219,6 +251,7 @@ const Sidebar = ({
             {!sidebarCollapsed && <span>Settings</span>}
           </button>
           
+          {/* Logout Button */}
           {onLogout && (
             <button 
               onClick={onLogout}
@@ -261,6 +294,112 @@ const Sidebar = ({
       >
         <Menu size={18} />
       </button>
+
+      {/* Profile Modal */}
+      {showProfile && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-md">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Profile</h2>
+                <button 
+                  onClick={() => setShowProfile(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X size={20} className="text-gray-500" />
+                </button>
+              </div>
+
+              <div className="text-center mb-6">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-green-500 flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-lg">
+                  <span className="text-3xl font-bold text-white">{user?.fullName?.[0] || 'U'}</span>
+                </div>
+                <p className="text-gray-600">{user?.email || 'user@hits.com'}</p>
+                <p className="text-sm text-gray-500 mt-1 capitalize">{user?.role || 'user'}</p>
+              </div>
+
+              <div className="border-t border-gray-200 pt-4">
+                <button
+                  onClick={() => {
+                    setShowProfile(false);
+                    if (onLogout) onLogout();
+                  }}
+                  className="w-full py-3 px-4 bg-red-100 text-red-700 rounded-lg font-medium hover:bg-red-200 transition-colors flex items-center justify-center gap-2"
+                >
+                  <LogOut size={20} />
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+                <button 
+                  onClick={() => setShowSettings(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X size={20} className="text-gray-500" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-8">
+              {/* General Settings */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">General</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 bg-gray-400 rounded"></div>
+                      <span className="font-medium">Dark mode</span>
+                    </div>
+                    <div className="w-12 h-6 bg-gray-300 rounded-full"></div>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 bg-gray-400 rounded"></div>
+                      <span className="font-medium">Notifications</span>
+                    </div>
+                    <div className="w-12 h-6 bg-blue-500 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* User Preferences */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">User Preferences</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                    <span className="font-medium">Language</span>
+                    <select className="px-3 py-1 border border-gray-300 rounded text-sm">
+                      <option>English</option>
+                      <option>Spanish</option>
+                      <option>French</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                    <span className="font-medium">Time Zone</span>
+                    <select className="px-3 py-1 border border-gray-300 rounded text-sm">
+                      <option>UTC (GMT+0)</option>
+                      <option>EST (GMT-5)</option>
+                      <option>PST (GMT-8)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -76,7 +76,7 @@ export const expenseRequests = [
 export const employeeReimbursements = [
   {
     id: 1,
-    name: 'Lucas prices',
+    name: 'Vikas',
     amount: 125.30,
     date: 'Apr 8, 2024',
     type: 'Travel Expenses',
@@ -85,7 +85,7 @@ export const employeeReimbursements = [
   },
   {
     id: 2,
-    name: 'James Ferdinand',
+    name: 'Viraj',
     amount: 74.10,
     date: 'Apr 8, 2024',
     type: 'Office Supplies',
@@ -94,7 +94,7 @@ export const employeeReimbursements = [
   },
   {
     id: 3,
-    name: 'Scarlett Groves',
+    name: 'Pooja',
     amount: 98.50,
     date: 'Apr 9, 2024',
     type: 'Mileage',
@@ -103,7 +103,7 @@ export const employeeReimbursements = [
   },
   {
     id: 4,
-    name: 'Michael Chen',
+    name: 'Nirmal',
     amount: 89.75,
     date: 'Apr 10, 2024',
     type: 'Meals & Entertainment',
@@ -112,7 +112,7 @@ export const employeeReimbursements = [
   },
   {
     id: 5,
-    name: 'Sarah Johnson',
+    name: 'Avnish Ji',
     amount: 156.20,
     date: 'Apr 11, 2024',
     type: 'Conference Fees',
@@ -121,7 +121,7 @@ export const employeeReimbursements = [
   },
   {
     id: 6,
-    name: 'David Wilson',
+    name: 'Mohan',
     amount: 67.80,
     date: 'Apr 12, 2024',
     type: 'Transportation',
@@ -184,8 +184,3 @@ export const checkedOutEmployees = [
   { name: 'Mark Thompson', time: '7:15 PM', avatar: '👤', date: 'July 23, 2025', fullDateTime: 'Wed, Jul 23, 2025 at 7:15 PM' }
 ];
 
-export const motionEvents = [
-  { time: '10:12 AM', avatar: '👤' },
-  { time: '9:25 AM', avatar: '👩' },
-  { time: '8:48 AM', avatar: '👤' }
-];

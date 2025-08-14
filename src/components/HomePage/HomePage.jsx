@@ -1,323 +1,229 @@
-import React, { useState, useEffect } from 'react';
-import { User, Lock, Eye, EyeOff, Building2, Users, CreditCard, Monitor, CheckCircle, ArrowRight, Sparkles, Mail } from 'lucide-react';
+// HomePage.jsx
+import React, { useState, useEffect } from "react";
+import {
+  User,
+  Lock,
+  Eye,
+  EyeOff,
+  Mail,
+  Building2,
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
+  LogIn,
+  ImageIcon,
+} from "lucide-react";
 
 const HomePage = ({ onLogin }) => {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [animateCards, setAnimateCards] = useState(false);
-  const [showContent, setShowContent] = useState(false);
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
-    // Show content immediately with a smooth fade-in
-    const contentTimer = setTimeout(() => {
-      setShowContent(true);
-    }, 100);
-
-    // Trigger card animations after content shows
-    const animationTimer = setTimeout(() => setAnimateCards(true), 600);
-    
-    return () => {
-      clearTimeout(contentTimer);
-      clearTimeout(animationTimer);
-    };
+    const t = setTimeout(() => setShow(true), 80);
+    return () => clearTimeout(t);
   }, []);
 
-  const handleSignUp = async (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Call the onLogin prop with user data including full name
-    if (onLogin) {
-      onLogin({
-        fullName: fullName,
-        email: email
-      });
-    }
-    
+    await new Promise((r) => setTimeout(r, 900)); // wire to real auth
+    onLogin?.({ fullName: "HITS User", email });
     setIsLoading(false);
   };
 
-  const features = [
-    {
-      icon: <CreditCard className="w-8 h-8" />,
-      title: "Expense Management",
-      description: "Submit and track your expense requests and reimbursements seamlessly",
-      delay: "0ms"
-    },
-    {
-      icon: <Users className="w-8 h-8" />,
-      title: "Account Portal",
-      description: "Access your account information and manage your profile settings",
-      delay: "100ms"
-    },
-    {
-      icon: <Monitor className="w-8 h-8" />,
-      title: "CCTV Monitoring",
-      description: "View and monitor security footage with advanced access controls",
-      delay: "200ms"
-    },
-    {
-      icon: <CheckCircle className="w-8 h-8" />,
-      title: "File Management",
-      description: "Organize and access your documents with our integrated file system",
-      delay: "300ms"
-    }
-  ];
-
-  // Simple loading overlay instead of skeleton
-  if (!showContent) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-orange-950 to-orange-900 relative overflow-hidden flex items-center justify-center">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-10 left-10 w-72 h-72 bg-orange-500/15 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-1/2 right-20 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-amber-500/15 rounded-full blur-3xl animate-pulse delay-2000"></div>
-        </div>
-
-        {/* Simple loading indicator */}
-        <div className="relative z-10 text-center">
-          <div className="flex items-center justify-center mb-6">
-            <Building2 className="w-16 h-16 text-orange-400 animate-pulse" />
-            <Sparkles className="w-8 h-8 text-amber-300 animate-spin ml-2" />
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-2 animate-fade-in">HITS Portal</h1>
-          <div className="flex items-center justify-center space-x-2">
-            <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce delay-100"></div>
-            <div className="w-2 h-2 bg-orange-400 rounded-full animate-bounce delay-200"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-orange-950 to-orange-900 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-10 left-10 w-72 h-72 bg-orange-500/15 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 right-20 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-amber-500/15 rounded-full blur-3xl animate-pulse delay-2000"></div>
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Background accents: blue + orange */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-16 -left-16 h-80 w-80 rounded-full bg-cyan-500/15 blur-3xl"></div>
+        <div className="absolute top-1/3 -right-24 h-96 w-96 rounded-full bg-orange-500/15 blur-3xl"></div>
+        <div className="absolute bottom-8 left-1/3 h-72 w-72 rounded-full bg-sky-400/10 blur-3xl"></div>
       </div>
 
-      {/* Floating Particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-white/20 rounded-full animate-bounce"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${3 + Math.random() * 2}s`
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-10 flex min-h-screen opacity-0 animate-fade-in" style={{ animationFillMode: 'forwards' }}>
-        {/* Left Side - Branding & Features */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-12 py-16">
-          <div className="max-w-md mx-auto">
-            {/* Logo & Title */}
-            <div className="mb-12 opacity-0 animate-fade-in" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
-              <div className="flex items-center mb-6">
-                <div className="relative">
-                  <Building2 className="w-12 h-12 text-orange-400" />
-                  <Sparkles className="w-6 h-6 text-amber-300 absolute -top-2 -right-2 animate-spin" />
-                </div>
-                <div className="ml-4">
-                  <h1 className="text-4xl font-bold text-white">HITS</h1>
-                  <p className="text-orange-300 text-sm">Employee Management System</p>
-                </div>
+      <div
+        className={`relative z-10 flex min-h-screen transition-opacity duration-700 ${
+          show ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        {/* Left: Brand + message */}
+        <aside className="hidden lg:flex lg:w-1/2 items-center justify-center px-14">
+          <div className="max-w-md">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="relative">
+                <Building2 className="h-11 w-11 text-cyan-400" />
+                <Sparkles className="h-6 w-6 text-orange-300 absolute -top-2 -right-2 animate-spin-slow" />
               </div>
-              <p className="text-slate-300 text-lg leading-relaxed">
-                Welcome to your comprehensive employee portal. Manage expenses, access accounts, and streamline your workflow all in one place.
-              </p>
+              <div>
+                <h1 className="text-4xl font-extrabold tracking-tight text-white">
+                  HITS
+                </h1>
+                <p className="text-sm text-cyan-200/90">
+                  Employee Operating System
+                </p>
+              </div>
             </div>
 
-            {/* Feature Cards */}
-            <div className="space-y-4">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className={`bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 transform transition-all duration-700 hover:scale-105 hover:bg-white/15 cursor-pointer ${
-                    animateCards ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'
-                  }`}
-                  style={{ transitionDelay: feature.delay }}
+            <h2 className="text-3xl font-bold text-white mb-3">
+              Hi 👋 Welcome back to HITS
+            </h2>
+            <p className="text-slate-300 mb-8">
+              Sign in to manage your work, track expenses, and get things done.
+            </p>
+
+            {/* Feature highlights */}
+            <ul className="space-y-3">
+              {[
+                ["Secure access control", ShieldCheck],
+                ["Smart expense tracking", User],
+                ["Clean, focused dashboards", ImageIcon],
+              ].map(([label, Icon], i) => (
+                <li
+                  key={label}
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm"
+                  style={{ animationDelay: `${150 * i}ms` }}
                 >
-                  <div className="flex items-start space-x-4">
-                    <div className="text-orange-400 flex-shrink-0 mt-1">
-                      {feature.icon}
-                    </div>
-                    <div>
-                      <h3 className="text-white font-semibold text-lg mb-2">{feature.title}</h3>
-                      <p className="text-slate-300 text-sm leading-relaxed">{feature.description}</p>
-                    </div>
-                  </div>
-                </div>
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-sky-500 text-white shadow-md">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="text-slate-200">{label}</span>
+                </li>
               ))}
-            </div>
+            </ul>
+            
           </div>
-        </div>
+        </aside>
 
-        {/* Right Side - Sign Up Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center px-8 py-16">
-          <div className="w-full max-w-sm">
-            {/* Mobile Logo */}
-            <div className="lg:hidden text-center mb-8 opacity-0 animate-fade-in" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
-              <div className="flex items-center justify-center mb-4">
-                <Building2 className="w-10 h-10 text-orange-400 mr-3" />
-                <h1 className="text-3xl font-bold text-white">Portal</h1>
+        {/* Right: Sign in */}
+        <main className="w-full lg:w-1/2 flex items-center justify-center px-6 sm:px-10 py-14">
+          <div className="w-full max-w-md">
+            {/* Compact logo for mobile */}
+            <div className="lg:hidden mb-8 text-center">
+              <div className="mx-auto mb-3 flex items-center justify-center gap-3">
+                <Building2 className="h-10 w-10 text-cyan-400" />
+                <span className="text-3xl font-extrabold text-white">HITS</span>
               </div>
-              <p className="text-slate-300">Employee Management System</p>
+              <p className="text-slate-300">Employee Operating System</p>
             </div>
 
-            {/* Sign Up Card */}
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 shadow-2xl opacity-0 animate-fade-in" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-white mb-2">Create your account</h2>
-                <p className="text-slate-300">Sign up to access your portal</p>
-              </div>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-6 shadow-2xl backdrop-blur-md">
+              <h3 className="text-2xl font-bold text-white">Sign in to your account</h3>
+              <p className="mt-2 text-sm text-slate-300">
+                Don’t have an account?
+                <a href="#" className="ml-1 text-cyan-300 hover:text-cyan-200">
+                  Contact the Admin for your credentials
+                </a>
+              </p>
 
-              <div className="space-y-6">
-                {/* Full Name Input */}
-                <div className="space-y-2">
-                  <label htmlFor="fullName" className="text-sm font-medium text-slate-200 block">
-                    Full Name
+              <form onSubmit={handleSignIn} className="mt-8 space-y-5">
+                <div>
+                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-200">
+                    Email address
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-                    <input
-                      id="fullName"
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all duration-200"
-                      placeholder="Enter your full name"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Email Input */}
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium text-slate-200 block">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                    <Mail className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                     <input
                       id="email"
                       type="email"
+                      required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all duration-200"
-                      placeholder="Enter your email"
-                      required
+                      className="w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-10 pr-4 text-white placeholder-slate-400 outline-none ring-0 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30"
+                      placeholder="you@company.com"
                     />
                   </div>
                 </div>
 
-                {/* Password Input */}
-                <div className="space-y-2">
-                  <label htmlFor="password" className="text-sm font-medium text-slate-200 block">
+                <div>
+                  <label htmlFor="password" className="mb-2 block text-sm font-medium text-slate-200">
                     Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                    <Lock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                     <input
                       id="password"
-                      type={showPassword ? 'text' : 'password'}
+                      type={showPassword ? "text" : "password"}
+                      required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-12 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition-all duration-200"
-                      placeholder="Enter your password"
-                      required
+                      className="w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-10 pr-12 text-white placeholder-slate-400 outline-none ring-0 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30"
+                      placeholder="6+ characters"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white transition-colors duration-200"
+                      onClick={() => setShowPassword((s) => !s)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                      aria-label="Toggle password visibility"
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
                   </div>
                 </div>
 
-                {/* Terms consent */}
-                <div className="flex items-center text-sm">
+                <div className="flex items-center justify-between text-sm">
                   <label className="flex items-center text-slate-300">
-                    <input type="checkbox" className="w-4 h-4 text-orange-400 bg-transparent border border-white/20 rounded focus:ring-orange-400 focus:ring-2" />
-                    <span className="ml-2">I agree to the Terms</span>
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-white/20 bg-transparent text-cyan-500 focus:ring-cyan-400"
+                    />
+                    <span className="ml-2">Remember me</span>
                   </label>
+                  <a href="#" className="text-orange-300 hover:text-orange-200">
+                    Forgot password?
+                  </a>
                 </div>
 
-                {/* Sign Up Button */}
                 <button
-                  type="button"
-                  onClick={handleSignUp}
+                  type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+                  className="group flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-cyan-500 to-orange-500 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:from-cyan-600 hover:to-orange-600 disabled:opacity-60"
                 >
                   {isLoading ? (
-                    <div className="flex items-center">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
-                      Creating account...
-                    </div>
+                    <span className="inline-flex items-center">
+                      <span className="mr-2 inline-block h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                      Signing in…
+                    </span>
                   ) : (
-                    <div className="flex items-center">
-                      Sign Up
-                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-                    </div>
+                    <>
+                      <LogIn className="mr-2 h-5 w-5 transition-transform group-hover:translate-x-0.5" />
+                      Sign in
+                    </>
                   )}
                 </button>
 
-                {/* Demo Credentials */}
-                <div className="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
-                  <p className="text-yellow-200 text-sm text-center mb-2 font-medium">Demo Credentials</p>
-                  <div className="text-xs text-yellow-100 space-y-1">
-                    <p><strong>Name:</strong> Tushar Kumar</p>
-                    <p><strong>Email:</strong> demo@portal.com</p>
-                    <p><strong>Password:</strong> demo123</p>
+                <div className="relative my-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-white/10" />
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="bg-transparent px-3 text-xs text-slate-400">OR</span>
                   </div>
                 </div>
-              </div>
+
+                <button
+                  type="button"
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-6 py-3 font-medium text-slate-100 hover:bg-white/10"
+                >
+                  Continue with Google
+                </button>
+              </form>
             </div>
 
-            {/* Bottom Links */}
-            <div className="text-center mt-6 opacity-0 animate-fade-in" style={{ animationDelay: '600ms', animationFillMode: 'forwards' }}>
-              <p className="text-slate-400 text-sm">
-                Already have an account?
-                <a href="#" className="text-orange-400 hover:text-orange-300 transition-colors duration-200 ml-1">Sign in</a>
-              </p>
-            </div>
+            <p className="mt-4 text-center text-sm text-slate-400">
+              Need access?
+              <a href="#" className="ml-1 text-cyan-300 hover:text-cyan-200">
+                Contact the Admin
+              </a>
+            </p>
           </div>
-        </div>
+        </main>
       </div>
 
-      <style jsx>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.8s ease-out;
+      <style jsx global>{`
+        .animate-spin-slow {
+          animation: spin 6s linear infinite;
         }
       `}</style>
     </div>

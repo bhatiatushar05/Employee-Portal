@@ -1,43 +1,46 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import HomePage from './components/HomePage/HomePage';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import LoginPage from './components/Auth/LoginPage';
 import Sidebar from './components/Sidebar/Sidebar';
+import TopRightHeader from './components/TopRightHeader/TopRightHeader';
 import Dashboard from './components/Dashboard/Dashboard';
 import EmployeePortal from './components/EmployeePortal/EmployeePortal';
-import AccountsPortal from './components/AccountsPortal/AccountsPortal';
+
 import CCTVMonitoring from './components/CCTVMonitoring/CCTVMonitoring';
 import EmployeeAttendance from './components/attendance/EmployeeAttendace';
 import VisitorManagement from './components/Vistor /Vistor';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
 
-const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
-  });
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('userData');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+const AppContent = () => {
+  const { user, logout, loading } = useAuth();
   const [activeSection, setActiveSection] = useState('dashboard');
   const [activeTab, setActiveTab] = useState('checkin');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const handleLogin = (userData) => {
-    setIsAuthenticated(true);
-    setUser(userData);
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('userData', JSON.stringify(userData));
-  };
-
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUser(null);
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userData');
+    logout();
     setActiveSection('dashboard');
     setActiveTab('checkin');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
 
   const renderContent = () => {
     switch(activeSection) {
@@ -45,8 +48,7 @@ const App = () => {
         return <Dashboard user={user} />;
       case 'employee':
         return <EmployeePortal user={user} />;
-      case 'accounts':
-        return <AccountsPortal user={user} />;
+
       case 'cctv':
         return <CCTVMonitoring activeTab={activeTab} setActiveTab={setActiveTab} user={user} />;
       case 'attendance':
@@ -57,19 +59,6 @@ const App = () => {
         return <Dashboard user={user} />;
     }
   };
-
-  if (!isAuthenticated) {
-    return (
-      <SkeletonTheme 
-        baseColor="#f3f4f6" 
-        highlightColor="#f9fafb"
-        borderRadius="0.75rem"
-        duration={1.5}
-      >
-        <HomePage onLogin={handleLogin} />
-      </SkeletonTheme>
-    );
-  }
 
   return (
     <SkeletonTheme 
@@ -125,6 +114,9 @@ const App = () => {
           user={user}
         />
 
+        {/* TopRightHeader */}
+        <TopRightHeader user={user} />
+
         {/* Main Content */}
         <div
           className={`
@@ -136,6 +128,19 @@ const App = () => {
         </div>
       </div>
     </SkeletonTheme>
+  );
+};
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/*" element={<AppContent />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 };
 
