@@ -65,23 +65,23 @@ const TopRightHeader = ({ user }) => {
 
   return (
     <>
-      <div className="fixed top-6 right-8 z-50 flex items-center gap-6">
+      <div className="fixed top-4 sm:top-6 right-3 sm:right-6 md:right-8 z-50 flex items-center gap-3 sm:gap-4 md:gap-6">
         {/* Search */}
         <div 
-          className="flex items-center gap-2 bg-white border border-gray-200 rounded-full px-3 py-1 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-1 sm:gap-2 bg-white border border-gray-200 rounded-full px-2 sm:px-3 py-1 shadow-sm cursor-pointer hover:bg-gray-50 transition-colors"
           onClick={() => setShowSearch(true)}
         >
-          <Search size={18} className="text-gray-500" />
-          <span className="text-xs text-gray-500 font-mono">⌘K</span>
+          <Search size={16} className="text-gray-500 sm:w-[18px] sm:h-[18px]" />
+          <span className="text-xs text-gray-500 font-mono hidden sm:inline">⌘K</span>
         </div>
 
         {/* Notification */}
         <button 
-          className="relative p-2 rounded-full bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
+          className="relative p-1.5 sm:p-2 rounded-full bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
           onClick={() => setShowNotifications(!showNotifications)}
         >
-          <Bell size={20} className="text-gray-500" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
+          <Bell size={18} className="text-gray-500 sm:w-5 sm:h-5" />
+          <span className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
             0
           </span>
         </button>
@@ -89,22 +89,22 @@ const TopRightHeader = ({ user }) => {
 
       {/* Search Overlay */}
       {showSearch && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-start justify-center pt-20">
-          <div ref={searchRef} className="bg-white rounded-lg shadow-2xl w-full max-w-2xl mx-4">
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex items-center gap-3">
-                <Search size={20} className="text-gray-500" />
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-start justify-center pt-16 sm:pt-20">
+          <div ref={searchRef} className="bg-white rounded-lg shadow-2xl w-full max-w-2xl mx-3 sm:mx-4">
+            <div className="p-3 sm:p-4 border-b border-gray-200">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Search size={18} className="text-gray-500 sm:w-5 sm:h-5" />
                 <input
                   type="text"
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 text-lg outline-none"
+                  className="flex-1 text-base sm:text-lg outline-none"
                   autoFocus
                 />
                 <button
                   onClick={() => setShowSearch(false)}
-                  className="px-3 py-1 text-sm text-gray-500 hover:text-gray-700"
+                  className="px-2 sm:px-3 py-1 text-xs sm:text-sm text-gray-500 hover:text-gray-700"
                 >
                   Esc
                 </button>
@@ -115,15 +115,15 @@ const TopRightHeader = ({ user }) => {
               {filteredResults.map((item, index) => (
                 <div 
                   key={index} 
-                  className="p-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 cursor-pointer transition-colors"
+                  className="p-3 sm:p-4 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 cursor-pointer transition-colors"
                   onClick={() => handleSearchResultClick(item)}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{item.icon}</span>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <span className="text-lg sm:text-xl">{item.icon}</span>
                       <div>
-                        <div className="font-medium text-gray-900">{item.name}</div>
-                        <div className="text-sm text-gray-500">{item.path}</div>
+                        <div className="font-medium text-gray-900 text-sm sm:text-base">{item.name}</div>
+                        <div className="text-xs sm:text-sm text-gray-500">{item.path}</div>
                       </div>
                     </div>
                     <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
@@ -134,7 +134,7 @@ const TopRightHeader = ({ user }) => {
               ))}
             </div>
             
-            <div className="p-4 text-center text-gray-500 text-sm">
+            <div className="p-3 sm:p-4 text-center text-gray-500 text-xs sm:text-sm">
               No Pending tasks
             </div>
           </div>
@@ -143,25 +143,25 @@ const TopRightHeader = ({ user }) => {
 
       {/* Notifications Panel */}
       {showNotifications && (
-        <div className="fixed top-20 right-8 z-[100]">
-          <div ref={notificationsRef} className="bg-white rounded-lg shadow-2xl border border-gray-200 w-80">
-            <div className="p-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+        <div className="fixed top-16 sm:top-20 right-3 sm:right-6 md:right-8 z-[100]">
+          <div ref={notificationsRef} className="bg-white rounded-lg shadow-2xl border border-gray-200 w-72 sm:w-80">
+            <div className="p-3 sm:p-4 border-b border-gray-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">Notifications</h3>
                 <div className="flex items-center gap-2">
-                  <select className="text-sm border border-gray-300 rounded px-2 py-1">
+                  <select className="text-xs sm:text-sm border border-gray-300 rounded px-2 py-1">
                     <option>Kanban</option>
                   </select>
-                  <button className="px-3 py-1 text-sm bg-blue-500 text-white rounded-full">
+                  <button className="px-2 sm:px-3 py-1 text-xs sm:text-sm bg-blue-500 text-white rounded-full">
                     Unread <span className="ml-1 bg-white text-blue-500 rounded-full px-1.5 text-xs">0</span>
                   </button>
                 </div>
               </div>
             </div>
             
-            <div className="p-8 text-center">
-              <div className="text-gray-400 text-6xl mb-4">🔔</div>
-              <p className="text-gray-500">No notifications</p>
+            <div className="p-6 sm:p-8 text-center">
+              <div className="text-gray-400 text-4xl sm:text-6xl mb-3 sm:mb-4">🔔</div>
+              <p className="text-gray-500 text-sm sm:text-base">No notifications</p>
             </div>
           </div>
         </div>

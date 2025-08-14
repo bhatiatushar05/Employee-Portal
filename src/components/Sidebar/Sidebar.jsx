@@ -61,8 +61,8 @@ const Sidebar = ({
       <button 
         onClick={onClick}
         className={`
-          group relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
-          text-sm font-medium transition-all duration-200 text-left
+          group relative w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg
+          text-xs sm:text-sm font-medium transition-all duration-200 text-left
           ${sidebarCollapsed ? 'justify-center px-2' : ''}
           ${isActive 
             ? 'bg-white/10 text-white shadow-sm border border-white/10' 
@@ -72,10 +72,10 @@ const Sidebar = ({
         title={sidebarCollapsed ? item.label : ''}
       >
         <div className={`
-          flex-shrink-0 p-1.5 rounded-md transition-all duration-200
+          flex-shrink-0 p-1 sm:p-1.5 rounded-md transition-all duration-200
           ${isActive ? 'bg-white/15' : 'group-hover:bg-white/10'}
         `}>
-          <Icon size={16} />
+          <Icon size={14} className="sm:w-4 sm:h-4" />
         </div>
         
         {!sidebarCollapsed && (
@@ -84,7 +84,7 @@ const Sidebar = ({
         
         {isActive && (
           <div className={`
-            absolute w-1 h-6 bg-blue-400 rounded-r-full transition-all duration-200
+            absolute w-1 h-5 sm:h-6 bg-orange-400 rounded-r-full transition-all duration-200
             ${sidebarCollapsed ? '-right-4' : '-right-3'}
           `} />
         )}
@@ -107,29 +107,29 @@ const Sidebar = ({
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
         md:translate-x-0 
         ${sidebarCollapsed ? 'md:w-16' : 'md:w-64'}
-        fixed md:relative z-50 md:z-auto w-64 h-full
-        bg-gradient-to-b from-blue-950 via-blue-900 to-blue-800
+        fixed md:relative z-50 md:z-auto w-72 sm:w-64 h-full
+        bg-gradient-to-br from-slate-800 via-blue-800 to-indigo-900
         text-white flex flex-col
         transition-all duration-300 ease-in-out
-        border-r border-blue-700/40
+        border-r border-slate-700/30
         shadow-xl md:shadow-none
       `}>
         
         {/* Header */}
         <div className={`
-          flex items-center justify-between p-4 border-b border-blue-700/40
+          flex items-center justify-between p-3 sm:p-4 border-b border-slate-700/30
           ${sidebarCollapsed ? 'px-2' : ''}
         `}>
           {/* Sidebar Header with Logo */}
-          <div className={`flex items-center gap-3 p-4 border-b border-blue-700/40 ${sidebarCollapsed ? 'px-2 justify-center' : ''}`}>
+          <div className={`flex items-center gap-2 sm:gap-3 p-3 sm:p-4 border-b border-slate-700/30 ${sidebarCollapsed ? 'px-2 justify-center' : ''}`}>
             <img
               src={HLogo}
               alt="Company Logo"
-              className="w-12 h-12 object-contain"
+              className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
             />
             {!sidebarCollapsed && (
               <div>
-                <h1 className="text-lg font-bold text-white">HITS</h1>
+                <h1 className="text-base sm:text-lg font-bold text-white">HITS</h1>
                 <p className="text-xs text-gray-400">Employee System</p>
               </div>
             )}
@@ -140,20 +140,20 @@ const Sidebar = ({
             onClick={() => setSidebarOpen(false)}
             className="md:hidden p-1 rounded-lg hover:bg-white/10 transition-colors"
           >
-            <X size={18} />
+            <X size={16} className="sm:w-[18px] sm:h-[18px]" />
           </button>
         </div>
 
         {/* User Section */}
         {user && (
-          <div className={`p-4 border-b border-blue-700/40 ${sidebarCollapsed ? 'px-2' : ''}`}>
+          <div className={`p-3 sm:p-4 border-b border-slate-700/30 ${sidebarCollapsed ? 'px-2' : ''}`}>
             {!sidebarCollapsed ? (
-              <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg border border-white/10">
-                <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-blue-500 rounded-full flex items-center justify-center">
-                  <User size={14} />
+              <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-white/5 rounded-lg border border-white/10">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <User size={12} className="sm:w-[14px] sm:h-[14px]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="text-xs sm:text-sm font-medium text-white truncate">
                     {user.fullName ? user.fullName.split(' ')[0] : 'User'}
                   </p>
                   <p className="text-xs text-gray-400 truncate">
@@ -163,8 +163,8 @@ const Sidebar = ({
               </div>
             ) : (
               <div className="flex justify-center">
-                <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-blue-500 rounded-full flex items-center justify-center" title={user.fullName || 'User'}>
-                  <User size={14} />
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0" title={user.fullName || 'User'}>
+                  <User size={12} className="sm:w-[14px] sm:h-[14px]" />
                 </div>
               </div>
             )}
@@ -172,11 +172,11 @@ const Sidebar = ({
         )}
 
         {/* Navigation */}
-        <nav className={`flex-1 p-4 space-y-6 overflow-y-auto ${sidebarCollapsed ? 'px-2' : ''}`}>
+        <nav className={`flex-1 p-3 sm:p-4 space-y-4 sm:space-y-6 overflow-y-auto ${sidebarCollapsed ? 'px-2' : ''}`}>
           {/* Main Navigation */}
           <div className="space-y-2">
             {!sidebarCollapsed && (
-              <h3 className="text-xs font-semibold text-blue-200 uppercase tracking-wider px-3">
+              <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider px-2 sm:px-3">
                 Main
               </h3>
             )}
@@ -195,7 +195,7 @@ const Sidebar = ({
           {/* Tools */}
           <div className="space-y-2">
             {!sidebarCollapsed && (
-              <h3 className="text-xs font-semibold text-blue-200 uppercase tracking-wider px-3">
+              <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider px-2 sm:px-3">
                 Tools
               </h3>
             )}

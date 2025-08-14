@@ -147,8 +147,6 @@ const FaceRecognitionAttendance = ({ onCheckInOut, currentCamera }) => {
   );
 };
 
-
-
 const EmployeeCheckTabs = ({ activeTab, setActiveTab, attendanceLogs }) => {
   const tabs = ['Check-In', 'Check-Out'];
   
@@ -302,92 +300,85 @@ const CCTVMonitoring = ({ user }) => {
   };
 
   return (
-    <div className="flex-1 bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 overflow-hidden">
+    <div className="flex-1 min-h-0 h-full bg-gradient-to-br from-blue-50 to-indigo-100 overflow-y-auto">
       {/* Top right header */}
       <TopRightHeader user={user} />
       
-      {/* Fixed Header */}
-      <div className="bg-white/90 backdrop-blur-md border-b border-white/20 p-6 pt-24">
-        <div className="max-w-[1400px] mx-auto">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setIsMenuOpen(true)}
-                className="p-3 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition-all duration-300 hover:scale-105 shadow-lg"
-              >
-                <Menu size={20} />
-              </button>
-              <div className="space-y-1">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 via-emerald-600 to-teal-600 bg-clip-text text-transparent leading-tight">
-                  CCTV Real-Time Monitoring
+      {/* Main Content */}
+      <div className="pt-16 sm:pt-20 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        {/* Header */}
+        <div className="bg-white rounded-xl shadow-md border border-gray-100 p-3 sm:p-4">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="p-2 bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-lg shadow-md">
+                <Camera size={16} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 leading-tight">
+                  <span className="text-gray-900">CCTV</span> <span className="text-orange-500">Real-Time Monitoring</span>
                 </h1>
-                <p className="text-gray-600 text-lg font-medium">
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">
                   {currentCamera.name} - {currentCamera.location}
                 </p>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm text-gray-600 font-medium">Live Monitoring</span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs sm:text-sm text-gray-600 font-medium">Live Monitoring</span>
                   </div>
-                  <div className="w-px h-4 bg-gray-300"></div>
-                  <span className="text-sm text-gray-500">{CAMERAS.length} Active Cameras</span>
+                  <div className="hidden sm:block w-px h-4 bg-gray-300"></div>
+                  <span className="text-xs sm:text-sm text-gray-500">{CAMERAS.length} Active Cameras</span>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                onClick={() => setIsMenuOpen(true)}
+                className="p-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-600 hover:to-red-700 transition-all duration-300 hover:scale-105 shadow-md"
+              >
+                <Menu size={16} />
+              </button>
               <div className="text-right">
-                <div className="text-sm text-gray-500">Current Time</div>
-                <div className="text-lg font-bold text-emerald-600">
+                <div className="text-xs sm:text-sm text-gray-500">Current Time</div>
+                <div className="text-base sm:text-lg font-bold text-blue-600">
                   {new Date().toLocaleTimeString()}
                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <button className="p-3 rounded-xl bg-white/80 backdrop-blur-sm border border-white/20 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-300 hover:scale-110 shadow-lg">
-                  <Search size={20} />
-                </button>
-                <button className="p-3 rounded-xl bg-white/80 backdrop-blur-sm border border-white/20 text-gray-600 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-300 hover:scale-110 shadow-lg">
-                  <User size={20} />
-                </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Scrollable Content */}
-      <div className="h-full overflow-y-auto p-8" style={{ height: 'calc(100vh - 200px)' }}>
-        <div className="max-w-[1400px] mx-auto">
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-[2fr_1fr] gap-8 min-h-full">
-            {/* Left Column - Face Recognition Attendance */}
-            <div className="flex flex-col gap-6">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+          {/* Left Column - Face Recognition Attendance */}
+          <div className="xl:col-span-2">
+            <div className="bg-white rounded-xl shadow-md border border-gray-100 p-3 sm:p-4">
               <FaceRecognitionAttendance 
                 onCheckInOut={handleCheckInOut} 
                 currentCamera={currentCamera}
               />
-
             </div>
-            {/* Right Sidebar */}
-            <div className="flex flex-col gap-6">
+          </div>
+          {/* Right Sidebar */}
+          <div className="xl:col-span-1">
+            <div className="bg-white rounded-xl shadow-md border border-gray-100 p-3 sm:p-4">
               <EmployeeCheckTabs 
                 activeTab={activeTab} 
                 setActiveTab={setActiveTab} 
                 attendanceLogs={attendanceLogs} 
               />
-
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Camera Selection Menu */}
-      <CameraMenu
-        cameras={CAMERAS}
-        currentCamera={currentCamera}
-        onCameraSelect={setCurrentCamera}
-        isOpen={isMenuOpen}
-        onClose={() => setIsMenuOpen(false)}
-      />
+        {/* Camera Selection Menu */}
+        <CameraMenu
+          cameras={CAMERAS}
+          currentCamera={currentCamera}
+          onCameraSelect={setCurrentCamera}
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+        />
+      </div>
     </div>
   );
 };
