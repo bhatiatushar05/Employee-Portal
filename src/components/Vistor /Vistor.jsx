@@ -340,57 +340,65 @@ const VisitorManagement = ({ user }) => {
 
   // PNG download for QR code and photo - Professional Visitor Pass
   const downloadQRCode = async (visitor) => {
+    // Create a larger canvas for better quality and cleaner text
     const canvas = document.createElement('canvas');
-    canvas.width = 400;
-    canvas.height = 600;
+    canvas.width = 500;
+    canvas.height = 800;
     const ctx = canvas.getContext('2d');
 
-    // Fill background with gradient-like effect
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#f8fafc');
-    gradient.addColorStop(1, '#e2e8f0');
-    ctx.fillStyle = gradient;
+    // Enable font smoothing for better text rendering
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    // Clean white background with subtle border
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add subtle border
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, canvas.width - 2, canvas.height - 2);
 
     // Header bar with HITS branding
-    ctx.fillStyle = '#1e40af'; // Blue color matching your UI
-    ctx.fillRect(0, 0, canvas.width, 60);
+    ctx.fillStyle = '#1e40af';
+    ctx.fillRect(0, 0, canvas.width, 80);
     
-    // Header text
+    // Header text - larger and bolder
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 20px Arial, sans-serif';
+    ctx.font = 'bold 28px Arial, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('VISITOR PASS', canvas.width / 2, 35);
+    ctx.fillText('VISITOR PASS', canvas.width / 2, 50);
 
-    // Company/Organization info
+    // Pass ID and Company info
     ctx.fillStyle = '#1e293b';
-    ctx.font = 'bold 16px Arial, sans-serif';
+    ctx.font = 'bold 20px Arial, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(visitor.company || 'Individual', 30, 100);
+    ctx.fillText(`Pass ID: ${visitor.id}`, 30, 120);
     
-    // Subtitle
     ctx.fillStyle = '#64748b';
-    ctx.font = '14px Arial, sans-serif';
-    ctx.fillText('HITS Portal', 30, 120);
+    ctx.font = 'bold 16px Arial, sans-serif';
+    ctx.fillText('HITS Portal', 30, 150);
 
     // Separator line
     ctx.strokeStyle = '#e2e8f0';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(30, 140);
-    ctx.lineTo(canvas.width - 30, 140);
+    ctx.moveTo(30, 170);
+    ctx.lineTo(canvas.width - 30, 170);
     ctx.stroke();
 
-    // Photo section (left side)
+    // Photo section (centered and larger)
     if (visitor.photo) {
       const img = new window.Image();
       img.onload = () => {
-        // Draw photo in a rounded rectangle effect
+        // Draw photo in center with larger size
+        const photoSize = 150;
+        const photoX = (canvas.width - photoSize) / 2;
         ctx.save();
         ctx.beginPath();
-        ctx.rect(30, 160, 120, 120);
+        ctx.rect(photoX, 190, photoSize, photoSize);
         ctx.clip();
-        ctx.drawImage(img, 30, 160, 120, 120);
+        ctx.drawImage(img, photoX, 190, photoSize, photoSize);
         ctx.restore();
         
         // Continue with QR code generation after photo is loaded
@@ -399,12 +407,14 @@ const VisitorManagement = ({ user }) => {
       img.src = visitor.photo;
     } else {
       // Placeholder if no photo
+      const photoSize = 150;
+      const photoX = (canvas.width - photoSize) / 2;
       ctx.fillStyle = '#e2e8f0';
-      ctx.fillRect(30, 160, 120, 120);
+      ctx.fillRect(photoX, 190, photoSize, photoSize);
       ctx.fillStyle = '#94a3b8';
-      ctx.font = '12px Arial, sans-serif';
+      ctx.font = 'bold 16px Arial, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('No Photo', 90, 220);
+      ctx.fillText('No Photo', canvas.width / 2, 265);
       
       // Continue with QR code generation
       generateQRAndCompletePass();
@@ -424,7 +434,7 @@ const VisitorManagement = ({ user }) => {
       // Generate QR code on a separate canvas
       const qrCanvas = document.createElement('canvas');
       QRCode.toCanvas(qrCanvas, JSON.stringify(qrData), {
-        width: 120,
+        width: 60, // Smaller QR code
         margin: 1,
         color: {
           dark: '#1e293b',
@@ -436,49 +446,50 @@ const VisitorManagement = ({ user }) => {
           return;
         }
         
-        // Draw QR code on the right side
-        ctx.drawImage(qrCanvas, canvas.width - 150, 160, 120, 120);
+        // Draw QR code at bottom center
+        const qrSize = 60;
+        const qrX = (canvas.width - qrSize) / 2;
+        const qrY = 580; // Bottom center position
+        ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
         
-        // Date
+        // Date below QR code
         ctx.fillStyle = '#1e293b';
         ctx.font = 'bold 14px Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(new Date().toLocaleDateString(), canvas.width - 90, 300);
+        ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, qrY + qrSize + 25);
         
-        // Visitor details section
+        // Visitor details section - positioned below photo with proper spacing
         ctx.fillStyle = '#1e293b';
-        ctx.font = 'bold 18px Arial, sans-serif';
-        ctx.textAlign = 'left';
-        ctx.fillText(visitor.name, 30, 320);
+        ctx.font = 'bold 24px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(visitor.name, canvas.width / 2, 380);
         
-        // Contact info
+        // Contact info with proper spacing - centered layout
         ctx.fillStyle = '#64748b';
-        ctx.font = '12px Arial, sans-serif';
-        ctx.fillText(`Phone: ${visitor.phone}`, 30, 345);
+        ctx.font = 'bold 16px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Phone: ${visitor.phone}`, canvas.width / 2, 410);
         
         if (visitor.email) {
-          ctx.fillText(`Email: ${visitor.email}`, 30, 365);
+          ctx.fillText(`Email: ${visitor.email}`, canvas.width / 2, 440);
         }
         
-        ctx.fillText(`Host: ${visitor.hostEmployee}`, 30, 385);
-        ctx.fillText(`Check-In: ${visitor.checkInTime}`, 30, 405);
+        ctx.fillText(`Host: ${visitor.hostEmployee}`, canvas.width / 2, 470);
+        ctx.fillText(`Check-In: ${visitor.checkInTime}`, canvas.width / 2, 500);
         if (visitor.checkOutTime) {
-          ctx.fillText(`Check-Out: ${visitor.checkOutTime}`, 30, 425);
-          ctx.fillText(`Purpose: ${visitor.purpose}`, 30, 445);
-        } else {
-          ctx.fillText(`Purpose: ${visitor.purpose}`, 30, 425);
+          ctx.fillText(`Check-Out: ${visitor.checkOutTime}`, canvas.width / 2, 530);
         }
         
-        // Footer with HITS branding
-        ctx.fillStyle = '#64748b';
-        ctx.font = '12px Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('powered by', canvas.width / 2, 570);
+        // Purpose - positioned above QR code
+        ctx.fillText(`Purpose: ${visitor.purpose}`, canvas.width / 2, 560);
         
-        // HITS logo text
-        ctx.fillStyle = '#1e40af';
-        ctx.font = 'bold 16px Arial, sans-serif';
-        ctx.fillText('HITS', canvas.width / 2, 590);
+        // Add a separator line before footer
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(30, 680);
+        ctx.lineTo(canvas.width - 30, 680);
+        ctx.stroke();
         
         // Download the final image
         const pngUrl = canvas.toDataURL("image/png", 1.0);
@@ -1355,11 +1366,10 @@ const VisitorManagement = ({ user }) => {
                   </div>
                   
                   {/* Footer */}
-                  <div className="text-center mt-3 pt-2 border-t border-gray-200">
-                    <p className="text-xs text-gray-500">powered by</p>
-                    <p className="font-bold text-blue-600 text-xs">HITS</p>
-                  </div>
+                  
                 </div>
+                 
+              
                 
                 {/* Action Buttons */}
                 <div className="flex gap-3 mt-4">

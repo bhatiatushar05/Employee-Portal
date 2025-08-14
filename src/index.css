@@ -98,6 +98,22 @@ body {
   animation: slide-in-left 0.8s ease-out 0.2s both;
 }
 
+/* Color Preset Variables for TopRightHeader */
+:root {
+  --green-500: #10b981;
+  --green-600: #059669;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --purple-500: #8b5cf6;
+  --purple-600: #7c3aed;
+  --orange-500: #f59e0b;
+  --orange-600: #d97706;
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --teal-500: #14b8a6;
+  --teal-600: #0d9488;
+}
+
 .animate-slide-in-left-delay-2 {
   animation: slide-in-left 0.8s ease-out 0.4s both;
 }
