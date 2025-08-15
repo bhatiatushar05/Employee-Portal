@@ -14,6 +14,7 @@ import CCTVMonitoring from './components/CCTVMonitoring/CCTVMonitoring';
 import EmployeeAttendance from './components/Attendace /EmployeeAttendace';
 import VisitorManagement from './components/Vistor /Vistor';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
+import { Chat } from './components/Chat';
 
 const AppContent = () => {
   const { user, logout, loading } = useAuth();
@@ -49,7 +50,8 @@ const AppContent = () => {
         return <Dashboard user={user} />;
       case 'employee':
         return <EmployeePortal user={user} />;
-
+      case 'chat':
+        return <Chat user={user} />;
       case 'cctv':
         return <CCTVMonitoring activeTab={activeTab} setActiveTab={setActiveTab} user={user} />;
       case 'attendance':
@@ -121,14 +123,14 @@ const AppContent = () => {
         {/* Main Content */}
         <div
           className={`
-            flex-1 pt-16 md:pt-0 overflow-hidden transition-all duration-500 ease-in-out
-            ${sidebarCollapsed ? 'md:ml-0' : 'md:ml-0'}
+            flex-1 min-h-screen transition-all duration-500 ease-in-out
+            ${activeSection === 'chat' ? 'pt-16 md:pt-20 overflow-auto' : 'pt-16 md:pt-0 overflow-auto'}
           `}
         >
           {renderContent()}
-          
-          {/* Footer Blank Space */}
-          <div className="h-16 sm:h-20 md:h-24"></div>
+          {activeSection === 'chat' && (
+            <div className="h-40 sm:h-40 md:h-40"></div>
+          )}
         </div>
       </div>
     </SkeletonTheme>

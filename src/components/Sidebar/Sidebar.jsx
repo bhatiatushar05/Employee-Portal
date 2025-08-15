@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { Home, Camera, CheckCircle, FolderOpen, Settings, X, LogOut, Building2, LayoutDashboard, User, ChevronLeft, ChevronRight, Clock, Users, Menu, Bell, Search, Moon, Sun } from 'lucide-react';
+import { Home, Camera, CheckCircle, FolderOpen, Settings, X, LogOut, Building2, LayoutDashboard, User, ChevronLeft, ChevronRight, Clock, Users, Menu, Bell, Search, Moon, Sun, MessageCircle } from 'lucide-react';
 import HLogo from '../../assets/H logo.png'; // Make sure the file is in src/assets/
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -25,6 +25,7 @@ const Sidebar = ({
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, category: 'main', permission: 'dashboard' },
       { id: 'employee', label: isAdmin() ? 'Request Management' : 'Employee Portal', icon: Home, category: 'main', permission: 'employee-portal' },
       { id: 'attendance', label: 'Attendance', icon: Clock, category: 'main', permission: 'attendance' },
+      { id: 'chat', label: 'Chat', icon: MessageCircle, category: 'main', permission: 'chat' },
     ];
 
     // Admin-only items
