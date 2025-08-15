@@ -1786,7 +1786,7 @@ const VisitorManagement = ({ user }) => {
       <TopRightHeader user={user} />
       
       {/* Main Content with proper spacing */}
-      <div className="pt-20 pb-2 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
+      <div className="pt-6 pb-2 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import LoginPage from './components/Auth/LoginPage';
 import Sidebar from './components/Sidebar/Sidebar';
 import TopRightHeader from './components/TopRightHeader/TopRightHeader';
@@ -29,10 +30,10 @@ const AppContent = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 dark:from-dark-bg dark:via-dark-surface dark:to-dark-card flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-orange-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Loading...</p>
         </div>
       </div>
     );
@@ -62,12 +63,12 @@ const AppContent = () => {
 
   return (
     <SkeletonTheme 
-      baseColor="#f3f4f6" 
-      highlightColor="#f9fafb"
+      baseColor={document.documentElement.classList.contains('dark') ? "#374151" : "#f3f4f6"}
+      highlightColor={document.documentElement.classList.contains('dark') ? "#4b5563" : "#f9fafb"}
       borderRadius="0.75rem"
       duration={1.5}
     >
-      <div className="h-screen bg-gray-50 font-sans flex">
+      <div className="h-screen bg-gray-50 dark:bg-dark-bg font-sans flex transition-colors duration-300">
         {/* Mobile Overlay */}
         {sidebarOpen && (
           <div 
@@ -77,22 +78,22 @@ const AppContent = () => {
         )}
 
         {/* Mobile Header */}
-        <div className="md:hidden fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 p-4 flex items-center justify-between z-30">
+        <div className="md:hidden fixed top-0 left-0 right-0 bg-white dark:bg-dark-surface shadow-sm border-b border-gray-200 dark:border-dark-border p-4 flex items-center justify-between z-30">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              className="p-2 rounded-md text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-card"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <h1 className="text-lg font-semibold text-gray-900">Portal</h1>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">Portal</h1>
           </div>
           <div className="flex items-center space-x-2">
             <button
               onClick={handleLogout}
-              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="p-2 rounded-md text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-dark-card min-h-[44px] min-w-[44px] flex items-center justify-center"
               title="Logout"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -136,14 +137,16 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/*" element={<AppContent />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/*" element={<AppContent />} />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

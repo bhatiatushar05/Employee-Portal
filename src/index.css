@@ -12,6 +12,18 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   background-color: #fbfbfb;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode styles */
+.dark body {
+  background-color: #0a0a0f;
+  color: #f9fafb;
+}
+
+/* Dark mode transitions */
+.dark * {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 /* Custom Animations */
@@ -114,6 +126,22 @@ body {
   --teal-600: #0d9488;
 }
 
+/* Dark mode color variables */
+.dark {
+  --green-500: #22c55e;
+  --green-600: #16a34a;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --purple-500: #a855f7;
+  --purple-600: #9333ea;
+  --orange-500: #f97316;
+  --orange-600: #ea580c;
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --teal-500: #14b8a6;
+  --teal-600: #0d9488;
+}
+
 .animate-slide-in-left-delay-2 {
   animation: slide-in-left 0.8s ease-out 0.4s both;
 }
@@ -146,6 +174,10 @@ body {
 .hover-lift:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.dark .hover-lift:hover {
+  box-shadow: 0 10px 25px rgba(249, 115, 22, 0.2);
 }
 
 /* Hide Scrollbars */

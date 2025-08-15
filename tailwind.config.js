@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
+  darkMode: 'class', // Enable dark mode with class strategy
   theme: {
     extend: {
       keyframes: {
@@ -79,6 +80,19 @@ export default {
           700: '#15803d',
           800: '#166534',
           900: '#14532d',
+        },
+        // Custom dark mode colors
+        'dark': {
+          'bg': '#0a0a0f', // Very dark blue-black
+          'surface': '#111827', // Dark blue-gray
+          'card': '#1f2937', // Dark blue-gray surface
+          'border': '#374151', // Dark blue-gray border
+          'text': '#f9fafb', // Light text
+          'text-secondary': '#d1d5db', // Secondary text
+          'accent': '#f97316', // Orange accent
+          'accent-hover': '#ea580c', // Darker orange on hover
+          'primary': '#1e40af', // Dark blue primary
+          'primary-hover': '#1e3a8a', // Darker blue on hover
         }
       }
     },

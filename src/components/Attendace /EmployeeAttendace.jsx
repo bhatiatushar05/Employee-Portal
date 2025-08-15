@@ -416,9 +416,9 @@ const EmployeeAttendance = ({ user }) => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'checked-in': return 'bg-green-100 text-green-800';
-      case 'checked-out': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'checked-in': return 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300';
+      case 'checked-out': return 'bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300';
+      default: return 'bg-gray-100 dark:bg-gray-900/20 text-gray-800 dark:text-gray-300';
     }
   };
 
@@ -690,33 +690,33 @@ const EmployeeAttendance = ({ user }) => {
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="bg-gray-50 border-b border-gray-200">
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Employee</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Date</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Check In</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Check Out</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Working Hours</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Photos</th>
+          <tr className="bg-gray-50 dark:bg-dark-surface border-b border-gray-200 dark:border-dark-border">
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-white uppercase tracking-wider transition-colors duration-300">Employee</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-white uppercase tracking-wider transition-colors duration-300">Date</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-white uppercase tracking-wider transition-colors duration-300">Check In</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-white uppercase tracking-wider transition-colors duration-300">Check Out</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-white uppercase tracking-wider transition-colors duration-300">Working Hours</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-white uppercase tracking-wider transition-colors duration-300">Status</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-white uppercase tracking-wider transition-colors duration-300">Photos</th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-50">
+        <tbody className="bg-white dark:bg-dark-card divide-y divide-gray-50 dark:divide-dark-border">
           {filteredRecords.length > 0 ? (
             filteredRecords.map((record, index) => (
-              <tr key={record.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-200`}>
-                <td className="px-4 py-3 text-sm text-gray-900 font-medium">
+              <tr key={record.id} className={`${index % 2 === 0 ? 'bg-white dark:bg-dark-card' : 'bg-gray-50 dark:bg-dark-surface'} hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors duration-200`}>
+                <td className="px-4 py-3 text-sm text-gray-900 dark:text-white font-medium transition-colors duration-300">
                   {record.employeeName}
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-900">
+                <td className="px-4 py-3 text-sm text-gray-900 dark:text-white transition-colors duration-300">
                   {new Date(record.date).toLocaleDateString()}
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-900">
+                <td className="px-4 py-3 text-sm text-gray-900 dark:text-white transition-colors duration-300">
                   {record.checkInTime}
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-900">
+                <td className="px-4 py-3 text-sm text-gray-900 dark:text-white transition-colors duration-300">
                   {record.checkOutTime || '-'}
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-900">
+                <td className="px-4 py-3 text-sm text-gray-900 dark:text-white transition-colors duration-300">
                   {record.workingHours ? `${record.workingHours} hrs` : '-'}
                 </td>
                 <td className="px-4 py-3">
@@ -729,7 +729,7 @@ const EmployeeAttendance = ({ user }) => {
                     {record.checkInPhoto && (
                       <button
                         onClick={() => { setSelectedPhoto(record.checkInPhoto); setShowPhotoModal(true); }}
-                        className="w-8 h-8 rounded-full overflow-hidden border border-gray-300 hover:border-blue-500 transition-colors"
+                        className="w-8 h-8 rounded-full overflow-hidden border border-gray-300 dark:border-dark-border hover:border-blue-500 transition-colors"
                       >
                         <img src={record.checkInPhoto} alt="Check In" className="w-full h-full object-cover" title="View Check In Photo" />
                       </button>
@@ -737,7 +737,7 @@ const EmployeeAttendance = ({ user }) => {
                     {record.checkOutPhoto && (
                       <button
                         onClick={() => { setSelectedPhoto(record.checkOutPhoto); setShowPhotoModal(true); }}
-                        className="w-8 h-8 rounded-full overflow-hidden border border-gray-300 hover:border-blue-500 transition-colors"
+                        className="w-8 h-8 rounded-full overflow-hidden border border-gray-300 dark:border-dark-border hover:border-blue-500 transition-colors"
                       >
                         <img src={record.checkOutPhoto} alt="Check Out" className="w-full h-full object-cover" title="View Check Out Photo" />
                       </button>
@@ -748,12 +748,12 @@ const EmployeeAttendance = ({ user }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
+              <td colSpan="7" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                 <div className="flex flex-col items-center gap-2">
-                  <Clock size={32} className="text-gray-300" />
+                  <Clock size={32} className="text-gray-300 dark:text-gray-600 transition-colors duration-300" />
                   <div>
-                    <p className="text-base font-medium">No attendance records found</p>
-                    <p className="text-xs text-gray-400">Attendance records will appear here</p>
+                    <p className="text-base font-medium text-gray-900 dark:text-white transition-colors duration-300">No attendance records found</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 transition-colors duration-300">Attendance records will appear here</p>
                   </div>
                 </div>
               </td>
@@ -768,43 +768,43 @@ const EmployeeAttendance = ({ user }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
       {filteredRecords.length > 0 ? (
         filteredRecords.map((record) => (
-          <div key={record.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
+          <div key={record.id} className="bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-lg p-4 hover:shadow-lg transition-shadow duration-200 transition-colors duration-300">
             <div className="text-center mb-3">
               <div className="flex justify-center gap-2 mb-2">
                 {record.checkInPhoto && (
-                  <img src={record.checkInPhoto} alt="Check In" className="w-12 h-12 rounded-full object-cover border-2 border-green-300" title="Check In Photo" />
+                  <img src={record.checkInPhoto} alt="Check In" className="w-12 h-12 rounded-full object-cover border-2 border-green-300 dark:border-green-600" title="Check In Photo" />
                 )}
                 {record.checkOutPhoto && (
-                  <img src={record.checkOutPhoto} alt="Check Out" className="w-12 h-12 rounded-full object-cover border-2 border-blue-300" title="Check Out Photo" />
+                  <img src={record.checkOutPhoto} alt="Check Out" className="w-12 h-12 rounded-full object-cover border-2 border-blue-300 dark:border-blue-600" title="Check Out Photo" />
                 )}
                 {!record.checkInPhoto && !record.checkOutPhoto && (
-                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
-                    <User size={24} className="text-gray-400" />
+                  <div className="w-12 h-12 bg-gray-200 dark:bg-dark-surface rounded-full flex items-center justify-center">
+                    <User size={24} className="text-gray-400 dark:text-gray-500" />
                   </div>
                 )}
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1 transition-colors duration-300">
                 {new Date(record.date).toLocaleDateString()}
               </h3>
               <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(record.status)} mb-3`}>
                 {record.status === 'checked-in' ? 'Checked In' : 'Checked Out'}
               </span>
             </div>
-            <div className="space-y-2 text-sm text-gray-600 mb-4">
+            <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300 mb-4 transition-colors duration-300">
               <div className="flex items-center gap-2">
-                <CheckCircle size={14} className="text-green-500" />
+                <CheckCircle size={14} className="text-green-500 dark:text-green-400" />
                 <span>Check In: {record.checkInTime}</span>
               </div>
               <div className="flex items-center gap-2">
-                <XCircle size={14} className="text-blue-500" />
+                <XCircle size={14} className="text-blue-500 dark:text-blue-400" />
                 <span>Check Out: {record.checkOutTime || 'Not checked out'}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Timer size={14} className="text-orange-500" />
+                <Timer size={14} className="text-orange-500 dark:text-orange-400" />
                 <span>Hours: {record.workingHours ? `${record.workingHours} hrs` : 'In progress...'}</span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin size={14} className="text-gray-500" />
+                <MapPin size={14} className="text-gray-500 dark:text-gray-400" />
                 <span className="truncate">Location: {record.location}</span>
               </div>
             </div>
@@ -812,16 +812,16 @@ const EmployeeAttendance = ({ user }) => {
         ))
       ) : (
         <div className="col-span-full text-center py-8">
-          <Clock size={32} className="text-gray-300 mx-auto mb-2" />
-          <p className="text-base font-medium text-gray-500">No attendance records found</p>
-          <p className="text-sm text-gray-400">Your attendance history will appear here</p>
+          <Clock size={32} className="text-gray-300 dark:text-gray-600 mx-auto mb-2 transition-colors duration-300" />
+          <p className="text-base font-medium text-gray-500 dark:text-gray-400 transition-colors duration-300">No attendance records found</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 transition-colors duration-300">Your attendance history will appear here</p>
         </div>
       )}
     </div>
   );
 
   return (
-    <div className="flex-1 min-h-0 h-full bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100 overflow-y-auto">
+    <div className="flex-1 min-h-0 h-full bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100 dark:from-dark-bg dark:via-dark-surface dark:to-dark-card overflow-y-auto transition-colors duration-300">
       {/* Top right header */}
       <TopRightHeader user={user} />
       
@@ -842,27 +842,27 @@ const EmployeeAttendance = ({ user }) => {
       )}
       
       {/* Main Content with proper spacing */}
-      <div className="pt-16 sm:pt-6 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
+      <div className="pt-2 sm:pt-2 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="bg-white rounded-xl shadow-md border border-gray-100 p-3 sm:p-4">
+        <div className="bg-white dark:bg-dark-card rounded-xl shadow-md border border-gray-100 dark:border-dark-border p-3 sm:p-4 transition-colors duration-300">
           <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="p-2 bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-lg shadow-lg">
                 <Clock size={16} />
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 leading-tight">
+                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white leading-tight transition-colors duration-300">
                   {isAdmin() ? (
                     <>
-                      <span className="text-gray-900">Employee</span> <span className="text-orange-500">Attendance Management</span>
+                      <span className="text-gray-900 dark:text-white">Employee</span> <span className="text-orange-500 dark:text-orange-400">Attendance Management</span>
                     </>
                   ) : (
                     <>
-                      <span className="text-gray-900">Employee</span> <span className="text-orange-500">Attendance</span>
+                      <span className="text-gray-900 dark:text-white">Employee</span> <span className="text-orange-500 dark:text-orange-400">Attendance</span>
                     </>
                   )}
                 </h1>
-                <p className="text-xs sm:text-sm text-gray-600 mt-1 hidden sm:block">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 mt-1 hidden sm:block transition-colors duration-300">
                   {isAdmin() 
                     ? 'Monitor employee attendance, check-in times, and working hours across the organization'
                     : 'Track your daily work hours and attendance with photo verification'
@@ -874,7 +874,7 @@ const EmployeeAttendance = ({ user }) => {
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <button
                   onClick={() => setShowAnalytics(true)}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-sm font-medium border border-gray-200"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 bg-white dark:bg-dark-surface text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-card transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-sm font-medium border border-gray-200 dark:border-dark-border"
                 >
                   <BarChart3 size={12} className="sm:w-3.5 sm:h-3.5" />
                   <span className="hidden sm:inline">Analytics</span>
@@ -882,7 +882,7 @@ const EmployeeAttendance = ({ user }) => {
                 </button>
                 <button 
                   onClick={() => exportAttendanceData()}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-sm font-medium border border-gray-200"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 bg-white dark:bg-dark-surface text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-dark-card transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-sm font-medium border border-gray-200 dark:border-dark-border"
                 >
                   <Download size={12} className="sm:w-3.5 sm:h-3.5" />
                   <span className="hidden sm:inline">Export</span>
@@ -937,92 +937,92 @@ const EmployeeAttendance = ({ user }) => {
         {/* Stats Cards */}
         {isAdmin() ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-            <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300">
+            <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border hover:shadow-lg transition-all duration-300">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-2 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-lg flex-shrink-0">
+                <div className="p-2 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 text-blue-700 dark:text-blue-300 rounded-lg flex-shrink-0">
                   <Users size={16} />
               </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-medium text-gray-700 text-xs truncate">Today's Attendance</h3>
-                  <p className="text-base sm:text-lg font-bold text-blue-600 mt-1">
+                  <h3 className="font-medium text-gray-700 dark:text-gray-200 text-xs truncate transition-colors duration-300">Today's Attendance</h3>
+                  <p className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400 mt-1 transition-colors duration-300">
                     {analyticsData.today.checkedIn}/{analyticsData.today.total}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300">
+            <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border hover:shadow-lg transition-all duration-300">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-2 bg-gradient-to-r from-green-100 to-green-200 text-green-700 rounded-lg flex-shrink-0">
+                <div className="p-2 bg-gradient-to-r from-green-100 to-green-200 dark:from-green-900/20 dark:to-green-800/20 text-green-700 dark:text-green-300 rounded-lg flex-shrink-0">
                   <Clock size={16} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-medium text-gray-700 text-xs truncate">Avg Check-in Time</h3>
-                  <p className="text-base sm:text-lg font-bold text-green-600 mt-1">{analyticsData.checkInAnalysis.average}:00</p>
+                  <h3 className="font-medium text-gray-700 dark:text-gray-200 text-xs truncate transition-colors duration-300">Avg Check-in Time</h3>
+                  <p className="text-base sm:text-lg font-bold text-green-600 dark:text-green-400 mt-1 transition-colors duration-300">{analyticsData.checkInAnalysis.average}:00</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300">
+            <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border hover:shadow-lg transition-all duration-300">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-2 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-700 rounded-lg flex-shrink-0">
+                <div className="p-2 bg-gradient-to-r from-orange-100 to-orange-200 dark:from-orange-900/20 dark:to-orange-800/20 text-orange-700 dark:text-orange-300 rounded-lg flex-shrink-0">
                   <Timer size={16} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-medium text-gray-700 text-xs truncate">Weekly Avg Hours</h3>
-                  <p className="text-base sm:text-lg font-bold text-orange-600 mt-1">{analyticsData.weekly.averageHours}h</p>
+                  <h3 className="font-medium text-gray-700 dark:text-gray-200 text-xs truncate transition-colors duration-300">Weekly Avg Hours</h3>
+                  <p className="text-base sm:text-lg font-bold text-orange-600 dark:text-orange-400 mt-1 transition-colors duration-300">{analyticsData.weekly.averageHours}h</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300">
+            <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border hover:shadow-lg transition-all duration-300">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-2 bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700 rounded-lg flex-shrink-0">
+                <div className="p-2 bg-gradient-to-r from-purple-100 to-purple-200 dark:from-purple-900/20 dark:to-purple-800/20 text-purple-700 dark:text-purple-300 rounded-lg flex-shrink-0">
                   <TrendingUp size={16} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-medium text-gray-700 text-xs truncate">Monthly Total</h3>
-                  <p className="text-base sm:text-lg font-bold text-purple-600 mt-1">{analyticsData.monthly.totalHours}h</p>
+                  <h3 className="font-medium text-gray-700 dark:text-gray-200 text-xs truncate transition-colors duration-300">Monthly Total</h3>
+                  <p className="text-base sm:text-lg font-bold text-purple-600 dark:text-purple-400 mt-1 transition-colors duration-300">{analyticsData.monthly.totalHours}h</p>
                 </div>
               </div>
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-            <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300">
+            <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border hover:shadow-lg transition-all duration-300">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-2 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-lg flex-shrink-0">
+                <div className="p-2 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 text-blue-700 dark:text-blue-300 rounded-lg flex-shrink-0">
                   <Timer size={16} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-medium text-gray-700 text-xs truncate">Current Time</h3>
-                  <p className="text-base sm:text-lg font-bold text-blue-600 mt-1">
+                  <h3 className="font-medium text-gray-700 dark:text-gray-200 text-xs truncate transition-colors duration-300">Current Time</h3>
+                  <p className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400 mt-1 transition-colors duration-300">
                   {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
             </div>
           </div>
 
-            <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300">
+            <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border hover:shadow-lg transition-all duration-300">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-2 bg-gradient-to-r from-green-100 to-green-200 text-green-700 rounded-lg flex-shrink-0">
+                <div className="p-2 bg-gradient-to-r from-green-100 to-green-200 dark:from-green-900/20 dark:to-green-800/20 text-green-700 dark:text-green-300 rounded-lg flex-shrink-0">
                   <User size={16} />
               </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-medium text-gray-700 text-xs truncate">Employee</h3>
-                  <p className="text-sm font-bold text-green-600 mt-1 truncate">{user?.fullName || 'John Doe'}</p>
+                  <h3 className="font-medium text-gray-700 dark:text-gray-200 text-xs truncate transition-colors duration-300">Employee</h3>
+                  <p className="text-sm font-bold text-green-600 dark:text-green-400 mt-1 truncate transition-colors duration-300">{user?.fullName || 'John Doe'}</p>
               </div>
             </div>
           </div>
 
-            <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300">
+            <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border hover:shadow-lg transition-all duration-300">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className={`p-2 rounded-lg flex-shrink-0 ${currentStatus === 'checked-in' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                <div className={`p-2 rounded-lg flex-shrink-0 ${currentStatus === 'checked-in' ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-900/20 text-gray-700 dark:text-gray-300'}`}>
                   {currentStatus === 'checked-in' ? <CheckCircle size={16} /> : <XCircle size={16} />}
               </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-medium text-gray-700 text-xs truncate">Status</h3>
-                  <p className={`text-sm font-bold mt-1 truncate ${currentStatus === 'checked-in' ? 'text-green-600' : 'text-gray-600'}`}>
+                  <h3 className="font-medium text-gray-700 dark:text-gray-200 text-xs truncate transition-colors duration-300">Status</h3>
+                  <p className={`text-sm font-bold mt-1 truncate transition-colors duration-300 ${currentStatus === 'checked-in' ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400'}`}>
                   {currentStatus === 'checked-in' ? 'Checked In' : 
                    currentStatus === 'checked-out' ? 'Checked Out' : 'Not Checked In'}
                 </p>
@@ -1030,14 +1030,14 @@ const EmployeeAttendance = ({ user }) => {
             </div>
           </div>
 
-            <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300">
+            <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border hover:shadow-lg transition-all duration-300">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-2 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-700 rounded-lg flex-shrink-0">
+                <div className="p-2 bg-gradient-to-r from-orange-100 to-orange-200 dark:from-orange-900/20 dark:to-orange-800/20 text-orange-700 dark:text-orange-300 rounded-lg flex-shrink-0">
                   <TrendingUp size={16} />
               </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-medium text-gray-700 text-xs truncate">Weekly Hours</h3>
-                  <p className="text-base sm:text-lg font-bold text-orange-600 mt-1">{getTotalWorkingHours()}h</p>
+                  <h3 className="font-medium text-gray-700 dark:text-gray-200 text-xs truncate transition-colors duration-300">Weekly Hours</h3>
+                  <p className="text-base sm:text-lg font-bold text-orange-600 dark:text-orange-400 mt-1 transition-colors duration-300">{getTotalWorkingHours()}h</p>
               </div>
             </div>
           </div>
@@ -1046,35 +1046,35 @@ const EmployeeAttendance = ({ user }) => {
 
         {/* Employee Check-in/Check-out Section */}
         {isEmployee() && (
-          <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100">
-            <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Attendance Actions</h2>
+          <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border transition-colors duration-300">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 transition-colors duration-300">Attendance Actions</h2>
           
           {todayRecord && (
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 border border-blue-200">
-                <h3 className="font-semibold text-blue-900 mb-3 sm:mb-4 text-base sm:text-lg">Today's Record</h3>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 border border-blue-200 dark:border-blue-700 transition-colors duration-300">
+                <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-3 sm:mb-4 text-base sm:text-lg transition-colors duration-300">Today's Record</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
                   <div className="text-center">
-                    <p className="text-xs sm:text-sm text-blue-600 font-medium">Check In</p>
-                    <p className="font-bold text-blue-900 text-base sm:text-lg">{todayRecord.checkInTime}</p>
+                    <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-medium transition-colors duration-300">Check In</p>
+                    <p className="font-bold text-blue-900 dark:text-blue-200 text-base sm:text-lg transition-colors duration-300">{todayRecord.checkInTime}</p>
                 </div>
                   <div className="text-center">
-                    <p className="text-xs sm:text-sm text-blue-600 font-medium">Check Out</p>
-                    <p className="font-bold text-blue-900 text-base sm:text-lg">{todayRecord.checkOutTime || 'Not checked out'}</p>
+                    <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-medium transition-colors duration-300">Check Out</p>
+                    <p className="font-bold text-blue-900 dark:text-blue-200 text-base sm:text-lg transition-colors duration-300">{todayRecord.checkOutTime || 'Not checked out'}</p>
                 </div>
                   <div className="text-center">
-                    <p className="text-xs sm:text-sm text-blue-600 font-medium">Working Hours</p>
-                    <p className="font-bold text-blue-900 text-base sm:text-lg">
+                    <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-medium transition-colors duration-300">Working Hours</p>
+                    <p className="font-bold text-blue-900 dark:text-blue-200 text-base sm:text-lg transition-colors duration-300">
                     {todayRecord.workingHours ? `${todayRecord.workingHours} hrs` : 'In progress...'}
                   </p>
                 </div>
                   <div className="text-center">
-                    <p className="text-xs sm:text-sm text-blue-600 font-medium mb-2">Photos</p>
+                    <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-medium mb-2 transition-colors duration-300">Photos</p>
                     <div className="flex justify-center gap-2 sm:gap-3">
                     {todayRecord.checkInPhoto && (
-                        <img src={todayRecord.checkInPhoto} alt="Check In" className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-blue-300 shadow-md" title="Check In Photo" />
+                        <img src={todayRecord.checkInPhoto} alt="Check In" className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-blue-300 dark:border-blue-600 shadow-md" title="Check In Photo" />
                     )}
                     {todayRecord.checkOutPhoto && (
-                        <img src={todayRecord.checkOutPhoto} alt="Check Out" className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-blue-300 shadow-md" title="Check Out Photo" />
+                        <img src={todayRecord.checkOutPhoto} alt="Check Out" className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-blue-300 dark:border-blue-600 shadow-md" title="Check Out Photo" />
                     )}
                   </div>
                 </div>
@@ -1117,7 +1117,7 @@ const EmployeeAttendance = ({ user }) => {
           </div>
 
           {location && (
-              <div className="mt-4 sm:mt-6 text-sm sm:text-base text-gray-600 flex items-center gap-2 sm:gap-3 justify-center">
+              <div className="mt-4 sm:mt-6 text-sm sm:text-base text-gray-600 dark:text-gray-400 flex items-center gap-2 sm:gap-3 justify-center transition-colors duration-300">
                 <MapPin size={16} className="sm:w-[18px] sm:h-[18px]" />
                 <span className="font-medium">Location: {location}</span>
             </div>
@@ -1127,19 +1127,19 @@ const EmployeeAttendance = ({ user }) => {
 
                 {/* Search and Filters - Admin Only */}
         {isAdmin() && (
-          <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100">
-            <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Search & Filters</h2>
+          <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border transition-colors duration-300">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 transition-colors duration-300">Search & Filters</h2>
             
             <div className="space-y-4 sm:space-y-6">
               {/* Search Bar */}
               <div className="relative">
-                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 sm:w-5 sm:h-5" size={18} />
+                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 sm:w-5 sm:h-5 transition-colors duration-300" size={18} />
                 <input
                   type="text"
                   placeholder="Search by employee name, ID, or date..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                  className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-3 sm:py-4 border border-gray-300 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-white dark:bg-dark-surface text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                 />
               </div>
               
@@ -1147,12 +1147,12 @@ const EmployeeAttendance = ({ user }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                 {/* Employee Filter */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Employee</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 mb-2 sm:mb-3 transition-colors duration-300">Employee</label>
                   <div className="relative">
                     <select
                       value={employeeFilter}
                       onChange={(e) => setEmployeeFilter(e.target.value)}
-                      className="w-full pl-3 sm:pl-4 pr-8 sm:pr-10 py-2.5 sm:py-3 border border-gray-300 rounded-xl appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                      className="w-full pl-3 sm:pl-4 pr-8 sm:pr-10 py-2.5 sm:py-3 border border-gray-300 dark:border-dark-border rounded-xl appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-white dark:bg-dark-surface text-gray-900 dark:text-white"
                     >
                       <option value="all">All Employees</option>
                       <option value="john@company.com">John Doe</option>
@@ -1160,35 +1160,35 @@ const EmployeeAttendance = ({ user }) => {
                       <option value="mike@company.com">Mike Chen</option>
                       <option value="emma@company.com">Emma Davis</option>
                     </select>
-                    <ChevronDown className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-400 sm:w-[18px] sm:h-[18px]" size={16} />
+                    <ChevronDown className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 sm:w-[18px] sm:h-[18px] transition-colors duration-300" size={16} />
                   </div>
                 </div>
                 
                 {/* Status Filter */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Status</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 mb-2 sm:mb-3 transition-colors duration-300">Status</label>
                   <div className="relative">
                     <select
                       value={statusFilter}
                       onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full pl-3 sm:pl-4 pr-8 sm:pr-10 py-2.5 sm:py-3 border border-gray-300 rounded-xl appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                      className="w-full pl-3 sm:pl-4 pr-8 sm:pr-10 py-2.5 sm:py-3 border border-gray-300 dark:border-dark-border rounded-xl appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-white dark:bg-dark-surface text-gray-900 dark:text-white"
                     >
                       <option value="all">All Status</option>
                       <option value="checked-in">Checked In</option>
                       <option value="checked-out">Checked Out</option>
                     </select>
-                    <ChevronDown className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-400 sm:w-[18px] sm:h-[18px]" size={16} />
+                    <ChevronDown className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 sm:w-[18px] sm:h-[18px] transition-colors duration-300" size={16} />
                   </div>
                 </div>
                 
                 {/* Date Filter */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">Date Range</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 mb-2 sm:mb-3 transition-colors duration-300">Date Range</label>
                   <div className="relative">
                     <select
                       value={dateFilter}
                       onChange={(e) => setDateFilter(e.target.value)}
-                      className="w-full pl-3 sm:pl-4 pr-8 sm:pr-10 py-2.5 sm:py-3 border border-gray-300 rounded-xl appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                      className="w-full pl-3 sm:pl-4 pr-8 sm:pr-10 py-2.5 sm:py-3 border border-gray-300 dark:border-dark-border rounded-xl appearance-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base bg-white dark:bg-dark-surface text-gray-900 dark:text-white"
                     >
                       <option value="all">All Time</option>
                       <option value="today">Today</option>
@@ -1196,20 +1196,20 @@ const EmployeeAttendance = ({ user }) => {
                       <option value="month">This Month</option>
                       <option value="custom">Custom Range</option>
                     </select>
-                    <ChevronDown className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-400 sm:w-[18px] sm:h-[18px]" size={16} />
+                    <ChevronDown className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 sm:w-[18px] sm:h-[18px] transition-colors duration-300" size={16} />
                   </div>
                 </div>
                 
                 {/* View Mode */}
                 <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">View Mode</label>
-                  <div className="flex bg-gray-100 rounded-xl p-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 mb-2 sm:mb-3 transition-colors duration-300">View Mode</label>
+                  <div className="flex bg-gray-100 dark:bg-dark-surface rounded-xl p-1">
                 <button
                   onClick={() => setViewMode('table')}
                       className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
                     viewMode === 'table' 
                       ? 'bg-blue-500 text-white shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-800'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-200'
                   }`}
                 >
                       <List size={14} className="inline mr-1.5 sm:mr-2 sm:w-4 sm:h-4" />
@@ -1256,12 +1256,12 @@ const EmployeeAttendance = ({ user }) => {
         )}
 
         {/* Attendance Records */}
-        <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
-          <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50">
-            <h2 className="text-lg font-bold text-gray-900">
+        <div className="bg-white dark:bg-dark-card rounded-xl shadow-md border border-gray-100 dark:border-dark-border overflow-hidden transition-colors duration-300">
+          <div className="p-4 border-b border-gray-100 dark:border-dark-border bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/10 dark:to-indigo-900/10">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white transition-colors duration-300">
               {isAdmin() ? 'All Employee Attendance Records' : 'Your Attendance Records'}
             </h2>
-            <p className="text-gray-600 mt-1 text-sm">
+            <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm transition-colors duration-300">
               {isAdmin() 
                 ? 'Monitor and analyze employee attendance across the organization'
                 : 'Track your daily attendance with photo verification'
@@ -1276,17 +1276,17 @@ const EmployeeAttendance = ({ user }) => {
         {/* Check In Modal */}
         {showCheckInModal && (
           <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-              <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-green-100 rounded-t-2xl">
-                <h2 className="text-xl font-bold text-gray-900">Check In</h2>
-                <p className="text-gray-600 mt-1 text-sm">Capture your photo to verify check-in</p>
+            <div className="bg-white dark:bg-dark-card rounded-2xl shadow-2xl max-w-md w-full transition-colors duration-300">
+              <div className="p-4 border-b border-gray-200 dark:border-dark-border bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/10 dark:to-green-800/10 rounded-t-2xl">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-300">Check In</h2>
+                <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm transition-colors duration-300">Capture your photo to verify check-in</p>
               </div>
               
               <div className="p-4">
                 {capturedPhoto ? (
                   <div className="text-center">
-                    <img src={capturedPhoto} alt="Captured" className="w-32 h-32 rounded-full object-cover mx-auto mb-4 border-4 border-green-300" />
-                    <p className="text-sm text-gray-600 mb-4">Photo captured successfully!</p>
+                    <img src={capturedPhoto} alt="Captured" className="w-32 h-32 rounded-full object-cover mx-auto mb-4 border-4 border-green-300 dark:border-green-600" />
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 transition-colors duration-300">Photo captured successfully!</p>
                     <div className="flex gap-4">
                       <button
                         onClick={handleCheckIn}
@@ -1296,7 +1296,7 @@ const EmployeeAttendance = ({ user }) => {
                       </button>
                       <button
                         onClick={retakePhoto}
-                        className="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all duration-300"
+                        className="px-4 py-3 bg-gray-200 dark:bg-dark-surface text-gray-700 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-dark-card transition-all duration-300"
                       >
                         Retake
                       </button>
@@ -1304,10 +1304,10 @@ const EmployeeAttendance = ({ user }) => {
                   </div>
                 ) : (
                   <div className="text-center">
-                    <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-dashed border-gray-300">
-                      <Camera size={48} className="text-gray-400" />
+                    <div className="w-32 h-32 bg-gray-100 dark:bg-dark-surface rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-dashed border-gray-300 dark:border-dark-border">
+                      <Camera size={48} className="text-gray-400 dark:text-gray-500" />
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">Please capture your photo for check-in verification</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 transition-colors duration-300">Please capture your photo for check-in verification</p>
                     <div className="flex gap-4">
                       <button
                         onClick={startCamera}
@@ -1333,17 +1333,17 @@ const EmployeeAttendance = ({ user }) => {
         {/* Check Out Modal */}
         {showCheckOutModal && (
           <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-              <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-red-50 to-red-100 rounded-t-2xl">
-                <h2 className="text-xl font-bold text-gray-900">Check Out</h2>
-                <p className="text-gray-600 mt-1 text-sm">Capture your photo to verify check-out</p>
+            <div className="bg-white dark:bg-dark-card rounded-2xl shadow-2xl max-w-md w-full transition-colors duration-300">
+              <div className="p-4 border-b border-gray-200 dark:border-dark-border bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/10 dark:to-red-800/10 rounded-t-2xl">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white transition-colors duration-300">Check Out</h2>
+                <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm transition-colors duration-300">Capture your photo to verify check-out</p>
               </div>
               
               <div className="p-4">
                 {capturedPhoto ? (
                   <div className="text-center">
-                    <img src={capturedPhoto} alt="Captured" className="w-32 h-32 rounded-full object-cover mx-auto mb-4 border-4 border-red-300" />
-                    <p className="text-sm text-gray-600 mb-4">Photo captured successfully!</p>
+                    <img src={capturedPhoto} alt="Captured" className="w-32 h-32 rounded-full object-cover mx-auto mb-4 border-4 border-red-300 dark:border-red-600" />
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 transition-colors duration-300">Photo captured successfully!</p>
                     <div className="flex gap-4">
                       <button
                         onClick={handleCheckOut}
@@ -1353,7 +1353,7 @@ const EmployeeAttendance = ({ user }) => {
                       </button>
                       <button
                         onClick={retakePhoto}
-                        className="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all duration-300"
+                        className="px-4 py-3 bg-gray-200 dark:bg-dark-surface text-gray-700 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-dark-card transition-all duration-300"
                       >
                         Retake
                       </button>
@@ -1361,10 +1361,10 @@ const EmployeeAttendance = ({ user }) => {
                   </div>
                 ) : (
                   <div className="text-center">
-                    <div className="w-32 h-32 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-dashed border-gray-300">
-                      <Camera size={48} className="text-gray-400" />
+                    <div className="w-32 h-32 bg-gray-100 dark:bg-dark-surface rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-dashed border-gray-300 dark:border-dark-border">
+                      <Camera size={48} className="text-gray-400 dark:text-gray-500" />
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">Please capture your photo for check-out verification</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 transition-colors duration-300">Please capture your photo for check-out verification</p>
                     <div className="flex gap-4">
                       <button
                         onClick={startCamera}
@@ -1375,7 +1375,7 @@ const EmployeeAttendance = ({ user }) => {
                       </button>
                       <button
                         onClick={() => setShowCheckOutModal(false)}
-                        className="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-all duration-300"
+                        className="px-4 py-3 bg-gray-200 dark:bg-dark-surface text-gray-700 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-300 dark:hover:bg-dark-card transition-all duration-300"
                       >
                         Cancel
                       </button>
@@ -1390,10 +1390,10 @@ const EmployeeAttendance = ({ user }) => {
         {/* Camera Modal */}
         {showCamera && (showCheckInModal || showCheckOutModal) && (
           <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[70] p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full">
-              <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-2xl">
-                <h3 className="text-lg font-bold text-gray-900">Capture Photo</h3>
-                <p className="text-sm text-gray-600">Position yourself in the camera and click capture</p>
+            <div className="bg-white dark:bg-dark-card rounded-2xl shadow-2xl max-w-lg w-full transition-colors duration-300">
+              <div className="p-4 border-b border-gray-200 dark:border-dark-border bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/10 dark:to-blue-800/10 rounded-t-2xl">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white transition-colors duration-300">Capture Photo</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">Position yourself in the camera and click capture</p>
               </div>
               
               <div className="p-4 text-center">
@@ -1443,7 +1443,7 @@ const EmployeeAttendance = ({ user }) => {
         {isAdmin() && showAnalytics && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowAnalytics(false)} />
-            <div className="relative w-full max-w-7xl bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden max-h-[90vh]">
+            <div className="relative w-full max-w-7xl bg-white dark:bg-dark-card rounded-2xl shadow-2xl border border-gray-100 dark:border-dark-border overflow-hidden max-h-[90vh] transition-colors duration-300">
               <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-blue-500 to-purple-600">
                 <h3 className="text-white font-semibold text-xl">Attendance Analytics & Insights</h3>
                 <button onClick={() => setShowAnalytics(false)} className="p-3 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
@@ -1454,50 +1454,50 @@ const EmployeeAttendance = ({ user }) => {
               <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
                 {/* Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-700 rounded-xl p-4 transition-colors duration-300">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-blue-100 rounded-lg">
-                        <Users size={20} className="text-blue-600" />
+                      <div className="p-2 bg-blue-100 dark:bg-blue-800/20 rounded-lg">
+                        <Users size={20} className="text-blue-600 dark:text-blue-400" />
                       </div>
                       <div>
-                        <p className="text-sm text-blue-600 font-medium">Today's Attendance</p>
-                        <p className="text-2xl font-bold text-blue-900">{analyticsData.today.checkedIn}/{analyticsData.today.total}</p>
+                        <p className="text-sm text-blue-600 dark:text-blue-400 font-medium transition-colors duration-300">Today's Attendance</p>
+                        <p className="text-2xl font-bold text-blue-900 dark:text-blue-200 transition-colors duration-300">{analyticsData.today.checkedIn}/{analyticsData.today.total}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                  <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-700 rounded-xl p-4 transition-colors duration-300">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-green-100 rounded-lg">
-                        <Clock size={20} className="text-green-600" />
+                      <div className="p-2 bg-green-100 dark:bg-green-800/20 rounded-lg">
+                        <Clock size={20} className="text-green-600 dark:text-green-400" />
                       </div>
                       <div>
-                        <p className="text-sm text-green-600 font-medium">Avg Check-in Time</p>
-                        <p className="text-2xl font-bold text-green-900">{analyticsData.checkInAnalysis.average}:00</p>
+                        <p className="text-sm text-green-600 dark:text-green-400 font-medium transition-colors duration-300">Avg Check-in Time</p>
+                        <p className="text-2xl font-bold text-green-900 dark:text-green-200 transition-colors duration-300">{analyticsData.checkInAnalysis.average}:00</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                  <div className="bg-orange-50 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-700 rounded-xl p-4 transition-colors duration-300">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-orange-100 rounded-lg">
-                        <Timer size={20} className="text-orange-600" />
+                      <div className="p-2 bg-orange-100 dark:bg-orange-800/20 rounded-lg">
+                        <Timer size={20} className="text-orange-600 dark:text-orange-400" />
                       </div>
                       <div>
-                        <p className="text-sm text-orange-600 font-medium">Weekly Avg Hours</p>
-                        <p className="text-2xl font-bold text-orange-900">{analyticsData.weekly.averageHours}h</p>
+                        <p className="text-sm text-orange-600 dark:text-orange-400 font-medium transition-colors duration-300">Weekly Avg Hours</p>
+                        <p className="text-2xl font-bold text-orange-900 dark:text-orange-200 transition-colors duration-300">{analyticsData.weekly.averageHours}h</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                  <div className="bg-purple-50 dark:bg-purple-900/10 border border-purple-200 dark:border-purple-700 rounded-xl p-4 transition-colors duration-300">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-purple-100 rounded-lg">
-                        <TrendingUp size={20} className="text-purple-600" />
+                      <div className="p-2 bg-purple-100 dark:bg-purple-800/20 rounded-lg">
+                        <TrendingUp size={20} className="text-purple-600 dark:text-purple-400" />
                       </div>
                       <div>
-                        <p className="text-sm text-purple-600 font-medium">Monthly Total</p>
-                        <p className="text-2xl font-bold text-purple-900">{analyticsData.monthly.totalHours}h</p>
+                        <p className="text-sm text-purple-600 dark:text-purple-400 font-medium transition-colors duration-300">Monthly Total</p>
+                        <p className="text-2xl font-bold text-purple-900 dark:text-purple-200 transition-colors duration-300">{analyticsData.monthly.totalHours}h</p>
                       </div>
                     </div>
                   </div>
@@ -1506,14 +1506,14 @@ const EmployeeAttendance = ({ user }) => {
                 {/* Charts Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                   {/* Check-in Time Distribution */}
-                  <div className="bg-white border border-gray-200 rounded-xl p-6">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4">Check-in Time Distribution</h4>
+                  <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-xl p-6 transition-colors duration-300">
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Check-in Time Distribution</h4>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Early Check-ins (Before 9:00 AM)</span>
-                        <span className="font-semibold text-green-600">{analyticsData.checkInAnalysis.early}</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">Early Check-ins (Before 9:00 AM)</span>
+                        <span className="font-semibold text-green-600 dark:text-green-400 transition-colors duration-300">{analyticsData.checkInAnalysis.early}</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                         <div 
                           className="bg-green-500 h-3 rounded-full transition-all duration-500"
                           style={{ width: `${(analyticsData.checkInAnalysis.early / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.onTime + analyticsData.checkInAnalysis.late)) * 100}%` }}
@@ -1521,10 +1521,10 @@ const EmployeeAttendance = ({ user }) => {
                       </div>
                       
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">On Time (9:00 - 9:30 AM)</span>
-                        <span className="font-semibold text-blue-600">{analyticsData.checkInAnalysis.onTime}</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">On Time (9:00 - 9:30 AM)</span>
+                        <span className="font-semibold text-blue-600 dark:text-blue-400 transition-colors duration-300">{analyticsData.checkInAnalysis.onTime}</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                         <div 
                           className="bg-blue-500 h-3 rounded-full transition-all duration-500"
                           style={{ width: `${(analyticsData.checkInAnalysis.onTime / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.onTime + analyticsData.checkInAnalysis.late)) * 100}%` }}
@@ -1532,10 +1532,10 @@ const EmployeeAttendance = ({ user }) => {
                       </div>
                       
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Late Check-ins (After 9:30 AM)</span>
-                        <span className="font-semibold text-red-600">{analyticsData.checkInAnalysis.late}</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">Late Check-ins (After 9:30 AM)</span>
+                        <span className="font-semibold text-red-600 dark:text-red-400 transition-colors duration-300">{analyticsData.checkInAnalysis.late}</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                         <div 
                           className="bg-red-500 h-3 rounded-full transition-all duration-500"
                           style={{ width: `${(analyticsData.checkInAnalysis.late / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.late)) * 100}%` }}
@@ -1545,16 +1545,16 @@ const EmployeeAttendance = ({ user }) => {
                   </div>
                   
                   {/* Department Performance */}
-                  <div className="bg-white border border-gray-200 rounded-xl p-6">
-                    <h4 className="text-lg font-semibold text-gray-900 mb-4">Department Attendance</h4>
+                  <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-xl p-6 transition-colors duration-300">
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Department Attendance</h4>
                     <div className="space-y-4">
                       {Object.entries(analyticsData.departmentData).map(([dept, data]) => (
                         <div key={dept}>
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-gray-700">{dept}</span>
-                            <span className="text-sm text-gray-600">{data.present}/{data.total}</span>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors duration-300">{dept}</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">{data.present}/{data.total}</span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                             <div 
                               className="bg-blue-500 h-2 rounded-full transition-all duration-500"
                               style={{ width: `${(data.present / data.total) * 100}%` }}
@@ -1567,27 +1567,27 @@ const EmployeeAttendance = ({ user }) => {
                 </div>
                 
                 {/* Employee Performance Table */}
-                <div className="bg-white border border-gray-200 rounded-xl p-6">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4">Employee Performance Summary</h4>
+                <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-xl p-6 transition-colors duration-300">
+                  <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Employee Performance Summary</h4>
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b border-gray-200">
-                          <th className="text-left py-2 text-sm font-medium text-gray-700">Employee</th>
-                          <th className="text-left py-2 text-sm font-medium text-gray-700">Total Days</th>
-                          <th className="text-left py-2 text-sm font-medium text-gray-700">Avg Hours</th>
-                          <th className="text-left py-2 text-sm font-medium text-gray-700">Early Check-ins</th>
-                          <th className="text-left py-2 text-sm font-medium text-gray-700">Late Check-ins</th>
+                        <tr className="border-b border-gray-200 dark:border-dark-border">
+                          <th className="text-left py-2 text-sm font-medium text-gray-700 dark:text-white transition-colors duration-300">Employee</th>
+                          <th className="text-left py-2 text-sm font-medium text-gray-700 dark:text-white transition-colors duration-300">Total Days</th>
+                          <th className="text-left py-2 text-sm font-medium text-gray-700 dark:text-white transition-colors duration-300">Avg Hours</th>
+                          <th className="text-left py-2 text-sm font-medium text-gray-700 dark:text-white transition-colors duration-300">Early Check-ins</th>
+                          <th className="text-left py-2 text-sm font-medium text-gray-700 dark:text-white transition-colors duration-300">Late Check-ins</th>
                         </tr>
                       </thead>
                       <tbody>
                         {Object.values(analyticsData.employeeStats).map((emp, index) => (
-                          <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                            <td className="py-2 text-sm font-medium text-gray-900">{emp.name}</td>
-                            <td className="py-2 text-sm text-gray-600">{emp.totalDays}</td>
-                            <td className="py-2 text-sm text-gray-600">{emp.averageHours}h</td>
-                            <td className="py-2 text-sm text-green-600">{emp.earlyCheckIns}</td>
-                            <td className="py-2 text-sm text-red-600">{emp.lateCheckIns}</td>
+                          <tr key={index} className="border-b border-gray-100 dark:border-dark-border hover:bg-gray-50 dark:hover:bg-dark-card">
+                            <td className="py-2 text-sm font-medium text-gray-900 dark:text-white transition-colors duration-300">{emp.name}</td>
+                            <td className="py-2 text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">{emp.totalDays}</td>
+                            <td className="py-2 text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">{emp.averageHours}h</td>
+                            <td className="py-2 text-sm text-green-600 dark:text-green-400 transition-colors duration-300">{emp.earlyCheckIns}</td>
+                            <td className="py-2 text-sm text-red-600 dark:text-red-400 transition-colors duration-300">{emp.lateCheckIns}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1603,10 +1603,10 @@ const EmployeeAttendance = ({ user }) => {
         {isAdmin() && showPhotoModal && selectedPhoto && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowPhotoModal(false)} />
-            <div className="relative max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">Attendance Photo</h3>
-                <button onClick={() => setShowPhotoModal(false)} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
+            <div className="relative max-w-2xl bg-white dark:bg-dark-card rounded-2xl shadow-2xl border border-gray-100 dark:border-dark-border overflow-hidden transition-colors duration-300">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-dark-border">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white transition-colors duration-300">Attendance Photo</h3>
+                <button onClick={() => setShowPhotoModal(false)} className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-surface transition-colors">
                   <X size={20} />
                 </button>
               </div>

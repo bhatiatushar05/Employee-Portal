@@ -143,32 +143,32 @@ const EmployeePortal = ({ user }) => {
     const configs = {
       pending: {
         label: 'Pending',
-        className: 'bg-gray-100 text-gray-800 border-gray-200',
+        className: 'bg-gray-100 dark:bg-gray-900/20 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-700',
         icon: Clock
       },
       payment_processing: {
         label: 'Payment Processing',
-        className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        className: 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-700',
         icon: Clock
       },
       under_verification: {
         label: 'Under Verification',
-        className: 'bg-orange-100 text-orange-800 border-orange-200',
+        className: 'bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-200 border-orange-200 dark:border-orange-700',
         icon: AlertCircle
       },
       approved: {
         label: 'Approved',
-        className: 'bg-blue-100 text-blue-800 border-blue-200',
+        className: 'bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-700',
         icon: CheckCircle
       },
       reimbursed: {
         label: 'Reimbursed',
-        className: 'bg-green-100 text-green-800 border-green-200',
+        className: 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200 border-green-200 dark:border-green-700',
         icon: Banknote
       },
       rejected: {
         label: 'Rejected',
-        className: 'bg-red-100 text-red-800 border-red-200',
+        className: 'bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-200 border-red-200 dark:border-red-700',
         icon: XCircle
       }
     };
@@ -503,20 +503,20 @@ const EmployeePortal = ({ user }) => {
   }, [requests]);
 
   return (
-    <div className="flex-1 min-h-0 h-full overflow-y-auto bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100">
+    <div className="flex-1 min-h-0 h-full overflow-y-auto bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100 dark:from-dark-bg dark:via-dark-surface dark:to-dark-card transition-colors duration-300">
       {/* Top right header */}
       <TopRightHeader user={user} />
       
       {/* Main Content with compact spacing */}
-      <div className="pt-6 pb-2 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="pt-2 pb-2 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {isAdmin() ? 'Request ' : 'Employee '}<span className="text-orange-600">{isAdmin() ? 'Management' : 'Portal'}</span>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
+                {isAdmin() ? 'Request ' : 'Employee '}<span className="text-orange-600 dark:text-orange-400">{isAdmin() ? 'Management' : 'Portal'}</span>
               </h1>
-              <p className="text-gray-600 mt-2 text-base">
+              <p className="text-gray-600 dark:text-gray-300 mt-2 text-base transition-colors duration-300">
                 {isEmployee() ? 'Submit and track your expense requests' : 'Comprehensive expense request management and approval system'}
               </p>
             </div>
@@ -524,11 +524,11 @@ const EmployeePortal = ({ user }) => {
                          <div className="flex items-center gap-3">
                {isAdmin() && (
                  <>
-                   <button onClick={() => setShowAnalytics(true)} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+                   <button onClick={() => setShowAnalytics(true)} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-dark-card transition-colors shadow-sm">
                      <TrendingUp size={16} />
                      <span className="hidden sm:inline">Analytics</span>
                    </button>
-                   <button onClick={exportCsv} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+                   <button onClick={exportCsv} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-dark-card transition-colors shadow-sm">
                      <Download size={16} />
                      <span className="hidden sm:inline">Export</span>
                    </button>
@@ -538,18 +538,18 @@ const EmployeePortal = ({ user }) => {
                  <Plus size={16} />
                  {isEmployee() ? 'Submit Request' : 'Add New Request'}
                </button>
-              <div className="hidden sm:flex items-center border border-gray-200 rounded-lg overflow-hidden ml-1">
+              <div className="hidden sm:flex items-center border border-gray-200 dark:border-dark-border rounded-lg overflow-hidden ml-1">
                 <button
                   aria-label="List view"
                   onClick={() => setViewMode('list')}
-                  className={`px-2.5 py-1.5 text-xs flex items-center gap-1.5 ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-800'}`}
+                  className={`px-2.5 py-1.5 text-xs flex items-center gap-1.5 ${viewMode === 'list' ? 'bg-gray-100 dark:bg-dark-card text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'}`}
                 >
                   <List size={14} />
                 </button>
                 <button
                   aria-label="Grid view"
                   onClick={() => setViewMode('grid')}
-                  className={`px-2.5 py-1.5 text-xs flex items-center gap-1.5 ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-800'}`}
+                  className={`px-2.5 py-1.5 text-xs flex items-center gap-1.5 ${viewMode === 'grid' ? 'bg-gray-100 dark:bg-dark-card text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'}`}
                 >
                   <LayoutGrid size={14} />
                 </button>
@@ -560,50 +560,50 @@ const EmployeePortal = ({ user }) => {
           {/* Stats Cards - Admin Only */}
           {isAdmin() && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
-              <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+              <div className="bg-white dark:bg-dark-card rounded-xl p-4 border border-gray-100 dark:border-dark-border shadow-sm transition-colors duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Total Submitted</p>
-                    <p className="text-2xl font-bold text-gray-900">{formatCurrency(summaryStats.total)}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1 transition-colors duration-300">Total Submitted</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">{formatCurrency(summaryStats.total)}</p>
                   </div>
-                  <div className="p-2.5 bg-blue-100 rounded-lg shrink-0">
-                    <IndianRupee className="w-5 h-5 text-blue-600" />
+                  <div className="p-2.5 bg-blue-100 dark:bg-blue-900/20 rounded-lg shrink-0">
+                    <IndianRupee className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+              <div className="bg-white dark:bg-dark-card rounded-xl p-4 border border-gray-100 dark:border-dark-border shadow-sm transition-colors duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Pending Amount</p>
-                    <p className="text-2xl font-bold text-orange-600">{formatCurrency(summaryStats.pending)}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1 transition-colors duration-300">Pending Amount</p>
+                    <p className="text-2xl font-bold text-orange-600 dark:text-orange-400 transition-colors duration-300">{formatCurrency(summaryStats.pending)}</p>
                   </div>
-                  <div className="p-2.5 bg-orange-100 rounded-lg shrink-0">
-                    <Clock className="w-5 h-5 text-orange-600" />
+                  <div className="p-2.5 bg-orange-100 dark:bg-orange-900/20 rounded-lg shrink-0">
+                    <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+              <div className="bg-white dark:bg-dark-card rounded-xl p-4 border border-gray-100 dark:border-dark-border shadow-sm transition-colors duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Approved Items</p>
-                    <p className="text-2xl font-bold text-blue-600">{summaryStats.approved}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1 transition-colors duration-300">Approved Items</p>
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 transition-colors duration-300">{summaryStats.approved}</p>
                   </div>
-                  <div className="p-2.5 bg-blue-100 rounded-lg shrink-0">
-                    <CheckCircle className="w-5 h-5 text-blue-600" />
+                  <div className="p-2.5 bg-blue-100 dark:bg-blue-900/20 rounded-lg shrink-0">
+                    <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
                 </div>
               </div>
               
-              <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+              <div className="bg-white dark:bg-dark-card rounded-xl p-4 border border-gray-100 dark:border-dark-border shadow-sm transition-colors duration-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-500 mb-1">Reimbursed</p>
-                    <p className="text-2xl font-bold text-green-600">{formatCurrency(summaryStats.reimbursed)}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1 transition-colors duration-300">Reimbursed</p>
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400 transition-colors duration-300">{formatCurrency(summaryStats.reimbursed)}</p>
                   </div>
-                  <div className="p-2.5 bg-green-100 rounded-lg shrink-0">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
+                  <div className="p-2.5 bg-green-100 dark:bg-green-900/20 rounded-lg shrink-0">
+                    <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
                   </div>
                 </div>
               </div>
@@ -612,24 +612,24 @@ const EmployeePortal = ({ user }) => {
         </div>
 
         {/* Enhanced Filters and Search for Admin */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-4">
+        <div className="bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border shadow-sm p-6 mb-4 transition-colors duration-300">
           <div className="space-y-4">
             {/* Search Row */}
             <div className="flex-1">
-              <label className="block text-xs font-medium text-gray-700 mb-1">Search Requests</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1 transition-colors duration-300">Search Requests</label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                 <input
                   type="text"
                   placeholder="Search by employee name, request ID, or expense type..."
-                  className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm"
+                  className="w-full pl-10 pr-10 py-3 border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm bg-white dark:bg-dark-surface text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-dark-card transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -642,10 +642,10 @@ const EmployeePortal = ({ user }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {/* Status Filter */}
                 <div className="relative">
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Status</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1 transition-colors duration-300">Status</label>
                   <div className="relative">
                     <select
-                      className="w-full px-3 py-3 pl-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm appearance-none bg-white"
+                      className="w-full px-3 py-3 pl-10 border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm appearance-none bg-white dark:bg-dark-surface text-gray-900 dark:text-white"
                       value={statusFilter}
                       onChange={(e) => setStatusFilter(e.target.value)}
                     >
@@ -658,41 +658,41 @@ const EmployeePortal = ({ user }) => {
                       <option value="rejected">Rejected</option>
                     </select>
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <CheckCircle className="w-4 h-4 text-gray-400" />
+                      <CheckCircle className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                     </div>
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                      <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                     </div>
                   </div>
                 </div>
 
                 {/* Date Range Filter */}
                 <div className="relative">
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Date Range</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1 transition-colors duration-300">Date Range</label>
                   <div className="flex items-center gap-2">
                     <div className="relative flex-1">
                       <input
                         type="date"
-                        className="w-full px-3 py-3 pl-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm"
+                        className="w-full px-3 py-3 pl-10 border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm bg-white dark:bg-dark-surface text-gray-900 dark:text-white"
                         value={dateRangeFilter.start}
                         onChange={(e) => setDateRangeFilter(prev => ({ ...prev, start: e.target.value }))}
                         placeholder="Start Date"
                       />
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Calendar className="w-4 h-4 text-gray-400" />
+                        <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                       </div>
                     </div>
-                    <div className="text-gray-400 text-sm font-medium">to</div>
+                    <div className="text-gray-400 dark:text-gray-500 text-sm font-medium transition-colors duration-300">to</div>
                     <div className="relative flex-1">
                       <input
                         type="date"
-                        className="w-full px-3 py-3 pl-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm"
+                        className="w-full px-3 py-3 pl-10 border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm bg-white dark:bg-dark-surface text-gray-900 dark:text-white"
                         value={dateRangeFilter.end}
                         onChange={(e) => setDateRangeFilter(prev => ({ ...prev, end: e.target.value }))}
                         placeholder="End Date"
                       />
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Calendar className="w-4 h-4 text-gray-400" />
+                        <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                       </div>
                     </div>
                   </div>
@@ -700,10 +700,10 @@ const EmployeePortal = ({ user }) => {
 
                 {/* Sort */}
                 <div className="relative">
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Sort By</label>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1 transition-colors duration-300">Sort By</label>
                   <div className="relative">
                     <select
-                      className="w-full px-3 py-3 pl-10 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm appearance-none bg-white"
+                      className="w-full px-3 py-3 pl-10 border border-gray-200 dark:border-dark-border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors text-sm appearance-none bg-white dark:bg-dark-surface text-gray-900 dark:text-white"
                       value={`${sortBy}-${sortOrder}`}
                       onChange={(e) => {
                         const [field, order] = e.target.value.split('-');
@@ -718,10 +718,10 @@ const EmployeePortal = ({ user }) => {
                       <option value="status-asc">Status A-Z</option>
                     </select>
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <TrendingUp className="w-4 h-4 text-gray-400" />
+                      <TrendingUp className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                     </div>
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                      <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                     </div>
                   </div>
                 </div>
@@ -730,32 +730,32 @@ const EmployeePortal = ({ user }) => {
 
             {/* Action Buttons Row */}
             {isAdmin() && (
-              <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+              <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-dark-border">
                 <div className="flex items-center gap-2">
                   {/* Active Filters Indicator */}
                   {(searchTerm || statusFilter !== 'all' || dateRangeFilter.start || dateRangeFilter.end || sortBy !== 'date' || sortOrder !== 'desc') && (
-                    <div className="flex items-center gap-2 text-xs text-gray-600">
+                    <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300 transition-colors duration-300">
                       <span className="font-medium">Active Filters:</span>
                       {searchTerm && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-md">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md transition-colors duration-300">
                           Search: "{searchTerm}"
-                          <button onClick={() => setSearchTerm('')} className="ml-1 hover:text-blue-800">
+                          <button onClick={() => setSearchTerm('')} className="ml-1 hover:text-blue-800 dark:hover:text-blue-200">
                             <X className="w-3 h-3" />
                           </button>
                         </span>
                       )}
                       {statusFilter !== 'all' && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded-md">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-md transition-colors duration-300">
                           Status: {statusFilter}
-                          <button onClick={() => setStatusFilter('all')} className="ml-1 hover:text-green-800">
+                          <button onClick={() => setStatusFilter('all')} className="ml-1 hover:text-green-800 dark:hover:text-green-200">
                             <X className="w-3 h-3" />
                           </button>
                         </span>
                       )}
                       {(dateRangeFilter.start || dateRangeFilter.end) && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-50 text-purple-700 rounded-md">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 rounded-md transition-colors duration-300">
                           Date: {dateRangeFilter.start || 'Any'} - {dateRangeFilter.end || 'Any'}
-                          <button onClick={() => setDateRangeFilter({ start: '', end: '' })} className="ml-1 hover:text-purple-800">
+                          <button onClick={() => setDateRangeFilter({ start: '', end: '' })} className="ml-1 hover:text-purple-800 dark:hover:text-purple-200">
                             <X className="w-3 h-3" />
                           </button>
                         </span>
@@ -771,7 +771,7 @@ const EmployeePortal = ({ user }) => {
                       setSortBy('date');
                       setSortOrder('desc');
                     }}
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-dark-surface hover:bg-gray-100 dark:hover:bg-dark-card rounded-lg transition-colors font-medium"
                   >
                     <X className="w-4 h-4" />
                     Clear All
@@ -796,7 +796,7 @@ const EmployeePortal = ({ user }) => {
 
         {/* Bulk Actions - Admin Only */}
         {isAdmin() && (
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-4">
+          <div className="bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border shadow-sm p-4 mb-4 transition-colors duration-300">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2">
@@ -810,12 +810,12 @@ const EmployeePortal = ({ user }) => {
                         setSelectedRequests([]);
                       }
                     }}
-                    className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                    className="rounded border-gray-300 dark:border-gray-600 text-orange-600 dark:text-orange-400 focus:ring-orange-500"
                   />
-                  <span className="text-sm text-gray-700">Select All</span>
+                  <span className="text-sm text-gray-700 dark:text-white transition-colors duration-300">Select All</span>
                 </label>
                 {selectedRequests.length > 0 && (
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">
                     {selectedRequests.length} request(s) selected
                   </span>
                 )}
@@ -849,13 +849,13 @@ const EmployeePortal = ({ user }) => {
 
         {/* Requests: List or Grid */}
         {viewMode === 'list' ? (
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-4">
+          <div className="bg-white dark:bg-dark-card rounded-xl border border-gray-100 dark:border-dark-border shadow-sm overflow-hidden mb-4 transition-colors duration-300">
             <div className="overflow-x-auto min-w-full">
               <table className="w-full min-w-full">
-                <thead className="bg-gradient-to-r from-orange-50 to-blue-50 border-b border-gray-100">
+                <thead className="bg-gradient-to-r from-orange-50 to-blue-50 dark:from-orange-900/10 dark:to-blue-900/10 border-b border-gray-100 dark:border-dark-border">
                   <tr>
                     {isAdmin() && (
-                      <th className="text-left py-2 px-4 font-semibold text-gray-900 text-xs w-12">
+                      <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white text-xs w-12 transition-colors duration-300">
                         <input
                           type="checkbox"
                           checked={selectedRequests.length === filteredAndSortedRequests.length && filteredAndSortedRequests.length > 0}
@@ -866,61 +866,61 @@ const EmployeePortal = ({ user }) => {
                               setSelectedRequests([]);
                             }
                           }}
-                          className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                          className="rounded border-gray-300 dark:border-gray-600 text-orange-600 dark:text-orange-400 focus:ring-orange-500"
                         />
                       </th>
                     )}
-                    <th className="text-left py-2 px-4 font-semibold text-gray-900 text-xs w-20">Request ID</th>
-                    <th className="text-left py-2 px-4 font-semibold text-gray-900 text-xs w-32">Employee Name</th>
-                    <th className="text-left py-2 px-4 font-semibold text-gray-900 text-xs w-28">Employee ID</th>
-                    <th className="text-left py-2 px-4 font-semibold text-gray-900 text-xs w-40">Expense Type</th>
-                    <th className="text-left py-2 px-4 font-semibold text-gray-900 text-xs w-24">Amount</th>
-                    <th className="text-left py-2 px-4 font-semibold text-gray-900 text-xs w-32">Submitted Date</th>
-                    <th className="text-left py-2 px-4 font-semibold text-gray-900 text-xs w-24">Status</th>
-                    <th className="text-left py-2 px-4 font-semibold text-gray-900 text-xs w-20">Actions</th>
+                    <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white text-xs w-20 transition-colors duration-300">Request ID</th>
+                    <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white text-xs w-32 transition-colors duration-300">Employee Name</th>
+                    <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white text-xs w-28 transition-colors duration-300">Employee ID</th>
+                    <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white text-xs w-40 transition-colors duration-300">Expense Type</th>
+                    <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white text-xs w-24 transition-colors duration-300">Amount</th>
+                    <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white text-xs w-32 transition-colors duration-300">Submitted Date</th>
+                    <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white text-xs w-24 transition-colors duration-300">Status</th>
+                    <th className="text-left py-2 px-4 font-semibold text-gray-900 dark:text-white text-xs w-20 transition-colors duration-300">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-gray-100 dark:divide-dark-border">
                   {filteredAndSortedRequests.map((request) => {
                     const statusConfig = getStatusConfig(request.status);
                     const StatusIcon = statusConfig.icon;
                     return (
-                      <tr key={request.id} className="hover:bg-orange-50/40 transition-colors">
+                      <tr key={request.id} className="hover:bg-orange-50/40 dark:hover:bg-orange-900/10 transition-colors">
                         {isAdmin() && (
                           <td className="py-2 px-4">
                             <input
                               type="checkbox"
                               checked={selectedRequests.includes(request.id)}
                               onChange={() => handleSelectRequest(request.id)}
-                              className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                              className="rounded border-gray-300 dark:border-gray-600 text-orange-600 dark:text-orange-400 focus:ring-orange-500"
                             />
                           </td>
                         )}
                         <td className="py-2 px-4">
                           <div className="flex items-center gap-2">
-                            <div className="p-1.5 bg-orange-100 rounded-md shrink-0">
-                              <FileText className="w-3 h-3 text-orange-600" />
+                            <div className="p-1.5 bg-orange-100 dark:bg-orange-900/20 rounded-md shrink-0">
+                              <FileText className="w-3 h-3 text-orange-600 dark:text-orange-400" />
                             </div>
-                            <span className="font-medium text-orange-600 text-xs">{request.id}</span>
+                            <span className="font-medium text-orange-600 dark:text-orange-400 text-xs transition-colors duration-300">{request.id}</span>
                           </div>
                         </td>
                         <td className="py-2 px-4">
-                          <div className="font-medium text-gray-900 text-sm truncate">{request.employeeName || 'N/A'}</div>
+                          <div className="font-medium text-gray-900 dark:text-white text-sm truncate transition-colors duration-300">{request.employeeName || 'N/A'}</div>
                         </td>
                         <td className="py-2 px-4">
-                          <div className="font-medium text-gray-900 text-sm truncate">{request.employeeId || 'N/A'}</div>
+                          <div className="font-medium text-gray-900 dark:text-white text-sm truncate transition-colors duration-300">{request.employeeId || 'N/A'}</div>
                         </td>
                         <td className="py-2 px-4">
                           <div>
-                            <div className="font-medium text-gray-900 text-sm truncate">{request.type}</div>
-                            <div className="text-xs text-gray-500 truncate max-w-32">{request.description}</div>
+                            <div className="font-medium text-gray-900 dark:text-white text-sm truncate transition-colors duration-300">{request.type}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-32 transition-colors duration-300">{request.description}</div>
                           </div>
                         </td>
                         <td className="py-2 px-4">
-                          <span className="font-semibold text-gray-900 text-sm">{formatCurrency(request.amount)}</span>
+                          <span className="font-semibold text-gray-900 dark:text-white text-sm transition-colors duration-300">{formatCurrency(request.amount)}</span>
                         </td>
                         <td className="py-2 px-4">
-                          <div className="flex items-center gap-1 text-gray-600 text-xs">
+                          <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400 text-xs transition-colors duration-300">
                             <Calendar className="w-3 h-3" />
                             <span className="truncate">{formatDate(request.submittedDate)}</span>
                           </div>
@@ -933,19 +933,19 @@ const EmployeePortal = ({ user }) => {
                         </td>
                         <td className="py-2 px-4">
                           <div className="relative inline-block text-left">
-                            <button onClick={(e) => toggleRowMenu(request.id, e)} className="p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-50 rounded-md">
+                            <button onClick={(e) => toggleRowMenu(request.id, e)} className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-dark-surface rounded-md transition-colors">
                               <MoreVertical size={14} />
                             </button>
                             {openMenuForId === request.id && (
-                              <div className="fixed z-50 w-48 bg-white border border-gray-200 rounded-lg shadow-lg action-menu-container" style={{
+                              <div className="fixed z-50 w-48 bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-lg shadow-lg action-menu-container transition-colors duration-300" style={{
                                 top: menuPosition.top,
                                 left: menuPosition.left
                               }}>
-                                <button onClick={() => { setEditingRequestId(null); setViewingRequest(request); setIsModalOpen(true); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">View</button>
+                                <button onClick={() => { setEditingRequestId(null); setViewingRequest(request); setIsModalOpen(true); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-dark-card transition-colors">View</button>
                                 {isAdmin() && (
                                   <>
-                                    <button onClick={() => { setViewingRequest(null); setEditingRequestId(request.id); setNewRequest({ employeeName: request.employeeName, employeeId: request.employeeId, type: request.type, amount: String(request.amount), submittedDate: request.submittedDate, status: request.status, description: request.description, category: request.category || 'other' }); setIsModalOpen(true); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Edit</button>
-                                    <button onClick={() => { handleStatusChange(request.id, request.status); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Change Status</button>
+                                    <button onClick={() => { setViewingRequest(null); setEditingRequestId(request.id); setNewRequest({ employeeName: request.employeeName, employeeId: request.employeeId, type: request.type, amount: String(request.amount), submittedDate: request.submittedDate, status: request.status, description: request.description, category: request.category || 'other' }); setIsModalOpen(true); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-dark-card transition-colors">Edit</button>
+                                    <button onClick={() => { handleStatusChange(request.id, request.status); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-dark-card transition-colors">Change Status</button>
                                   </>
                                 )}
                                 <button onClick={() => { handleDelete(request.id); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">Delete</button>
@@ -961,55 +961,55 @@ const EmployeePortal = ({ user }) => {
             </div>
             {filteredAndSortedRequests.length === 0 && (
               <div className="text-center py-8">
-                <FileText className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                <h3 className="text-base font-medium text-gray-900 mb-2">
+                <FileText className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3 transition-colors duration-300" />
+                <h3 className="text-base font-medium text-gray-900 dark:text-white mb-2 transition-colors duration-300">
                   {isEmployee() ? 'No requests submitted yet' : 'No requests found'}
                 </h3>
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-500 dark:text-gray-400 text-sm transition-colors duration-300">
                   {isEmployee() ? 'Click "Submit Request" to create your first expense request' : 'Try adjusting your search or filters'}
                 </p>
               </div>
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-4">
+          <div className="bg-white dark:bg-dark-card rounded-2xl border border-gray-100 dark:border-dark-border shadow-sm p-4 mb-4 transition-colors duration-300">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredAndSortedRequests.map((request) => {
                 const statusConfig = getStatusConfig(request.status);
                 const StatusIcon = statusConfig.icon;
                 return (
-                  <div key={request.id} className="border border-gray-100 rounded-xl p-4 hover:shadow-sm transition-shadow relative">
-                    <button onClick={(e) => toggleRowMenu(request.id, e)} className="absolute top-2 right-2 p-1.5 text-gray-500 hover:text-gray-800 hover:bg-gray-50 rounded-lg">
+                  <div key={request.id} className="border border-gray-100 dark:border-dark-border rounded-xl p-4 hover:shadow-sm transition-shadow relative">
+                    <button onClick={(e) => toggleRowMenu(request.id, e)} className="absolute top-2 right-2 p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-dark-surface rounded-lg transition-colors">
                       <MoreVertical size={16} />
                     </button>
                     {openMenuForId === request.id && (
-                      <div className="fixed z-50 w-48 bg-white border border-gray-200 rounded-lg shadow-lg action-menu-container" style={{
+                      <div className="fixed z-50 w-48 bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-lg shadow-lg action-menu-container transition-colors duration-300" style={{
                         top: menuPosition.top,
                         left: menuPosition.left
                       }}>
-                        <button onClick={() => { setEditingRequestId(null); setViewingRequest(request); setIsModalOpen(true); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">View</button>
+                        <button onClick={() => { setEditingRequestId(null); setViewingRequest(request); setIsModalOpen(true); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-dark-card transition-colors">View</button>
                                                     {isAdmin() && (
                               <>
-                                <button onClick={() => { setViewingRequest(null); setEditingRequestId(request.id); setNewRequest({ employeeName: request.employeeName, employeeId: request.employeeId, type: request.type, amount: String(request.amount), submittedDate: request.submittedDate, status: request.status, description: request.description, category: request.category || 'other' }); setIsModalOpen(true); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Edit</button>
-                                <button onClick={() => { handleStatusChange(request.id, request.status); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50">Change Status</button>
+                                <button onClick={() => { setViewingRequest(null); setEditingRequestId(request.id); setNewRequest({ employeeName: request.employeeName, employeeId: request.employeeId, type: request.type, amount: String(request.amount), submittedDate: request.submittedDate, status: request.status, description: request.description, category: request.category || 'other' }); setIsModalOpen(true); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-dark-card transition-colors">Edit</button>
+                                <button onClick={() => { handleStatusChange(request.id, request.status); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-dark-card transition-colors">Change Status</button>
                               </>
                             )}
-                        <button onClick={() => { handleDelete(request.id); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">Delete</button>
+                        <button onClick={() => { handleDelete(request.id); setOpenMenuForId(null); }} className="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Delete</button>
                       </div>
                     )}
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="p-2 bg-orange-100 rounded-lg">
-                        <FileText className="w-4 h-4 text-orange-600" />
+                      <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
+                        <FileText className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                       </div>
-                      <span className="font-medium text-orange-600 text-sm">{request.id}</span>
+                      <span className="font-medium text-orange-600 dark:text-orange-400 text-sm transition-colors duration-300">{request.id}</span>
                     </div>
-                    <div className="text-xs text-gray-500 mb-1">Employee: {request.employeeName || 'N/A'}</div>
-                    <div className="text-xs text-gray-500 mb-2">ID: {request.employeeId || 'N/A'}</div>
-                    <div className="font-medium text-gray-900 text-sm">{request.type}</div>
-                    <div className="text-xs text-gray-500 line-clamp-2 mb-2">{request.description}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-1 transition-colors duration-300">Employee: {request.employeeName || 'N/A'}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">ID: {request.employeeId || 'N/A'}</div>
+                    <div className="font-medium text-gray-900 dark:text-white text-sm transition-colors duration-300">{request.type}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-2 transition-colors duration-300">{request.description}</div>
                     <div className="flex items-center justify-between text-sm mt-2">
-                      <span className="font-semibold">{formatCurrency(request.amount)}</span>
-                      <span className="flex items-center gap-1 text-gray-600">
+                      <span className="font-semibold text-gray-900 dark:text-white transition-colors duration-300">{formatCurrency(request.amount)}</span>
+                      <span className="flex items-center gap-1 text-gray-600 dark:text-gray-400 transition-colors duration-300">
                         <Calendar className="w-3.5 h-3.5" />
                         {formatDate(request.submittedDate)}
                       </span>
@@ -1024,11 +1024,11 @@ const EmployeePortal = ({ user }) => {
             </div>
             {filteredAndSortedRequests.length === 0 && (
               <div className="text-center py-6">
-                <FileText className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                <h3 className="text-base font-medium text-gray-900 mb-1">
+                <FileText className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2 transition-colors duration-300" />
+                <h3 className="text-base font-medium text-gray-900 dark:text-white mb-1 transition-colors duration-300">
                   {isEmployee() ? 'No requests submitted yet' : 'No requests found'}
                 </h3>
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-500 dark:text-gray-400 text-sm transition-colors duration-300">
                   {isEmployee() ? 'Click "Submit Request" to create your first expense request' : 'Try adjusting your search or filters'}
                 </p>
               </div>
@@ -1038,7 +1038,7 @@ const EmployeePortal = ({ user }) => {
         }
 
         {/* Results Info */}
-        <div className="mt-4 flex items-center justify-between text-base text-gray-500">
+        <div className="mt-4 flex items-center justify-between text-base text-gray-500 dark:text-gray-400 transition-colors duration-300">
           <span>
             {isEmployee() 
                               ? `Showing ${filteredAndSortedRequests.length} of ${requests.length} submitted requests`
@@ -1047,7 +1047,7 @@ const EmployeePortal = ({ user }) => {
           </span>
           {isAdmin() && (
             <span>
-              Total Amount: <strong className="text-gray-900">{formatCurrency(summaryStats.total)}</strong>
+              Total Amount: <strong className="text-gray-900 dark:text-white transition-colors duration-300">{formatCurrency(summaryStats.total)}</strong>
             </span>
           )}
         </div>
@@ -1057,7 +1057,7 @@ const EmployeePortal = ({ user }) => {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={closeModal} />
-          <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+          <div className="relative w-full max-w-2xl bg-white dark:bg-dark-card rounded-2xl shadow-2xl border border-gray-100 dark:border-dark-border overflow-hidden transition-colors duration-300">
             <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-orange-500 to-blue-600">
               <h3 className="text-white font-semibold text-lg">{
                 viewingRequest ? 'Request Details' : (editingRequestId ? 'Edit Expense Request' : (isEmployee() ? 'Submit New Request' : 'New Expense Request'))
@@ -1072,36 +1072,36 @@ const EmployeePortal = ({ user }) => {
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <div className="text-sm text-gray-500 mb-2">Request ID</div>
-                      <div className="font-medium text-gray-900 text-base">{viewingRequest.id}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Request ID</div>
+                      <div className="font-medium text-gray-900 dark:text-white text-base transition-colors duration-300">{viewingRequest.id}</div>
                     </div>
                     {(isEmployee() || isAdmin()) && (
                       <>
                         <div>
-                          <div className="text-sm text-gray-500 mb-2">Employee Name</div>
-                          <div className="font-medium text-gray-900 text-base">{viewingRequest.employeeName || 'N/A'}</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Employee Name</div>
+                          <div className="font-medium text-gray-900 dark:text-white text-base transition-colors duration-300">{viewingRequest.employeeName || 'N/A'}</div>
                         </div>
                         <div>
-                          <div className="text-sm text-gray-500 mb-2">Employee ID</div>
-                          <div className="font-medium text-gray-900 text-base">{viewingRequest.employeeId || 'N/A'}</div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Employee ID</div>
+                          <div className="font-medium text-gray-900 dark:text-white text-base transition-colors duration-300">{viewingRequest.employeeId || 'N/A'}</div>
                         </div>
                       </>
                     )}
                     <div>
-                      <div className="text-sm text-gray-500 mb-2">Submitted</div>
-                      <div className="font-medium text-gray-900 text-base">{formatDate(viewingRequest.submittedDate)}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Submitted</div>
+                      <div className="font-medium text-gray-900 dark:text-white text-base transition-colors duration-300">{formatDate(viewingRequest.submittedDate)}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-500 mb-2">Type</div>
-                      <div className="font-medium text-gray-900 text-base">{viewingRequest.type}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Type</div>
+                      <div className="font-medium text-gray-900 dark:text-white text-base transition-colors duration-300">{viewingRequest.type}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-500 mb-2">Amount</div>
-                      <div className="font-medium text-gray-900 text-base">{formatCurrency(viewingRequest.amount)}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Amount</div>
+                      <div className="font-medium text-gray-900 dark:text-white text-base transition-colors duration-300">{formatCurrency(viewingRequest.amount)}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-gray-500 mb-2">Status</div>
-                      <div className="font-medium text-gray-900 text-base">
+                      <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Status</div>
+                      <div className="font-medium text-gray-900 dark:text-white text-base transition-colors duration-300">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${getStatusConfig(viewingRequest.status).className}`}>
                           {(() => {
                             const StatusIcon = getStatusConfig(viewingRequest.status).icon;
@@ -1112,8 +1112,8 @@ const EmployeePortal = ({ user }) => {
                       </div>
                     </div>
                     <div className="col-span-2">
-                      <div className="text-sm text-gray-500 mb-2">Description</div>
-                      <div className="font-medium text-gray-900 text-base">{viewingRequest.description || '—'}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400 mb-2 transition-colors duration-300">Description</div>
+                      <div className="font-medium text-gray-900 dark:text-white text-base transition-colors duration-300">{viewingRequest.description || '—'}</div>
                     </div>
                     
 
@@ -1124,7 +1124,7 @@ const EmployeePortal = ({ user }) => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {/* Employee Name and ID - Always visible for admin, conditional for employees */}
                     <div>
-                      <label className="block text-base text-gray-600 mb-2">
+                      <label className="block text-base text-gray-600 dark:text-gray-200 mb-2 transition-colors duration-300">
                         {isEmployee() ? 'Your Name' : 'Employee Name'}
                       </label>
                       <input
@@ -1132,12 +1132,12 @@ const EmployeePortal = ({ user }) => {
                         value={newRequest.employeeName || ''}
                         onChange={(e) => handleNewRequestChange('employeeName', e.target.value)}
                         placeholder={isEmployee() ? 'Your full name' : 'Enter employee name'}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base bg-white dark:bg-dark-surface text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-base text-gray-600 mb-2">
+                      <label className="block text-base text-gray-600 dark:text-gray-200 mb-2 transition-colors duration-300">
                         {isEmployee() ? 'Your Employee ID' : 'Employee ID'}
                       </label>
                       <input
@@ -1145,23 +1145,23 @@ const EmployeePortal = ({ user }) => {
                         value={newRequest.employeeId || ''}
                         onChange={(e) => handleNewRequestChange('employeeId', e.target.value)}
                         placeholder={isEmployee() ? 'Your employee ID' : 'Enter employee ID'}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base bg-white dark:bg-dark-surface text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-base text-gray-600 mb-2">Expense Type</label>
+                      <label className="block text-base text-gray-600 dark:text-gray-200 mb-2 transition-colors duration-300">Expense Type</label>
                       <input
                         type="text"
                         value={newRequest.type}
                         onChange={(e) => handleNewRequestChange('type', e.target.value)}
                         placeholder="e.g. Travel Expenses"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base bg-white dark:bg-dark-surface text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-base text-gray-600 mb-2">Amount</label>
+                      <label className="block text-base text-gray-600 dark:text-gray-200 mb-2 transition-colors duration-300">Amount</label>
                       <input
                         type="number"
                         step="0.01"
@@ -1169,27 +1169,27 @@ const EmployeePortal = ({ user }) => {
                         value={newRequest.amount}
                         onChange={(e) => handleNewRequestChange('amount', e.target.value)}
                         placeholder="0.00"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base bg-white dark:bg-dark-surface text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-base text-gray-600 mb-2">Date</label>
+                      <label className="block text-base text-gray-600 dark:text-gray-200 mb-2 transition-colors duration-300">Date</label>
                       <input
                         type="date"
                         value={newRequest.submittedDate}
                         onChange={(e) => handleNewRequestChange('submittedDate', e.target.value)}
-                        className="w-full px-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
+                        className="w-full px-3 py-3 border border-gray-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base bg-white dark:bg-dark-surface text-gray-900 dark:text-white"
                         required
                       />
                     </div>
                     {isAdmin() && (
                       <div>
-                        <label className="block text-base text-gray-600 mb-2">Status</label>
+                        <label className="block text-base text-gray-600 dark:text-gray-200 mb-2 transition-colors duration-300">Status</label>
                         <select
                           value={newRequest.status}
                           onChange={(e) => handleNewRequestChange('status', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
+                          className="w-full px-4 py-3 border border-gray-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base bg-white dark:bg-dark-surface text-gray-900 dark:text-white"
                         >
                           <option value="pending">Pending</option>
                           <option value="under_verification">Under Verification</option>
@@ -1201,11 +1201,11 @@ const EmployeePortal = ({ user }) => {
                       </div>
                     )}
                     <div>
-                      <label className="block text-base text-gray-600 mb-2">Category</label>
+                      <label className="block text-base text-gray-600 dark:text-gray-200 mb-2 transition-colors duration-300">Category</label>
                       <select
                         value={newRequest.category}
                         onChange={(e) => handleNewRequestChange('category', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-base bg-white dark:bg-dark-surface text-gray-900 dark:text-white"
                       >
                         <option value="travel">Travel</option>
                         <option value="office">Office</option>
@@ -1216,19 +1216,19 @@ const EmployeePortal = ({ user }) => {
                       </select>
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="block text-base text-gray-600 mb-2">Description</label>
+                      <label className="block text-base text-gray-600 dark:text-gray-200 mb-2 transition-colors duration-300">Description</label>
                       <textarea
                         value={newRequest.description}
                         onChange={(e) => handleNewRequestChange('description', e.target.value)}
                         rows={3}
                         placeholder="Optional details"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-y text-base"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-dark-border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-y text-base bg-white dark:bg-dark-surface text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                       />
                     </div>
                   </div>
 
                   <div className="flex items-center justify-end gap-4 pt-4">
-                    <button type="button" onClick={closeModal} className="px-6 py-3 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 text-base">Cancel</button>
+                    <button type="button" onClick={closeModal} className="px-6 py-3 rounded-xl border border-gray-200 dark:border-dark-border text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-dark-surface text-base transition-colors duration-300">Cancel</button>
                     <button type="submit" className="px-8 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-blue-600 text-white hover:from-orange-600 hover:to-blue-700 shadow text-base font-medium">
                       {editingRequestId ? 'Update Request' : (isEmployee() ? 'Submit Request' : 'Create Request')}
                     </button>
@@ -1246,7 +1246,7 @@ const EmployeePortal = ({ user }) => {
       {showAnalytics && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowAnalytics(false)} />
-          <div className="relative w-full max-w-7xl bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden max-h-[90vh]">
+          <div className="relative w-full max-w-7xl bg-white dark:bg-dark-card rounded-2xl shadow-2xl border border-gray-100 dark:border-dark-border overflow-hidden max-h-[90vh] transition-colors duration-300">
             <div className="flex items-center justify-between px-6 py-5 bg-gradient-to-r from-orange-500 to-blue-600">
               <h3 className="text-white font-semibold text-xl">Request Analytics & Insights</h3>
               <button onClick={() => setShowAnalytics(false)} className="p-3 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-colors">

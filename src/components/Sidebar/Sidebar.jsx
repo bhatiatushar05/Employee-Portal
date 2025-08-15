@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { Home, Camera, CheckCircle, FolderOpen, Settings, X, LogOut, Building2, LayoutDashboard, User, ChevronLeft, ChevronRight, Clock, Users, Menu, Bell, Search } from 'lucide-react';
+import { Home, Camera, CheckCircle, FolderOpen, Settings, X, LogOut, Building2, LayoutDashboard, User, ChevronLeft, ChevronRight, Clock, Users, Menu, Bell, Search, Moon, Sun } from 'lucide-react';
 import HLogo from '../../assets/H logo.png'; // Make sure the file is in src/assets/
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const Sidebar = ({ 
   activeSection, 
@@ -14,6 +15,7 @@ const Sidebar = ({
   user 
 }) => {
   const { isAdmin, isEmployee } = useAuth();
+  const { isDarkMode, toggleDarkMode } = useTheme();
   const [showProfile, setShowProfile] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -298,15 +300,15 @@ const Sidebar = ({
       {/* Profile Modal */}
       {showProfile && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-2xl w-full max-w-md">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl w-full max-w-md">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Profile</h2>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Profile</h2>
                 <button 
                   onClick={() => setShowProfile(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                 >
-                  <X size={20} className="text-gray-500" />
+                  <X size={20} className="text-gray-500 dark:text-gray-400" />
                 </button>
               </div>
 
@@ -314,17 +316,17 @@ const Sidebar = ({
                 <div className="w-20 h-20 rounded-full bg-gradient-to-r from-purple-500 to-green-500 flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-lg">
                   <span className="text-3xl font-bold text-white">{user?.fullName?.[0] || 'U'}</span>
                 </div>
-                <p className="text-gray-600">{user?.email || 'user@hits.com'}</p>
-                <p className="text-sm text-gray-500 mt-1 capitalize">{user?.role || 'user'}</p>
+                <p className="text-gray-600 dark:text-gray-300">{user?.email || 'user@hits.com'}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 capitalize">{user?.role || 'user'}</p>
               </div>
 
-              <div className="border-t border-gray-200 pt-4">
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                 <button
                   onClick={() => {
                     setShowProfile(false);
                     if (onLogout) onLogout();
                   }}
-                  className="w-full py-3 px-4 bg-red-100 text-red-700 rounded-lg font-medium hover:bg-red-200 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-3 px-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg font-medium hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors flex items-center justify-center gap-2"
                 >
                   <LogOut size={20} />
                   Logout
@@ -338,15 +340,15 @@ const Sidebar = ({
       {/* Settings Modal */}
       {showSettings && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h2>
                 <button 
                   onClick={() => setShowSettings(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                 >
-                  <X size={20} className="text-gray-500" />
+                  <X size={20} className="text-gray-500 dark:text-gray-400" />
                 </button>
               </div>
             </div>
@@ -354,41 +356,56 @@ const Sidebar = ({
             <div className="p-6 space-y-8">
               {/* General Settings */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">General</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">General</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 bg-gray-400 rounded"></div>
-                      <span className="font-medium">Dark mode</span>
+                      {isDarkMode ? (
+                        <Moon className="w-5 h-5 text-orange-500" />
+                      ) : (
+                        <Sun className="w-5 h-5 text-yellow-500" />
+                      )}
+                      <span className="font-medium text-gray-900 dark:text-white">Dark mode</span>
                     </div>
-                    <div className="w-12 h-6 bg-gray-300 rounded-full"></div>
+                    <button
+                      onClick={toggleDarkMode}
+                      className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
+                        isDarkMode ? 'bg-orange-500' : 'bg-gray-300'
+                      }`}
+                    >
+                      <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 ${
+                        isDarkMode ? 'transform translate-x-6' : ''
+                      }`} />
+                    </button>
                   </div>
 
-                  <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 bg-gray-400 rounded"></div>
-                      <span className="font-medium">Notifications</span>
+                      <Bell className="w-5 h-5 text-blue-500" />
+                      <span className="font-medium text-gray-900 dark:text-white">Notifications</span>
                     </div>
-                    <div className="w-12 h-6 bg-blue-500 rounded-full"></div>
+                    <div className="w-12 h-6 bg-blue-500 rounded-full relative">
+                      <div className="absolute top-0.5 right-0.5 w-5 h-5 bg-white rounded-full" />
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* User Preferences */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">User Preferences</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">User Preferences</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                    <span className="font-medium">Language</span>
-                    <select className="px-3 py-1 border border-gray-300 rounded text-sm">
+                  <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
+                    <span className="font-medium text-gray-900 dark:text-white">Language</span>
+                    <select className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                       <option>English</option>
                       <option>Spanish</option>
                       <option>French</option>
                     </select>
                   </div>
-                  <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                    <span className="font-medium">Time Zone</span>
-                    <select className="px-3 py-1 border border-gray-300 rounded text-sm">
+                  <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800">
+                    <span className="font-medium text-gray-900 dark:text-white">Time Zone</span>
+                    <select className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                       <option>UTC (GMT+0)</option>
                       <option>EST (GMT-5)</option>
                       <option>PST (GMT-8)</option>
