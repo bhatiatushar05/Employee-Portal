@@ -112,6 +112,9 @@ const FaceRecognitionAttendance = ({ onCheckInOut }) => {
         Tap to Check In/Out
       </button>
       {liveness && <div className="mt-2 text-green-500 font-bold">Liveness Detected!</div>}
+      
+      {/* Footer Blank Space */}
+      <div className="h-16 sm:h-20 md:h-24"></div>
     </div>
   );
 };

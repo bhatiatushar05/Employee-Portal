@@ -12,6 +12,9 @@ const ProtectedRoute = ({ children, requiredPermission = null }) => {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
+        
+        {/* Footer Blank Space */}
+        <div className="h-16 sm:h-20 md:h-24"></div>
       </div>
     );
   }
@@ -40,6 +43,9 @@ const ProtectedRoute = ({ children, requiredPermission = null }) => {
             Go Back
           </button>
         </div>
+        
+        {/* Footer Blank Space */}
+        <div className="h-16 sm:h-20 md:h-24"></div>
       </div>
     );
   }

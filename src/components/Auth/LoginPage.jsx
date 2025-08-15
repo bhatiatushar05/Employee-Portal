@@ -177,6 +177,9 @@ const LoginPage = () => {
             <div><strong>Employee:</strong> employee@hits.com / emp123</div>
           </div>
         </div>
+        
+        {/* Footer Blank Space */}
+        <div className="h-16 sm:h-20 md:h-24"></div>
       </div>
     </div>
   );

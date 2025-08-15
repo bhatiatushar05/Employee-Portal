@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Clock, Calendar, Users, CheckCircle, XCircle, Timer, MapPin, User, Camera, Grid, List, Filter, TrendingUp, X, BarChart3, PieChart, Activity, Search, Download, Eye, ChevronDown, RefreshCw } from 'lucide-react';
+import { Clock, Calendar, Users, CheckCircle, XCircle, Timer, MapPin, User, Camera, Grid, List, Filter, TrendingUp, X, BarChart3, PieChart, Activity, Search, Download, Eye, ChevronDown, RefreshCw, Bell } from 'lucide-react';
 import TopRightHeader from '../TopRightHeader/TopRightHeader';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -24,6 +24,8 @@ const EmployeeAttendance = ({ user }) => {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -37,11 +39,15 @@ const EmployeeAttendance = ({ user }) => {
 
   // Load attendance data from memory
   useEffect(() => {
+    console.log('Loading attendance data for user:', user?.email);
     // Load existing data from localStorage first
+    let saved = null;
     try {
-      const saved = localStorage.getItem('attendance_records');
+      saved = localStorage.getItem('hits_attendance_records');
+      console.log('Found saved data:', saved ? 'yes' : 'no');
       if (saved) {
         const parsedRecords = JSON.parse(saved);
+        console.log('Parsed records:', parsedRecords.length);
         setAttendanceRecords(parsedRecords);
       }
     } catch (error) {
@@ -49,7 +55,7 @@ const EmployeeAttendance = ({ user }) => {
     }
     
     // Initialize with sample data only if no data exists in localStorage
-    if (attendanceRecords.length === 0) {
+    if (!saved || attendanceRecords.length === 0) {
       const sampleRecords = [
         {
           id: 1,
@@ -121,22 +127,40 @@ const EmployeeAttendance = ({ user }) => {
       
       // Save sample data to localStorage
       try {
-        localStorage.setItem('attendance_records', JSON.stringify(sampleRecords));
+        localStorage.setItem('hits_attendance_records', JSON.stringify(sampleRecords));
       } catch (error) {
         console.error('Error saving sample records:', error);
       }
     }
     
-    // Find today's record
+    // Find today's record for current user
     const today = new Date().toDateString();
-    const todayRec = attendanceRecords.find(record => 
+    const currentUserEmail = user?.email || 'john@company.com';
+    
+    // First check in the loaded records
+    let todayRec = attendanceRecords.find(record => 
       new Date(record.date).toDateString() === today && 
-      record.employeeId === (user?.email || 'john@company.com')
+      record.employeeId === currentUserEmail
     );
+    
+    // If not found in current records, check in the saved data
+    if (!todayRec && saved) {
+      try {
+        const parsedRecords = JSON.parse(saved);
+        todayRec = parsedRecords.find(record => 
+          new Date(record.date).toDateString() === today && 
+          record.employeeId === currentUserEmail
+        );
+      } catch (error) {
+        console.error('Error parsing saved records:', error);
+      }
+    }
     
     if (todayRec) {
       setTodayRecord(todayRec);
       setCurrentStatus(todayRec.status);
+    } else {
+      setCurrentStatus('not-checked-in');
     }
     
     // Get user's location
@@ -150,25 +174,40 @@ const EmployeeAttendance = ({ user }) => {
         }
       );
     }
-  }, [user, attendanceRecords.length]);
+  }, [user]);
 
-  // Listen for localStorage changes to refresh data
+  // Listen for localStorage changes to refresh data in real-time
   useEffect(() => {
-    const handleStorageChange = () => {
-      try {
-        const saved = localStorage.getItem('attendance_records');
-        if (saved) {
-          const parsedRecords = JSON.parse(saved);
-          setAttendanceRecords(parsedRecords);
+    const handleStorageChange = (e) => {
+      if (e.key === 'hits_attendance_records') {
+        try {
+          if (e.newValue) {
+            const parsedRecords = JSON.parse(e.newValue);
+            setAttendanceRecords(parsedRecords);
+            
+            // Update current status for current user
+            const today = new Date().toDateString();
+            const todayRec = parsedRecords.find(record => 
+              new Date(record.date).toDateString() === today && 
+              record.employeeId === (user?.email || 'john@company.com')
+            );
+            
+            if (todayRec) {
+              setTodayRecord(todayRec);
+              setCurrentStatus(todayRec.status);
+            } else {
+              setCurrentStatus('not-checked-in');
+            }
+          }
+        } catch (error) {
+          console.error('Error refreshing attendance records:', error);
         }
-      } catch (error) {
-        console.error('Error refreshing attendance records:', error);
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
     
-    // Also check for changes every few seconds (for same-tab updates)
+    // Also check for changes every 2 seconds for same-tab updates
     const interval = setInterval(() => {
       try {
         const saved = localStorage.getItem('attendance_records');
@@ -176,35 +215,34 @@ const EmployeeAttendance = ({ user }) => {
           const parsedRecords = JSON.parse(saved);
           if (JSON.stringify(parsedRecords) !== JSON.stringify(attendanceRecords)) {
             setAttendanceRecords(parsedRecords);
+            
+            // Update current status for current user
+            const today = new Date().toDateString();
+            const todayRec = parsedRecords.find(record => 
+              new Date(record.date).toDateString() === today && 
+              record.employeeId === (user?.email || 'john@company.com')
+            );
+            
+            if (todayRec) {
+              setTodayRecord(todayRec);
+              setCurrentStatus(todayRec.status);
+            } else {
+              setCurrentStatus('not-checked-in');
+            }
           }
         }
       } catch (error) {
         console.error('Error checking attendance records:', error);
       }
-    }, 1000); // Check every second for faster updates
+    }, 2000); // Check every 2 seconds for better performance
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       clearInterval(interval);
     };
-  }, [attendanceRecords]);
+  }, [attendanceRecords, user]);
 
-  // Force refresh data when component mounts or user changes
-  useEffect(() => {
-    const refreshData = () => {
-      try {
-        const saved = localStorage.getItem('attendance_records');
-        if (saved) {
-          const parsedRecords = JSON.parse(saved);
-          setAttendanceRecords(parsedRecords);
-        }
-      } catch (error) {
-        console.error('Error refreshing attendance records:', error);
-      }
-    };
 
-    refreshData();
-  }, [user]);
 
   // Cleanup camera stream on component unmount
   useEffect(() => {
@@ -286,6 +324,7 @@ const EmployeeAttendance = ({ user }) => {
   };
 
   const handleCheckIn = () => {
+    console.log('Starting check-in process for user:', user?.email);
     if (!capturedPhoto) {
       alert('Please capture your photo for check-in verification.');
       return;
@@ -318,9 +357,14 @@ const EmployeeAttendance = ({ user }) => {
     setShowCheckInModal(false);
     setCapturedPhoto(null);
     
-    // Save to localStorage for persistence
+    // Save to localStorage for persistence and notify other tabs/windows
     try {
       localStorage.setItem('attendance_records', JSON.stringify(updatedRecords));
+      // Trigger storage event for other tabs/windows to sync
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'attendance_records',
+        newValue: JSON.stringify(updatedRecords)
+      }));
     } catch (error) {
       console.error('Error saving attendance records:', error);
     }
@@ -355,9 +399,14 @@ const EmployeeAttendance = ({ user }) => {
     setShowCheckOutModal(false);
     setCapturedPhoto(null);
     
-    // Save to localStorage for persistence
+    // Save to localStorage for persistence and notify other tabs/windows
     try {
       localStorage.setItem('attendance_records', JSON.stringify(updatedRecords));
+      // Trigger storage event for other tabs/windows to sync
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'attendance_records',
+        newValue: JSON.stringify(updatedRecords)
+      }));
     } catch (error) {
       console.error('Error saving attendance records:', error);
     }
@@ -368,6 +417,21 @@ const EmployeeAttendance = ({ user }) => {
       case 'checked-in': return 'bg-green-100 text-green-800';
       case 'checked-out': return 'bg-blue-100 text-blue-800';
       default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // Show notification for admin when employees check in/out
+  const showNotificationMessage = (message) => {
+    console.log('Showing notification:', message);
+    setNotificationMessage(message);
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 5000); // Hide after 5 seconds
+  };
+
+  // Test notification function
+  const testNotification = () => {
+    if (isAdmin()) {
+      showNotificationMessage('Test notification - Employee checked in at ' + new Date().toLocaleTimeString());
     }
   };
 
@@ -445,11 +509,26 @@ const EmployeeAttendance = ({ user }) => {
     // For employees, only show their own records
     if (!isAdmin()) {
       records = records.filter(record => 
-      record.employeeId === (user?.email || 'john@company.com')
-    );
+        record.employeeId === (user?.email || 'john@company.com')
+      );
     }
     
     return records;
+  };
+
+  // Get real-time attendance status for admin dashboard
+  const getRealTimeAttendanceStatus = () => {
+    const today = new Date().toDateString();
+    const todayRecords = attendanceRecords.filter(record => 
+      new Date(record.date).toDateString() === today
+    );
+    
+    return {
+      totalEmployees: 4, // Total employees in the system
+      checkedIn: todayRecords.filter(r => r.status === 'checked-in').length,
+      checkedOut: todayRecords.filter(r => r.status === 'checked-out').length,
+      notCheckedIn: 4 - todayRecords.filter(r => r.status === 'checked-in' || r.status === 'checked-out').length
+    };
   };
 
   const getWeeklyRecords = () => {
@@ -745,14 +824,30 @@ const EmployeeAttendance = ({ user }) => {
   );
 
   return (
-    <div className="flex-1 min-h-0 h-full bg-gradient-to-br from-blue-50 to-indigo-100 overflow-y-auto">
+    <div className="flex-1 min-h-0 h-full bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100 overflow-y-auto">
       {/* Top right header */}
       <TopRightHeader user={user} />
       
+      {/* Admin Notification */}
+      {isAdmin() && showNotification && (
+        <div className="fixed top-20 right-4 z-50 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg max-w-sm">
+          <div className="flex items-center gap-3">
+            <CheckCircle size={20} />
+            <span className="font-medium">{notificationMessage}</span>
+            <button 
+              onClick={() => setShowNotification(false)}
+              className="ml-auto text-white hover:text-green-100"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+      
       {/* Main Content with proper spacing */}
-        <div className="bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100 pt-16 sm:pt-20 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
+      <div className="pt-16 sm:pt-20 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="rounded-xl shadow-md p-3 sm:p-4">
+        <div className="bg-white rounded-xl shadow-md border border-gray-100 p-3 sm:p-4">
           <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="p-2 bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-lg shadow-lg">
@@ -799,10 +894,24 @@ const EmployeeAttendance = ({ user }) => {
                 <button 
                   onClick={() => {
                     try {
-                      const saved = localStorage.getItem('attendance_records');
+                      const saved = localStorage.getItem('hits_attendance_records');
                       if (saved) {
                         const parsedRecords = JSON.parse(saved);
                         setAttendanceRecords(parsedRecords);
+                        
+                        // Update current status for current user
+                        const today = new Date().toDateString();
+                        const todayRec = parsedRecords.find(record => 
+                          new Date(record.date).toDateString() === today && 
+                          record.employeeId === (user?.email || 'john@company.com')
+                        );
+                        
+                        if (todayRec) {
+                          setTodayRecord(todayRec);
+                          setCurrentStatus(todayRec.status);
+                        } else {
+                          setCurrentStatus('not-checked-in');
+                        }
                       }
                     } catch (error) {
                       console.error('Error refreshing data:', error);
@@ -814,8 +923,36 @@ const EmployeeAttendance = ({ user }) => {
                   <span className="hidden sm:inline">Refresh</span>
                   <span className="sm:hidden">R</span>
                 </button>
-              </div>
-            ) : (
+                
+                {/* Debug Button - Admin Only */}
+                <button 
+                  onClick={() => {
+                    console.log('=== DEBUG INFO ===');
+                    console.log('Current attendance records:', attendanceRecords);
+                    console.log('Current user:', user);
+                    console.log('Current status:', currentStatus);
+                    console.log('Today record:', todayRecord);
+                    console.log('LocalStorage data:', localStorage.getItem('hits_attendance_records'));
+                    console.log('==================');
+                  }}
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-sm font-medium"
+                >
+                  <Activity size={12} className="sm:w-3.5 sm:h-3.5" />
+                  <span className="hidden sm:inline">Debug</span>
+                                    <span className="sm:hidden">D</span>
+                </button>
+                
+                {/* Test Notification Button - Admin Only */}
+                <button 
+                  onClick={testNotification}
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-sm font-medium"
+                >
+                  <Bell size={12} className="sm:w-3.5 sm:h-3.5" />
+                  <span className="hidden sm:inline">Test Notif</span>
+                  <span className="sm:hidden">TN</span>
+                </button>
+                </div>
+              ) : (
               <div className="flex items-center gap-3">
                 <div className="text-right">
                   <p className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">{currentTime.toLocaleTimeString()}</p>
@@ -1508,6 +1645,9 @@ const EmployeeAttendance = ({ user }) => {
             </div>
           </div>
         )}
+        
+        {/* Footer Blank Space */}
+        <div className="h-16 sm:h-20 md:h-24"></div>
       </div>
     </div>
   );

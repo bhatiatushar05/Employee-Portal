@@ -1545,6 +1545,9 @@ const EmployeePortal = ({ user }) => {
           )}
         </div>
       )}
+      
+      {/* Footer Blank Space */}
+      <div className="h-16 sm:h-20 md:h-24"></div>
     </div>
   );
 };
