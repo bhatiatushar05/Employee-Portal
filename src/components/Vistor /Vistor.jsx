@@ -4,6 +4,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import QRCode from 'qrcode';
 import TopRightHeader from '../TopRightHeader/TopRightHeader';
+import { useTheme } from '../../contexts/ThemeContext';
 
 // Register Chart.js components
 ChartJS.register(
@@ -19,6 +20,7 @@ ChartJS.register(
 );
 
 const VisitorManagement = ({ user }) => {
+  const { isDarkMode } = useTheme();
   const [visitors, setVisitors] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedVisitor, setSelectedVisitor] = useState(null);
@@ -311,10 +313,18 @@ const VisitorManagement = ({ user }) => {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case 'checked-in': return 'bg-green-100 text-green-800';
-      case 'checked-out': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+    if (isDarkMode) {
+      switch (status) {
+        case 'checked-in': return 'bg-green-900/30 text-green-400 border border-green-700/50';
+        case 'checked-out': return 'bg-blue-900/30 text-blue-400 border border-blue-700/50';
+        default: return 'bg-gray-900/30 text-gray-400 border border-gray-700/50';
+      }
+    } else {
+      switch (status) {
+        case 'checked-in': return 'bg-green-100 text-green-800';
+        case 'checked-out': return 'bg-blue-100 text-blue-800';
+        default: return 'bg-gray-100 text-gray-800';
+      }
     }
   };
 
@@ -682,90 +692,7 @@ const VisitorManagement = ({ user }) => {
     return Math.round((weekVisitors.length / 7) * 10) / 10;
   };
 
-  // Enhanced Analytics Functions
-  const getAdvancedHourlyDistribution = () => {
-    const hourlyData = Array(24).fill(0);
-    const hourlyDuration = Array(24).fill(0);
-    const hourlyCount = Array(24).fill(0);
-    
-    const today = new Date().toDateString();
-    
-    visitors.forEach(visitor => {
-      if (new Date(visitor.checkInTime).toDateString() === today) {
-        const hour = new Date(visitor.checkInTime).getHours();
-        hourlyData[hour]++;
-        hourlyCount[hour]++;
-        if (visitor.duration) {
-          hourlyDuration[hour] += visitor.duration;
-        }
-      }
-    });
-    
-    return hourlyData.map((count, hour) => ({
-      hour: `${hour.toString().padStart(2, '0')}:00`,
-      count,
-      avgDuration: hourlyCount[hour] > 0 ? (hourlyDuration[hour] / hourlyCount[hour]).toFixed(1) : 0,
-      percentage: count > 0 ? ((count / Math.max(...hourlyData)) * 100).toFixed(1) : 0
-    }));
-  };
 
-  const getAdvancedDailyTrends = (days = 30) => {
-    const dailyData = [];
-    const today = new Date();
-    
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      
-      const dateStr = date.toDateString();
-      
-      const dayVisitors = visitors.filter(visitor => 
-        new Date(visitor.checkInTime).toDateString() === dateStr
-      );
-      
-      const totalDuration = dayVisitors.reduce((sum, v) => sum + (v.duration || 0), 0);
-      const avgDuration = dayVisitors.length > 0 ? (totalDuration / dayVisitors.length).toFixed(1) : 0;
-      
-      dailyData.push({
-        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        count: dayVisitors.length,
-        checkedIn: dayVisitors.filter(v => v.status === 'checked-in').length,
-        checkedOut: dayVisitors.filter(v => v.status === 'checked-out').length,
-        avgDuration: parseFloat(avgDuration),
-        totalDuration: totalDuration,
-        trend: i < days - 1 ? (dayVisitors.length - dailyData[dailyData.length - 1]?.count || 0) : 0
-      });
-    }
-    
-    return dailyData;
-  };
-
-  const getPredictiveInsights = () => {
-    const dailyData = getAdvancedDailyTrends(30);
-    const recentData = dailyData.slice(-7);
-    const avgRecent = recentData.reduce((sum, d) => sum + d.count, 0) / recentData.length;
-    
-    // Simple trend prediction
-    const trend = recentData[recentData.length - 1]?.count - recentData[0]?.count || 0;
-    const predictedNext = Math.max(0, Math.round(avgRecent + (trend * 0.1)));
-    
-    // Peak day prediction
-    const dayOfWeekCounts = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
-    dailyData.forEach(day => {
-      const date = new Date();
-      const dayOfWeek = date.getDay();
-      dayOfWeekCounts[dayOfWeek] += day.count;
-    });
-    const peakDay = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayOfWeekCounts.indexOf(Math.max(...dayOfWeekCounts))];
-    
-    return {
-      predictedNext,
-      trend: trend > 0 ? 'increasing' : trend < 0 ? 'decreasing' : 'stable',
-      peakDay,
-      avgRecent: Math.round(avgRecent),
-      confidence: Math.min(95, Math.max(60, 85 + Math.abs(trend)))
-    };
-  };
 
   const getVisitorBehaviorInsights = () => {
     const companies = getCompanyDistribution();
@@ -826,7 +753,7 @@ const VisitorManagement = ({ user }) => {
           display: false
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.8)',
           titleColor: 'white',
           bodyColor: 'white',
           borderColor: 'rgba(59, 130, 246, 0.5)',
@@ -839,11 +766,11 @@ const VisitorManagement = ({ user }) => {
         y: {
           beginAtZero: true,
           grid: {
-            color: 'rgba(0, 0, 0, 0.1)',
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
             drawBorder: false
           },
           ticks: {
-            color: '#6b7280',
+            color: isDarkMode ? '#9ca3af' : '#6b7280',
             font: {
               size: 12
             }
@@ -854,7 +781,7 @@ const VisitorManagement = ({ user }) => {
             display: false
           },
           ticks: {
-            color: '#6b7280',
+            color: isDarkMode ? '#9ca3af' : '#6b7280',
             font: {
               size: 11
             }
@@ -865,7 +792,9 @@ const VisitorManagement = ({ user }) => {
 
     return (
       <div className="space-y-4">
-        <h4 className="font-semibold text-gray-800 text-sm">{title}</h4>
+        <h4 className={`font-semibold text-sm ${
+          isDarkMode ? 'text-gray-200' : 'text-gray-800'
+        }`}>{title}</h4>
         <div className="h-64">
           <Bar data={chartData} options={options} />
         </div>
@@ -918,7 +847,7 @@ const VisitorManagement = ({ user }) => {
           display: false
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.8)',
           titleColor: 'white',
           bodyColor: 'white',
           borderColor: 'rgba(59, 130, 246, 0.5)',
@@ -931,11 +860,11 @@ const VisitorManagement = ({ user }) => {
         y: {
           beginAtZero: true,
           grid: {
-            color: 'rgba(0, 0, 0, 0.1)',
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
             drawBorder: false
           },
           ticks: {
-            color: '#6b7280',
+            color: isDarkMode ? '#9ca3af' : '#6b7280',
             font: {
               size: 12
             }
@@ -946,7 +875,7 @@ const VisitorManagement = ({ user }) => {
             display: false
           },
           ticks: {
-            color: '#6b7280',
+            color: isDarkMode ? '#9ca3af' : '#6b7280',
             font: {
               size: 11
             }
@@ -957,7 +886,9 @@ const VisitorManagement = ({ user }) => {
 
     return (
       <div className="space-y-4">
-        <h4 className="font-semibold text-gray-800 text-sm">{title}</h4>
+        <h4 className={`font-semibold text-sm ${
+          isDarkMode ? 'text-gray-200' : 'text-gray-800'
+        }`}>{title}</h4>
         <div className="h-64">
           <Line data={chartData} options={options} />
         </div>
@@ -1001,16 +932,15 @@ const VisitorManagement = ({ user }) => {
             font: {
               size: 12
             },
-            color: '#374151'
+            color: isDarkMode ? '#d1d5db' : '#374151'
           }
         },
         tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.8)',
           titleColor: 'white',
           bodyColor: 'white',
           borderColor: 'rgba(59, 130, 246, 0.5)',
           borderWidth: 1,
-          cornerRadius: 8,
           callbacks: {
             label: function(context) {
               const total = context.dataset.data.reduce((a, b) => a + b, 0);
@@ -1024,7 +954,9 @@ const VisitorManagement = ({ user }) => {
 
     return (
       <div className="space-y-4">
-        <h4 className="font-semibold text-gray-800 text-sm">{title}</h4>
+        <h4 className={`font-semibold text-sm ${
+          isDarkMode ? 'text-gray-200' : 'text-gray-800'
+        }`}>{title}</h4>
         <div className="h-64">
           <Pie data={chartData} options={options} />
         </div>
@@ -1032,167 +964,327 @@ const VisitorManagement = ({ user }) => {
     );
   };
 
-  const renderAnalyticsOverview = () => (
+  // Analytics content renderer
+  const renderAnalyticsContent = () => {
+    switch (analyticsView) {
+      case 'overview':
+        return renderOverviewAnalytics();
+      case 'hourly':
+        return renderHourlyAnalytics();
+      case 'daily':
+        return renderDailyAnalytics();
+      case 'weekly':
+        return renderWeeklyAnalytics();
+      case 'monthly':
+        return renderMonthlyAnalytics();
+      default:
+        return renderOverviewAnalytics();
+    }
+  };
+
+  // Overview Analytics
+  const renderOverviewAnalytics = () => (
     <div className="space-y-6">
-      {/* Key Metrics Dashboard */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-xl shadow-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-100 text-sm">Total Visitors</p>
-              <p className="text-2xl font-bold">{visitors.length}</p>
-            </div>
-            <Users className="w-8 h-8 text-blue-200" />
-          </div>
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className={`text-center p-6 rounded-xl shadow-lg border ${
+          isDarkMode 
+            ? 'bg-dark-card border-dark-border shadow-dark' 
+            : 'bg-white border-gray-100'
+        }`}>
+          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{visitors.length}</div>
+          <div className={`text-sm ${
+            isDarkMode ? 'text-blue-300' : 'text-blue-700'
+          }`}>Total Visitors</div>
         </div>
-        
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-xl shadow-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-orange-100 text-sm">Currently In</p>
-              <p className="text-2xl font-bold">{getActiveVisitors().length}</p>
-            </div>
-            <CheckCircle className="w-8 h-8 text-orange-200" />
-          </div>
+        <div className={`text-center p-6 rounded-xl shadow-lg border ${
+          isDarkMode 
+            ? 'bg-dark-card border-dark-border shadow-dark' 
+            : 'bg-white border-gray-100'
+        }`}>
+          <div className="text-3xl font-bold text-green-600 dark:text-green-400">{getActiveVisitors().length}</div>
+          <div className={`text-sm ${
+            isDarkMode ? 'text-green-300' : 'text-green-700'
+          }`}>Currently In</div>
         </div>
-        
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-xl shadow-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-100 text-sm">Avg Duration</p>
-              <p className="text-2xl font-bold">
-                {visitors.length > 0 ? (visitors.reduce((sum, v) => sum + (v.duration || 0), 0) / visitors.length).toFixed(1) : 0}h
-              </p>
-            </div>
-            <Clock className="w-8 h-8 text-blue-200" />
-          </div>
+        <div className={`text-center p-6 rounded-xl shadow-lg border ${
+          isDarkMode 
+            ? 'bg-dark-card border-dark-border shadow-dark' 
+            : 'bg-white border-gray-100'
+        }`}>
+          <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">{getTodayVisitors().length}</div>
+          <div className={`text-sm ${
+            isDarkMode ? 'text-orange-300' : 'text-orange-700'
+          }`}>Today</div>
         </div>
-        
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-xl shadow-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-orange-100 text-sm">Peak Hour</p>
-              <p className="text-2xl font-bold">{getVisitorBehaviorInsights().peakHour}</p>
-            </div>
-            <TrendingUp className="w-8 h-8 text-orange-200" />
-          </div>
+        <div className={`text-center p-6 rounded-xl shadow-lg border ${
+          isDarkMode 
+            ? 'bg-dark-card border-dark-border shadow-dark' 
+            : 'bg-white border-gray-100'
+        }`}>
+          <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">{getWeeklyVisitors().length}</div>
+          <div className={`text-sm ${
+            isDarkMode ? 'text-purple-300' : 'text-purple-700'
+          }`}>This Week</div>
         </div>
       </div>
 
-      {/* Charts Grid */}
+      {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Hourly Distribution */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          {renderBarChart(getAdvancedHourlyDistribution(), 'Hourly Visitor Distribution', 'hour', 'count', 'blue')}
+        <div className={`rounded-xl shadow-lg p-6 border ${
+          isDarkMode 
+            ? 'bg-dark-card border-dark-border shadow-dark' 
+            : 'bg-white border-gray-100'
+        }`}>
+          <h3 className={`text-lg font-bold mb-4 ${
+            isDarkMode ? 'text-white' : 'text-gray-900'
+          }`}>Visitor Status Distribution</h3>
+          {renderPieChart(getVisitorStatusDistribution(), 'Status', 'count', 'status')}
         </div>
-        
-        {/* Daily Trends */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          {renderLineChart(getAdvancedDailyTrends(7), 'Daily Visitor Trends (Last 7 Days)', 'date', 'count', 'orange', true)}
-        </div>
-        
-        {/* Company Distribution */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          {renderPieChart(getCompanyDistribution(), 'Top Companies by Visitors')}
-        </div>
-        
-        {/* Purpose Distribution */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          {renderPieChart(getPurposeDistribution(), 'Visit Purpose Distribution')}
+        <div className={`rounded-xl shadow-lg p-6 border ${
+          isDarkMode 
+            ? 'bg-dark-card border-dark-border shadow-dark' 
+            : 'bg-white border-gray-100'
+        }`}>
+          <h3 className={`text-lg font-bold mb-4 ${
+            isDarkMode ? 'text-white' : 'text-gray-900'
+          }`}>Recent Activity</h3>
+          {renderLineChart(getRecentActivity(7), 'Last 7 Days', 'date', 'count', 'blue', true)}
         </div>
       </div>
 
       {/* Predictive Insights */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
-            <TrendingUp className="w-5 h-5" />
-          </div>
-          <h3 className="text-lg font-bold text-gray-900">Predictive Insights</h3>
-        </div>
-        
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Predictive Insights</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {(() => {
-            const insights = getPredictiveInsights();
-            return (
-              <>
-                <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
-                  <div className="text-2xl font-bold text-blue-600">{insights.predictedNext}</div>
-                  <div className="text-sm text-blue-700">Predicted Tomorrow</div>
-                  <div className="text-xs text-blue-500 mt-1">{insights.confidence}% confidence</div>
-                </div>
-                
-                <div className="text-center p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200">
-                  <div className="text-2xl font-bold text-orange-600">{insights.peakDay}</div>
-                  <div className="text-sm text-orange-700">Peak Day</div>
-                  <div className="text-xs text-orange-500 mt-1">Most visitors</div>
-                </div>
-                
-                <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-orange-50 rounded-lg border border-blue-200">
-                  <div className="text-2xl font-bold text-blue-600">{insights.trend}</div>
-                  <div className="text-sm text-blue-700">Trend</div>
-                  <div className="text-xs text-blue-500 mt-1">Last 7 days</div>
-                </div>
-              </>
-            );
-          })()}
+          {getPredictiveInsights().map((insight, index) => (
+            <div key={index} className={`p-4 rounded-lg border ${
+              isDarkMode 
+                ? 'bg-dark-surface border-dark-border' 
+                : 'bg-gray-50 border-gray-200'
+            }`}>
+              <div className={`text-sm font-medium ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>{insight.title}</div>
+              <div className={`text-lg font-bold ${
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              }`}>{insight.value}</div>
+              <div className={`text-xs ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              }`}>{insight.description}</div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 
+  // Helper functions for analytics
+  const getVisitorStatusDistribution = () => {
+    const statusCounts = {};
+    visitors.forEach(visitor => {
+      statusCounts[visitor.status] = (statusCounts[visitor.status] || 0) + 1;
+    });
+    return Object.entries(statusCounts).map(([status, count]) => ({
+      status: status === 'checked-in' ? 'In Building' : 'Checked Out',
+      count
+    }));
+  };
+
+  const getRecentActivity = (days) => {
+    const now = new Date();
+    const data = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      const dayVisitors = visitors.filter(visitor => 
+        new Date(visitor.checkInTime).toDateString() === date.toDateString()
+      );
+      data.push({
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        count: dayVisitors.length
+      });
+    }
+    return data;
+  };
+
+  const getPredictiveInsights = () => [
+    {
+      title: 'Expected Today',
+      value: Math.round(getTodayVisitors().length * 1.1),
+      description: 'Based on current trends'
+    },
+    {
+      title: 'Peak Hour',
+      value: getVisitorBehaviorInsights().peakHour,
+      description: 'Busiest time of day'
+    },
+    {
+      title: 'Avg Duration',
+      value: `${getVisitorBehaviorInsights().avgDuration}h`,
+      description: 'Typical visit length'
+    }
+  ];
+
+  const getAdvancedHourlyDistribution = () => {
+    const hourlyData = {};
+    const totalVisitors = visitors.length;
+    
+    visitors.forEach(visitor => {
+      const hour = new Date(visitor.checkInTime).getHours();
+      if (!hourlyData[hour]) {
+        hourlyData[hour] = { count: 0, totalDuration: 0, visitors: [] };
+      }
+      hourlyData[hour].count++;
+      hourlyData[hour].visitors.push(visitor);
+      
+      if (visitor.checkOutTime) {
+        const duration = (new Date(visitor.checkOutTime) - new Date(visitor.checkInTime)) / (1000 * 60 * 60);
+        hourlyData[hour].totalDuration += duration;
+      }
+    });
+
+    return Object.entries(hourlyData).map(([hour, data]) => ({
+      hour: `${hour}:00`,
+      count: data.count,
+      percentage: Math.round((data.count / totalVisitors) * 100),
+      avgDuration: data.count > 0 ? Math.round((data.totalDuration / data.count) * 10) / 10 : 0
+    })).sort((a, b) => parseInt(a.hour) - parseInt(b.hour));
+  };
+
+  const getAdvancedDailyTrends = (days) => {
+    const now = new Date();
+    const data = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      const dayVisitors = visitors.filter(visitor => 
+        new Date(visitor.checkInTime).toDateString() === date.toDateString()
+      );
+      const checkedIn = dayVisitors.filter(v => v.status === 'checked-in').length;
+      const checkedOut = dayVisitors.filter(v => v.status === 'checked-out').length;
+      
+      data.push({
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        count: dayVisitors.length,
+        checkedIn,
+        checkedOut,
+        trend: i < days - 1 ? dayVisitors.length - data[data.length - 1]?.count : 0
+      });
+    }
+    return data;
+  };
+
+
+
   const renderHourlyAnalytics = () => (
     <div className="space-y-6">
       {/* Peak Hours Analysis */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Peak Hours Analysis</h3>
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Peak Hours Analysis</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">{getVisitorBehaviorInsights().peakHour}</div>
-            <div className="text-sm text-blue-700">Peak Hour</div>
-            <div className="text-xs text-blue-500 mt-1">{getVisitorBehaviorInsights().peakHourCount} visitors</div>
+          <div className={`text-center p-4 rounded-lg ${
+            isDarkMode 
+              ? 'bg-gradient-to-r from-blue-900/30 to-blue-100/30' 
+              : 'bg-gradient-to-r from-blue-50 to-blue-100'
+          }`}>
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{getVisitorBehaviorInsights().peakHour}</div>
+            <div className={`text-sm ${
+              isDarkMode ? 'text-blue-300' : 'text-blue-700'
+            }`}>Peak Hour</div>
+            <div className={`text-xs ${
+              isDarkMode ? 'text-blue-400' : 'text-blue-500'
+            }`} mt-1>{getVisitorBehaviorInsights().peakHourCount} visitors</div>
           </div>
-          <div className="text-center p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg">
-            <div className="text-2xl font-bold text-orange-600">{getVisitorBehaviorInsights().avgDuration}</div>
-            <div className="text-sm text-orange-700">Avg Duration</div>
-            <div className="text-xs text-orange-500 mt-1">hours per visit</div>
+          <div className={`text-center p-4 rounded-lg ${
+            isDarkMode 
+              ? 'bg-gradient-to-r from-orange-900/30 to-orange-100/30' 
+              : 'bg-gradient-to-r from-orange-50 to-orange-100'
+          }`}>
+            <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{getVisitorBehaviorInsights().avgDuration}</div>
+            <div className={`text-sm ${
+              isDarkMode ? 'text-orange-300' : 'text-orange-700'
+            }`}>Avg Duration</div>
+            <div className={`text-xs ${
+              isDarkMode ? 'text-orange-400' : 'text-orange-500'
+            }`} mt-1>hours per visit</div>
           </div>
-          <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-orange-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">{getVisitorBehaviorInsights().activeVisitors}</div>
-            <div className="text-sm text-blue-700">Currently In</div>
-            <div className="text-xs text-blue-500 mt-1">active visitors</div>
+          <div className={`text-center p-4 rounded-lg ${
+            isDarkMode 
+              ? 'bg-gradient-to-r from-blue-900/30 to-orange-900/30' 
+              : 'bg-gradient-to-r from-blue-50 to-orange-50'
+          }`}>
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{getVisitorBehaviorInsights().activeVisitors}</div>
+            <div className={`text-sm ${
+              isDarkMode ? 'text-blue-300' : 'text-blue-700'
+            }`}>Currently In</div>
+            <div className={`text-xs ${
+              isDarkMode ? 'text-blue-400' : 'text-blue-500'
+            }`} mt-1>active visitors</div>
           </div>
         </div>
       </div>
       
       {/* Detailed Hourly Chart */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Detailed Hourly Distribution</h3>
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Detailed Hourly Distribution</h3>
         {renderBarChart(getAdvancedHourlyDistribution(), '', 'hour', 'count', 'blue')}
       </div>
 
       {/* Hourly Duration Analysis */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Hourly Duration Patterns</h3>
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Hourly Duration Patterns</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-semibold text-gray-700 mb-3">Average Duration by Hour</h4>
+            <h4 className={`font-semibold mb-3 ${
+              isDarkMode ? 'text-gray-200' : 'text-gray-700'
+            }`}>Average Duration by Hour</h4>
             <div className="space-y-2">
               {getAdvancedHourlyDistribution()
                 .filter(hour => hour.avgDuration > 0)
                 .sort((a, b) => b.avgDuration - a.avgDuration)
                 .slice(0, 5)
                 .map((hour, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <span className="text-sm text-gray-700">{hour.hour}</span>
+                  <div key={index} className={`flex items-center justify-between p-2 rounded ${
+                    isDarkMode ? 'bg-dark-surface' : 'bg-gray-50'
+                  }`}>
+                    <span className={`text-sm ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}>{hour.hour}</span>
                     <div className="flex items-center gap-2">
-                      <div className="w-20 bg-gray-200 rounded-full h-2">
+                      <div className={`w-20 rounded-full h-2 ${
+                        isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+                      }`}>
                         <div 
                           className="bg-blue-500 h-2 rounded-full"
                           style={{ width: `${(hour.avgDuration / 4) * 100}%` }}
                         ></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-900">{hour.avgDuration}h</span>
+                      <span className={`text-sm font-medium ${
+                        isDarkMode ? 'text-white' : 'text-gray-900'
+                      }`}>{hour.avgDuration}h</span>
                     </div>
                   </div>
                 ))}
@@ -1200,23 +1292,33 @@ const VisitorManagement = ({ user }) => {
           </div>
           
           <div>
-            <h4 className="font-semibold text-gray-700 mb-3">Visitor Density by Hour</h4>
+            <h4 className={`font-semibold mb-3 ${
+              isDarkMode ? 'text-gray-200' : 'text-gray-700'
+            }`}>Visitor Density by Hour</h4>
             <div className="space-y-2">
               {getAdvancedHourlyDistribution()
                 .filter(hour => hour.count > 0)
                 .sort((a, b) => b.count - a.count)
                 .slice(0, 5)
                 .map((hour, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <span className="text-sm text-gray-700">{hour.hour}</span>
+                  <div key={index} className={`flex items-center justify-between p-2 rounded ${
+                    isDarkMode ? 'bg-dark-surface' : 'bg-gray-50'
+                  }`}>
+                    <span className={`text-sm ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}>{hour.hour}</span>
                     <div className="flex items-center gap-2">
-                      <div className="w-20 bg-gray-200 rounded-full h-2">
+                      <div className={`w-20 rounded-full h-2 ${
+                        isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+                      }`}>
                         <div 
                           className="bg-orange-500 h-2 rounded-full"
                           style={{ width: `${hour.percentage}%` }}
                         ></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-900">{hour.count}</span>
+                      <span className={`text-sm font-medium ${
+                        isDarkMode ? 'text-white' : 'text-gray-900'
+                      }`}>{hour.count}</span>
                     </div>
                   </div>
                 ))}
@@ -1230,8 +1332,14 @@ const VisitorManagement = ({ user }) => {
   const renderDailyAnalytics = () => (
     <div className="space-y-6">
       {/* Daily Trends with Multiple Metrics */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Daily Visitor Trends</h3>
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Daily Visitor Trends</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {renderLineChart(getAdvancedDailyTrends(7), 'Total Visitors (Last 7 Days)', 'date', 'count', 'blue', true)}
           {renderLineChart(getAdvancedDailyTrends(7), 'Average Duration (Last 7 Days)', 'date', 'avgDuration', 'orange', true)}
@@ -1239,15 +1347,29 @@ const VisitorManagement = ({ user }) => {
       </div>
       
       {/* Daily Statistics */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Daily Statistics</h3>
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Daily Statistics</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {getAdvancedDailyTrends(7).map((day, index) => (
-            <div key={index} className="text-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
-              <div className="text-lg font-bold text-gray-900">{day.count}</div>
-              <div className="text-xs text-gray-600">{day.date}</div>
-              <div className="text-xs text-green-600">+{day.checkedIn}</div>
-              <div className="text-xs text-blue-600">-{day.checkedOut}</div>
+            <div key={index} className={`text-center p-3 rounded-lg hover:transition-colors cursor-pointer ${
+              isDarkMode 
+                ? 'bg-dark-surface hover:bg-gray-800' 
+                : 'bg-gray-50 hover:bg-gray-100'
+            }`}>
+              <div className={`text-lg font-bold ${
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              }`}>{day.count}</div>
+              <div className={`text-xs ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+              }`}>{day.date}</div>
+              <div className="text-xs text-green-600 dark:text-green-400">+{day.checkedIn}</div>
+              <div className="text-xs text-blue-600 dark:text-blue-400">-{day.checkedOut}</div>
               {day.trend !== 0 && (
                 <div className={`text-xs mt-1 ${day.trend > 0 ? 'text-green-500' : 'text-red-500'}`}>
                   {day.trend > 0 ? '↗' : '↘'} {Math.abs(day.trend)}
@@ -1259,8 +1381,14 @@ const VisitorManagement = ({ user }) => {
       </div>
 
       {/* Trend Analysis */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Trend Analysis</h3>
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Trend Analysis</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {(() => {
             const dailyData = getAdvancedDailyTrends(7);
@@ -1270,24 +1398,48 @@ const VisitorManagement = ({ user }) => {
             
             return (
               <>
-                <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">{avgVisitors.toFixed(1)}</div>
-                  <div className="text-sm text-blue-700">Daily Average</div>
-                  <div className="text-xs text-blue-500 mt-1">Last 7 days</div>
+                <div className={`text-center p-4 rounded-lg ${
+                  isDarkMode 
+                    ? 'bg-gradient-to-r from-blue-900/30 to-blue-100/30' 
+                    : 'bg-gradient-to-r from-blue-50 to-blue-100'
+                }`}>
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{avgVisitors.toFixed(1)}</div>
+                  <div className={`text-sm ${
+                    isDarkMode ? 'text-blue-300' : 'text-blue-700'
+                  }`}>Daily Average</div>
+                  <div className={`text-xs ${
+                    isDarkMode ? 'text-blue-400' : 'text-blue-500'
+                  }`} mt-1>Last 7 days</div>
                 </div>
                 
-                <div className="text-center p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg">
-                  <div className="text-2xl font-bold text-orange-600">{totalVisitors}</div>
-                  <div className="text-sm text-orange-700">Total Visitors</div>
-                  <div className="text-xs text-orange-500 mt-1">This week</div>
+                <div className={`text-center p-4 rounded-lg ${
+                  isDarkMode 
+                    ? 'bg-gradient-to-r from-orange-900/30 to-orange-100/30' 
+                    : 'bg-gradient-to-r from-orange-50 to-orange-100'
+                }`}>
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{totalVisitors}</div>
+                  <div className={`text-sm ${
+                    isDarkMode ? 'text-orange-300' : 'text-orange-700'
+                  }`}>Total Visitors</div>
+                  <div className={`text-xs ${
+                    isDarkMode ? 'text-orange-400' : 'text-orange-500'
+                  }`} mt-1>This week</div>
                 </div>
                 
-                <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-orange-50 rounded-lg">
+                <div className={`text-center p-4 rounded-lg ${
+                  isDarkMode 
+                    ? 'bg-gradient-to-r from-blue-900/30 to-orange-900/30' 
+                    : 'bg-gradient-to-r from-blue-50 to-orange-50'
+                }`}>
                   <div className={`text-2xl font-bold ${trend > 0 ? 'text-green-600' : trend < 0 ? 'text-red-600' : 'text-blue-600'}`}>
                     {trend > 0 ? '+' : ''}{trend}
                   </div>
-                  <div className="text-sm text-gray-700">Weekly Trend</div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className={`text-sm ${
+                    isDarkMode ? 'text-gray-200' : 'text-gray-700'
+                  }`}>Weekly Trend</div>
+                  <div className={`text-xs ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  }`} mt-1>
                     {trend > 0 ? 'Increasing' : trend < 0 ? 'Decreasing' : 'Stable'}
                   </div>
                 </div>
@@ -1302,23 +1454,43 @@ const VisitorManagement = ({ user }) => {
   const renderWeeklyAnalytics = () => (
     <div className="space-y-6">
       {/* Weekly Trends */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Weekly Visitor Patterns</h3>
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Weekly Visitor Patterns</h3>
         {renderBarChart(getWeeklyTrends(4), 'Weekly Visitor Count (Last 4 Weeks)', 'week', 'count', 'orange')}
       </div>
       
       {/* Weekly Averages */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Weekly Averages</h3>
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Weekly Averages</h3>
         {renderLineChart(getWeeklyTrends(4), 'Average Daily Visitors per Week', 'week', 'avgDaily', 'blue', true)}
       </div>
 
       {/* Week-over-Week Comparison */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Week-over-Week Comparison</h3>
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Week-over-Week Comparison</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-semibold text-gray-700 mb-3">Visitor Growth</h4>
+            <h4 className={`font-semibold mb-3 ${
+              isDarkMode ? 'text-gray-200' : 'text-gray-700'
+            }`}>Visitor Growth</h4>
             <div className="space-y-3">
               {getWeeklyTrends(4).map((week, index) => {
                 if (index === 0) return null;
@@ -1326,8 +1498,12 @@ const VisitorManagement = ({ user }) => {
                 const growth = ((week.count - prevWeek.count) / prevWeek.count) * 100;
                 
                 return (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                    <span className="text-sm text-gray-700">{week.week}</span>
+                  <div key={index} className={`flex items-center justify-between p-3 rounded ${
+                    isDarkMode ? 'bg-dark-surface' : 'bg-gray-50'
+                  }`}>
+                    <span className={`text-sm ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}>{week.week}</span>
                     <div className="flex items-center gap-2">
                       <span className={`text-sm font-medium ${growth > 0 ? 'text-green-600' : growth < 0 ? 'text-red-600' : 'text-gray-600'}`}>
                         {growth > 0 ? '+' : ''}{growth.toFixed(1)}%
@@ -1341,14 +1517,24 @@ const VisitorManagement = ({ user }) => {
           </div>
           
           <div>
-            <h4 className="font-semibold text-gray-700 mb-3">Performance Metrics</h4>
+            <h4 className={`font-semibold mb-3 ${
+              isDarkMode ? 'text-gray-200' : 'text-gray-700'
+            }`}>Performance Metrics</h4>
             <div className="space-y-3">
               {getWeeklyTrends(4).map((week, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                  <span className="text-sm text-gray-700">{week.week}</span>
+                <div key={index} className={`flex items-center justify-between p-3 rounded ${
+                  isDarkMode ? 'bg-dark-surface' : 'bg-gray-50'
+                }`}>
+                  <span className={`text-sm ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>{week.week}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-900">{week.count}</span>
-                    <span className="text-xs text-gray-500">visitors</span>
+                    <span className={`text-sm font-medium ${
+                      isDarkMode ? 'text-white' : 'text-gray-900'
+                    }`}>{week.count}</span>
+                    <span className={`text-xs ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>visitors</span>
                   </div>
                 </div>
               ))}
@@ -1362,37 +1548,65 @@ const VisitorManagement = ({ user }) => {
   const renderMonthlyAnalytics = () => (
     <div className="space-y-6">
       {/* Monthly Trends */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Monthly Visitor Trends</h3>
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Monthly Visitor Trends</h3>
         {renderBarChart(getMonthlyTrends(6), 'Monthly Visitor Count (Last 6 Months)', 'month', 'count', 'blue')}
       </div>
       
       {/* Monthly Averages */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Monthly Averages</h3>
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Monthly Averages</h3>
         {renderLineChart(getMonthlyTrends(6), 'Average Daily Visitors per Month', 'month', 'avgDaily', 'orange', true)}
       </div>
 
       {/* Seasonal Analysis */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Seasonal Analysis</h3>
+      <div className={`rounded-xl shadow-lg p-6 border ${
+        isDarkMode 
+          ? 'bg-dark-card border-dark-border shadow-dark' 
+          : 'bg-white border-gray-100'
+      }`}>
+        <h3 className={`text-lg font-bold mb-4 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>Seasonal Analysis</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-semibold text-gray-700 mb-3">Monthly Performance</h4>
+            <h4 className={`font-semibold mb-3 ${
+              isDarkMode ? 'text-gray-200' : 'text-gray-700'
+            }`}>Monthly Performance</h4>
             <div className="space-y-2">
               {getMonthlyTrends(6).map((month, index) => {
                 const performance = (month.count / Math.max(...getMonthlyTrends(6).map(m => m.count))) * 100;
                 return (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <span className="text-sm text-gray-700">{month.month}</span>
+                  <div key={index} className={`flex items-center justify-between p-2 rounded ${
+                    isDarkMode ? 'bg-dark-surface' : 'bg-gray-50'
+                  }`}>
+                    <span className={`text-sm ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}>{month.month}</span>
                     <div className="flex items-center gap-2">
-                      <div className="w-20 bg-gray-200 rounded-full h-2">
+                      <div className={`w-20 rounded-full h-2 ${
+                        isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+                      }`}>
                         <div 
                           className="bg-blue-500 h-2 rounded-full"
                           style={{ width: `${performance}%` }}
                         ></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-900">{month.count}</span>
+                      <span className={`text-sm font-medium ${
+                        isDarkMode ? 'text-white' : 'text-gray-900'
+                      }`}>{month.count}</span>
                     </div>
                   </div>
                 );
@@ -1401,7 +1615,9 @@ const VisitorManagement = ({ user }) => {
           </div>
           
           <div>
-            <h4 className="font-semibold text-gray-700 mb-3">Growth Rate</h4>
+            <h4 className={`font-semibold mb-3 ${
+              isDarkMode ? 'text-gray-200' : 'text-gray-700'
+            }`}>Growth Rate</h4>
             <div className="space-y-2">
               {getMonthlyTrends(6).map((month, index) => {
                 if (index === 0) return null;
@@ -1409,8 +1625,12 @@ const VisitorManagement = ({ user }) => {
                 const growth = ((month.count - prevMonth.count) / prevMonth.count) * 100;
                 
                 return (
-                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                    <span className="text-sm text-gray-700">{month.month}</span>
+                  <div key={index} className={`flex items-center justify-between p-2 rounded ${
+                    isDarkMode ? 'bg-dark-surface' : 'bg-gray-50'
+                  }`}>
+                    <span className={`text-sm ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                    }`}>{month.month}</span>
                     <span className={`text-sm font-medium ${growth > 0 ? 'text-green-600' : growth < 0 ? 'text-red-600' : 'text-gray-600'}`}>
                       {growth > 0 ? '+' : ''}{growth.toFixed(1)}%
                     </span>
@@ -1424,39 +1644,46 @@ const VisitorManagement = ({ user }) => {
     </div>
   );
 
-  const renderAnalyticsContent = () => {
-    switch (analyticsView) {
-      case 'hourly':
-        return renderHourlyAnalytics();
-      case 'daily':
-        return renderDailyAnalytics();
-      case 'weekly':
-        return renderWeeklyAnalytics();
-      case 'monthly':
-        return renderMonthlyAnalytics();
-      default:
-        return renderAnalyticsOverview();
-    }
-  };
-
   // Render functions for different view modes
   const renderTableView = () => (
     <div className="overflow-x-auto">
       <table className="w-full">
         <thead>
-          <tr className="bg-gray-50 border-b border-gray-200">
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Visitor Details</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Company</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Purpose</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Host Employee</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+          <tr className={`border-b ${
+            isDarkMode 
+              ? 'bg-dark-surface border-dark-border' 
+              : 'bg-gray-50 border-gray-200'
+          }`}>
+            <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>Visitor Details</th>
+            <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>Company</th>
+            <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>Purpose</th>
+            <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>Host Employee</th>
+            <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>Status</th>
+            <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>Actions</th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-100">
+        <tbody className={`divide-y ${
+          isDarkMode ? 'divide-dark-border' : 'divide-gray-100'
+        }`}>
           {filteredVisitors.length > 0 ? (
             filteredVisitors.map((visitor, index) => (
-              <tr key={visitor.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-200`}>
+              <tr key={visitor.id} className={`${
+                index % 2 === 0 
+                  ? isDarkMode ? 'bg-dark-card' : 'bg-white'
+                  : isDarkMode ? 'bg-dark-surface' : 'bg-gray-50'
+              } hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200`}>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     {visitor.photo ? (
@@ -1467,13 +1694,19 @@ const VisitorManagement = ({ user }) => {
                       </div>
                     )}
                     <div className="space-y-1">
-                      <div className="text-base font-semibold text-gray-900">{visitor.name}</div>
-                      <div className="text-xs text-gray-600 flex items-center gap-2">
+                      <div className={`text-base font-semibold ${
+                        isDarkMode ? 'text-white' : 'text-gray-900'
+                      }`}>{visitor.name}</div>
+                      <div className={`text-xs flex items-center gap-2 ${
+                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                      }`}>
                         <Phone size={12} />
                         {visitor.phone}
                       </div>
                       {visitor.email && (
-                        <div className="text-xs text-gray-600 flex items-center gap-2">
+                        <div className={`text-xs flex items-center gap-2 ${
+                          isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
                           <Mail size={12} />
                           {visitor.email}
                         </div>
@@ -1482,17 +1715,23 @@ const VisitorManagement = ({ user }) => {
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="text-sm font-medium text-gray-900">
+                  <div className={`text-sm font-medium ${
+                    isDarkMode ? 'text-white' : 'text-gray-900'
+                  }`}>
                     {visitor.company || 'Individual'}
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="text-sm text-gray-900 max-w-xs truncate">
+                  <div className={`text-sm max-w-xs truncate ${
+                    isDarkMode ? 'text-white' : 'text-gray-900'
+                  }`}>
                     {visitor.purpose}
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="text-sm text-gray-900">
+                  <div className={`text-sm ${
+                    isDarkMode ? 'text-white' : 'text-gray-900'
+                  }`}>
                     {visitor.hostEmployee}
                   </div>
                 </td>
@@ -1505,33 +1744,59 @@ const VisitorManagement = ({ user }) => {
                   <div className="relative action-menu">
                     <button
                       onClick={() => setOpenActionMenu(openActionMenu === visitor.id ? null : visitor.id)}
-                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      className={`p-2 rounded-lg transition-colors ${
+                        isDarkMode 
+                          ? 'hover:bg-dark-surface' 
+                          : 'hover:bg-gray-100'
+                      }`}
                     >
-                      <div className="w-1 h-1 bg-gray-600 rounded-full mb-1"></div>
-                      <div className="w-1 h-1 bg-gray-600 rounded-full mb-1"></div>
-                      <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+                      <div className={`w-1 h-1 rounded-full mb-1 ${
+                        isDarkMode ? 'bg-gray-400' : 'bg-gray-600'
+                      }`}></div>
+                      <div className={`w-1 h-1 rounded-full mb-1 ${
+                        isDarkMode ? 'bg-gray-400' : 'bg-gray-600'
+                      }`}></div>
+                      <div className={`w-1 h-1 rounded-full ${
+                        isDarkMode ? 'bg-gray-400' : 'bg-gray-600'
+                      }`}></div>
                     </button>
                     
                     {openActionMenu === visitor.id && (
-                      <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                      <div className={`absolute right-0 top-full mt-1 w-48 rounded-lg shadow-lg border z-10 ${
+                        isDarkMode 
+                          ? 'bg-dark-card border-dark-border shadow-dark' 
+                          : 'bg-white border-gray-200'
+                      }`}>
                         <div className="py-1">
                           <button
                             onClick={() => handleViewPass(visitor)}
-                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 ${
+                              isDarkMode 
+                                ? 'text-gray-300 hover:bg-dark-surface' 
+                                : 'text-gray-700 hover:bg-gray-50'
+                            }`}
                           >
                             <QrCode size={14} />
                             View Pass
                           </button>
                           <button
                             onClick={() => handleDownloadPass(visitor)}
-                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 ${
+                              isDarkMode 
+                                ? 'text-gray-300 hover:bg-dark-surface' 
+                                : 'text-gray-700 hover:bg-gray-50'
+                            }`}
                           >
                             <Download size={14} />
                             Download Pass
                           </button>
                           <button
                             onClick={() => handleViewDetails(visitor)}
-                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 ${
+                              isDarkMode 
+                                ? 'text-gray-300 hover:bg-dark-surface' 
+                                : 'text-gray-700 hover:bg-gray-50'
+                            }`}
                           >
                             <User size={14} />
                             Details
@@ -1539,7 +1804,7 @@ const VisitorManagement = ({ user }) => {
                           {visitor.status === 'checked-in' && (
                             <button
                               onClick={() => handleCheckOut(visitor.id)}
-                              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
                             >
                               <XCircle size={14} />
                               Check Out
@@ -1554,12 +1819,16 @@ const VisitorManagement = ({ user }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
+              <td colSpan="6" className="px-4 py-8 text-center">
                 <div className="flex flex-col items-center gap-2">
-                  <Users size={32} className="text-gray-300" />
+                  <Users size={32} className={isDarkMode ? 'text-gray-600' : 'text-gray-300'} />
                   <div>
-                    <p className="text-base font-medium">No visitors found</p>
-                    <p className="text-xs text-gray-400">Add your first visitor to get started</p>
+                    <p className={`text-base font-medium ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>No visitors found</p>
+                    <p className={`text-xs ${
+                      isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                    }`}>Add your first visitor to get started</p>
                   </div>
                 </div>
               </td>
@@ -1574,7 +1843,11 @@ const VisitorManagement = ({ user }) => {
     <div className="space-y-4 p-4">
       {filteredVisitors.length > 0 ? (
         filteredVisitors.map((visitor) => (
-          <div key={visitor.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
+          <div key={visitor.id} className={`border rounded-lg p-4 hover:shadow-md transition-shadow duration-200 ${
+            isDarkMode 
+              ? 'bg-dark-card border-dark-border hover:shadow-dark' 
+              : 'bg-white border-gray-200'
+          }`}>
             <div className="flex items-start gap-4">
               {visitor.photo ? (
                 <img src={visitor.photo} alt={visitor.name} className="w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-gray-200" />
@@ -1586,8 +1859,12 @@ const VisitorManagement = ({ user }) => {
               <div className="flex-1">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{visitor.name}</h3>
-                    <p className="text-sm text-gray-600">{visitor.company || 'Individual'}</p>
+                    <h3 className={`text-lg font-semibold ${
+                      isDarkMode ? 'text-white' : 'text-gray-900'
+                    }`}>{visitor.name}</h3>
+                    <p className={`text-sm ${
+                      isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                    }`}>{visitor.company || 'Individual'}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(visitor.status)}`}>
@@ -1597,33 +1874,59 @@ const VisitorManagement = ({ user }) => {
                     <div className="relative action-menu">
                       <button
                         onClick={() => setOpenActionMenu(openActionMenu === visitor.id ? null : visitor.id)}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                        className={`p-2 rounded-lg transition-colors ${
+                          isDarkMode 
+                            ? 'hover:bg-dark-surface' 
+                            : 'hover:bg-gray-100'
+                        }`}
                       >
-                        <div className="w-1 h-1 bg-gray-600 rounded-full mb-1"></div>
-                        <div className="w-1 h-1 bg-gray-600 rounded-full mb-1"></div>
-                        <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+                        <div className={`w-1 h-1 rounded-full mb-1 ${
+                          isDarkMode ? 'bg-gray-400' : 'bg-gray-600'
+                        }`}></div>
+                        <div className={`w-1 h-1 rounded-full mb-1 ${
+                          isDarkMode ? 'bg-gray-400' : 'bg-gray-600'
+                        }`}></div>
+                        <div className={`w-1 h-1 rounded-full ${
+                          isDarkMode ? 'bg-gray-400' : 'bg-gray-600'
+                        }`}></div>
                       </button>
                       
                       {openActionMenu === visitor.id && (
-                        <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                        <div className={`absolute right-0 top-full mt-1 w-48 rounded-lg shadow-lg border z-10 ${
+                          isDarkMode 
+                            ? 'bg-dark-card border-dark-border shadow-dark' 
+                            : 'bg-white border-gray-200'
+                        }`}>
                           <div className="py-1">
                             <button
                               onClick={() => handleViewPass(visitor)}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 ${
+                                isDarkMode 
+                                  ? 'text-gray-300 hover:bg-dark-surface' 
+                                  : 'text-gray-700 hover:bg-gray-50'
+                              }`}
                             >
                               <QrCode size={14} />
                               View Pass
                             </button>
                             <button
                               onClick={() => handleDownloadPass(visitor)}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 ${
+                                isDarkMode 
+                                  ? 'text-gray-300 hover:bg-dark-surface' 
+                                  : 'text-gray-700 hover:bg-gray-50'
+                              }`}
                             >
                               <Download size={14} />
                               Download Pass
                             </button>
                             <button
                               onClick={() => handleViewDetails(visitor)}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 ${
+                                isDarkMode 
+                                  ? 'text-gray-300 hover:bg-dark-surface' 
+                                  : 'text-gray-700 hover:bg-gray-50'
+                              }`}
                             >
                               <User size={14} />
                               Details
@@ -1631,7 +1934,7 @@ const VisitorManagement = ({ user }) => {
                             {visitor.status === 'checked-in' && (
                               <button
                                 onClick={() => handleCheckOut(visitor.id)}
-                                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
                               >
                                 <XCircle size={14} />
                                 Check Out
@@ -1643,7 +1946,9 @@ const VisitorManagement = ({ user }) => {
                     </div>
                   </div>
                 </div>
-                <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
+                <div className={`mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                }`}>
                   <div className="flex items-center gap-2">
                     <Phone size={14} />
                     {visitor.phone}
@@ -1663,16 +1968,22 @@ const VisitorManagement = ({ user }) => {
                     {new Date(visitor.checkInTime).toLocaleString()}
                   </div>
                 </div>
-                <p className="mt-2 text-sm text-gray-700">{visitor.purpose}</p>
+                <p className={`mt-2 text-sm ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>{visitor.purpose}</p>
               </div>
             </div>
           </div>
         ))
       ) : (
         <div className="text-center py-8">
-          <Users size={32} className="text-gray-300 mx-auto mb-2" />
-          <p className="text-base font-medium text-gray-500">No visitors found</p>
-          <p className="text-sm text-gray-400">Add your first visitor to get started</p>
+          <Users size={32} className={isDarkMode ? 'text-gray-600' : 'text-gray-300'} />
+          <p className={`text-base font-medium ${
+            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+          }`}>No visitors found</p>
+          <p className={`text-sm ${
+            isDarkMode ? 'text-gray-500' : 'text-gray-400'
+          }`}>Add your first visitor to get started</p>
         </div>
       )}
     </div>
@@ -1682,17 +1993,25 @@ const VisitorManagement = ({ user }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
       {filteredVisitors.length > 0 ? (
         filteredVisitors.map((visitor) => (
-          <div key={visitor.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow duration-200">
+          <div key={visitor.id} className={`border rounded-lg p-4 hover:shadow-lg transition-shadow duration-200 ${
+            isDarkMode 
+              ? 'bg-dark-card border-dark-border hover:shadow-dark' 
+              : 'bg-white border-gray-200'
+          }`}>
             <div className="text-center relative">
               {visitor.photo ? (
-                <img src={visitor.photo} alt={visitor.name} className="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-2 border-gray-200" />
+                <img src={visitor.photo} alt={visitor.name} className="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-2 border-gray-300" />
               ) : (
                 <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Users size={32} className="text-gray-400" />
                 </div>
               )}
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">{visitor.name}</h3>
-              <p className="text-sm text-gray-600 mb-2">{visitor.company || 'Individual'}</p>
+              <h3 className={`text-lg font-semibold mb-1 ${
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              }`}>{visitor.name}</h3>
+              <p className={`text-sm mb-2 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+              }`}>{visitor.company || 'Individual'}</p>
               <div className="flex items-center justify-center gap-2 mb-3">
                 <span className={`inline-block px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(visitor.status)}`}>
                   {visitor.status === 'checked-in' ? 'In Building' : 'Checked Out'}
@@ -1701,33 +2020,59 @@ const VisitorManagement = ({ user }) => {
                 <div className="relative action-menu">
                   <button
                     onClick={() => setOpenActionMenu(openActionMenu === visitor.id ? null : visitor.id)}
-                    className="p-1 hover:bg-gray-100 rounded transition-colors"
+                    className={`p-1 rounded transition-colors ${
+                      isDarkMode 
+                        ? 'hover:bg-dark-surface' 
+                        : 'hover:bg-gray-100'
+                    }`}
                   >
-                    <div className="w-1 h-1 bg-gray-600 rounded-full mb-0.5"></div>
-                    <div className="w-1 h-1 bg-gray-600 rounded-full mb-0.5"></div>
-                    <div className="w-1 h-1 bg-gray-600 rounded-full"></div>
+                    <div className={`w-1 h-1 rounded-full mb-0.5 ${
+                      isDarkMode ? 'bg-gray-400' : 'bg-gray-600'
+                    }`}></div>
+                    <div className={`w-1 h-1 rounded-full mb-0.5 ${
+                      isDarkMode ? 'bg-gray-400' : 'bg-gray-600'
+                    }`}></div>
+                    <div className={`w-1 h-1 rounded-full ${
+                      isDarkMode ? 'bg-gray-400' : 'bg-gray-600'
+                    }`}></div>
                   </button>
                   
                   {openActionMenu === visitor.id && (
-                    <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                    <div className={`absolute right-0 top-full mt-1 w-40 rounded-lg shadow-lg border z-10 ${
+                      isDarkMode 
+                        ? 'bg-dark-card border-dark-border shadow-dark' 
+                        : 'bg-white border-gray-200'
+                    }`}>
                       <div className="py-1">
                         <button
                           onClick={() => handleViewPass(visitor)}
-                          className="w-full px-3 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                          className={`w-full px-3 py-2 text-left text-xs flex items-center gap-2 ${
+                            isDarkMode 
+                              ? 'text-gray-300 hover:bg-dark-surface' 
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
                         >
                           <QrCode size={12} />
                           View Pass
                         </button>
                         <button
                           onClick={() => handleDownloadPass(visitor)}
-                          className="w-full px-3 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                          className={`w-full px-3 py-2 text-left text-xs flex items-center gap-2 ${
+                            isDarkMode 
+                              ? 'text-gray-300 hover:bg-dark-surface' 
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
                         >
                           <Download size={12} />
                           Download Pass
                         </button>
                         <button
                           onClick={() => handleViewDetails(visitor)}
-                          className="w-full px-3 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                          className={`w-full px-3 py-2 text-left text-xs flex items-center gap-2 ${
+                            isDarkMode 
+                              ? 'text-gray-300 hover:bg-dark-surface' 
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
                         >
                           <User size={12} />
                           Details
@@ -1735,7 +2080,7 @@ const VisitorManagement = ({ user }) => {
                         {visitor.status === 'checked-in' && (
                           <button
                             onClick={() => handleCheckOut(visitor.id)}
-                            className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50 flex items-center gap-2"
+                            className="w-full px-3 py-2 text-left text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
                           >
                             <XCircle size={12} />
                             Check Out
@@ -1747,7 +2092,9 @@ const VisitorManagement = ({ user }) => {
                 </div>
               </div>
             </div>
-            <div className="space-y-2 text-sm text-gray-600 mb-4">
+            <div className={`space-y-2 text-sm mb-4 ${
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+            }`}>
               <div className="flex items-center gap-2">
                 <Phone size={14} />
                 <span className="truncate">{visitor.phone}</span>
@@ -1767,36 +2114,54 @@ const VisitorManagement = ({ user }) => {
                 <span className="text-xs">{new Date(visitor.checkInTime).toLocaleString()}</span>
               </div>
             </div>
-            <p className="text-sm text-gray-700 mb-4 line-clamp-2">{visitor.purpose}</p>
+            <p className={`text-sm mb-4 line-clamp-2 ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>{visitor.purpose}</p>
           </div>
         ))
       ) : (
         <div className="col-span-full text-center py-8">
-          <Users size={32} className="text-gray-300 mx-auto mb-2" />
-          <p className="text-base font-medium text-gray-500">No visitors found</p>
-          <p className="text-sm text-gray-400">Add your first visitor to get started</p>
+          <Users size={32} className={isDarkMode ? 'text-gray-600' : 'text-gray-300'} />
+          <p className={`text-base font-medium ${
+            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+          }`}>No visitors found</p>
+          <p className={`text-sm ${
+            isDarkMode ? 'text-gray-500' : 'text-gray-400'
+          }`}>Add your first visitor to get started</p>
         </div>
       )}
     </div>
   );
 
   return (
-    <div className="flex-1 min-h-0 h-full bg-gradient-to-br from-blue-50 to-orange-50 overflow-y-auto">
+    <div className={`flex-1 min-h-0 h-full overflow-y-auto ${
+      isDarkMode 
+        ? 'bg-gradient-to-br from-dark-bg via-dark-surface to-dark-card' 
+        : 'bg-gradient-to-br from-blue-50 to-orange-50'
+    }`}>
       {/* Top right header */}
       <TopRightHeader user={user} />
       
       {/* Main Content with proper spacing */}
       <div className="pt-6 pb-2 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
+        <div className={`rounded-2xl shadow-lg border p-4 ${
+          isDarkMode 
+            ? 'bg-dark-card border-dark-border shadow-dark' 
+            : 'bg-white border-gray-100'
+        }`}>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gradient-to-r from-orange-500 to-blue-600 text-white rounded-xl shadow-lg">
                 <Users size={18} />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Visitor Management</h1>
-                <p className="text-base text-gray-600 mt-1">Manage visitor check-ins and issue QR passes</p>
+                <h1 className={`text-2xl font-bold ${
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                }`}>Visitor Management</h1>
+                <p className={`text-base mt-1 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                }`}>Manage visitor check-ins and issue QR passes</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -1824,49 +2189,73 @@ const VisitorManagement = ({ user }) => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-xl shadow-lg p-3 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className={`rounded-xl shadow-lg p-3 border hover:shadow-xl transition-all duration-300 ${
+            isDarkMode 
+              ? 'bg-dark-card border-dark-border shadow-dark' 
+              : 'bg-white border-gray-100'
+          }`}>
             <div className="flex items-center gap-2">
               <div className="p-2 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-700 rounded-lg">
                 <Users size={18} />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-700 text-xs">Today's Visitors</h3>
+                <h3 className={`font-semibold text-xs ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>Today's Visitors</h3>
                 <p className="text-xl font-bold text-orange-600 mt-0.5">{getTodayVisitors().length}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-3 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className={`rounded-xl shadow-lg p-3 border hover:shadow-xl transition-all duration-300 ${
+            isDarkMode 
+              ? 'bg-dark-card border-dark-border shadow-dark' 
+              : 'bg-white border-gray-100'
+          }`}>
             <div className="flex items-center gap-2">
               <div className="p-2 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 rounded-lg">
                 <CheckCircle size={18} />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-700 text-xs">Currently In</h3>
+                <h3 className={`font-semibold text-xs ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>Currently In</h3>
                 <p className="text-xl font-bold text-blue-600 mt-0.5">{getActiveVisitors().length}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-3 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className={`rounded-xl shadow-lg p-3 border hover:shadow-xl transition-all duration-300 ${
+            isDarkMode 
+              ? 'bg-dark-card border-dark-border shadow-dark' 
+              : 'bg-white border-gray-100'
+          }`}>
             <div className="flex items-center gap-2">
               <div className="p-2 bg-gradient-to-r from-orange-100 to-blue-100 text-orange-700 rounded-lg">
                 <TrendingUp size={18} />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-700 text-xs">Weekly Visitors</h3>
+                <h3 className={`font-semibold text-xs ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>Weekly Visitors</h3>
                 <p className="text-xl font-bold text-orange-600 mt-0.5">{getWeeklyVisitors().length}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-3 border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <div className={`rounded-xl shadow-lg p-3 border hover:shadow-xl transition-all duration-300 ${
+            isDarkMode 
+              ? 'bg-dark-card border-dark-border shadow-dark' 
+              : 'bg-white border-gray-100'
+          }`}>
             <div className="flex items-center gap-2">
               <div className="p-2 bg-gradient-to-r from-blue-100 to-orange-100 text-blue-700 rounded-lg">
                 <Clock size={18} />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-700 text-xs">Current Time</h3>
+                <h3 className={`font-semibold text-xs ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>Current Time</h3>
                 <p className="text-base font-bold text-blue-600 mt-0.5">
                   {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
@@ -1876,18 +2265,26 @@ const VisitorManagement = ({ user }) => {
         </div>
 
         {/* Controls */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4">
+        <div className={`rounded-xl shadow-lg border p-4 ${
+          isDarkMode 
+            ? 'bg-dark-card border-dark-border shadow-dark' 
+            : 'bg-white border-gray-100'
+        }`}>
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             {/* View Mode Toggle */}
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-gray-700">View:</span>
-              <div className="flex bg-gray-100 rounded-lg p-1">
+              <span className={`text-sm font-semibold ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>View:</span>
+              <div className={`flex rounded-lg p-1 ${
+                isDarkMode ? 'bg-dark-surface' : 'bg-gray-100'
+              }`}>
                 <button
                   onClick={() => setViewMode('table')}
                   className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
                     viewMode === 'table' 
                       ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-800'
+                      : isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
                   <List size={14} className="inline mr-1" />
@@ -1898,7 +2295,7 @@ const VisitorManagement = ({ user }) => {
                   className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
                     viewMode === 'list' 
                       ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-800'
+                      : isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
                   <List size={14} className="inline mr-1" />
@@ -1909,7 +2306,7 @@ const VisitorManagement = ({ user }) => {
                   className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
                     viewMode === 'grid' 
                       ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-800'
+                      : isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
                   <Grid size={14} className="inline mr-1" />
@@ -1921,11 +2318,15 @@ const VisitorManagement = ({ user }) => {
             {/* Date Filter */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <Filter size={16} className="text-gray-500" />
+                <Filter size={16} className={isDarkMode ? 'text-gray-400' : 'text-gray-500'} />
                 <select
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
-                  className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className={`px-3 py-1 border rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
+                    isDarkMode 
+                      ? 'bg-dark-surface border-dark-border text-white' 
+                      : 'border-gray-300 text-gray-900'
+                  }`}
                 >
                   <option value="all">All Time</option>
                   <option value="today">Today</option>
@@ -1938,18 +2339,26 @@ const VisitorManagement = ({ user }) => {
               {/* Custom Date Range */}
               {dateFilter === 'custom' && (
                 <div className="flex items-center gap-2 text-sm">
-                                      <input
-                      type="date"
-                      value={customDateRange.start}
-                      onChange={(e) => setCustomDateRange(prev => ({ ...prev, start: e.target.value }))}
-                      className="px-2 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                    />
-                  <span className="text-gray-500">to</span>
+                  <input
+                    type="date"
+                    value={customDateRange.start}
+                    onChange={(e) => setCustomDateRange(prev => ({ ...prev, start: e.target.value }))}
+                    className={`px-2 py-1 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
+                      isDarkMode 
+                        ? 'bg-dark-surface border-dark-border text-white' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
+                  />
+                  <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>to</span>
                   <input
                     type="date"
                     value={customDateRange.end}
                     onChange={(e) => setCustomDateRange(prev => ({ ...prev, end: e.target.value }))}
-                    className="px-2 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className={`px-2 py-1 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      isDarkMode 
+                        ? 'bg-dark-surface border-dark-border text-white' 
+                        : 'border-gray-300 text-gray-900'
+                    }`}
                   />
                 </div>
               )}
@@ -1958,10 +2367,22 @@ const VisitorManagement = ({ user }) => {
         </div>
 
         {/* Visitor List */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-          <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-orange-50 to-blue-50">
-            <h2 className="text-xl font-bold text-gray-900">Visitor Records</h2>
-            <p className="text-gray-600 mt-1 text-sm">Track all visitor activities and manage check-ins/check-outs</p>
+        <div className={`rounded-2xl shadow-lg border overflow-hidden ${
+          isDarkMode 
+            ? 'bg-dark-card border-dark-border shadow-dark' 
+            : 'bg-white border-gray-100'
+        }`}>
+          <div className={`p-4 border-b ${
+            isDarkMode 
+              ? 'border-dark-border bg-gradient-to-r from-orange-900/20 to-blue-900/20' 
+              : 'border-gray-100 bg-gradient-to-r from-orange-50 to-blue-50'
+          }`}>
+            <h2 className={`text-xl font-bold ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}>Visitor Records</h2>
+            <p className={`mt-1 text-sm ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-600'
+            }`}>Track all visitor activities and manage check-ins/check-outs</p>
           </div>
           
           {viewMode === 'table' && renderTableView()}
@@ -2226,27 +2647,47 @@ const VisitorManagement = ({ user }) => {
         {/* QR Code Modal */}
         {showQRCode && selectedVisitor && (
           <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md relative">
+            <div className={`rounded-3xl shadow-2xl w-full max-w-md relative ${
+              isDarkMode ? 'bg-dark-card border border-dark-border' : 'bg-white'
+            }`}>
               {/* Close Button - Top Right */}
               <button
                 onClick={() => {
                   setShowQRCode(false);
                   setSelectedVisitor(null);
                 }}
-                className="absolute top-4 right-4 z-10 p-2 bg-white/80 hover:bg-white rounded-full shadow-lg transition-all duration-300"
+                className={`absolute top-4 right-4 z-10 p-2 rounded-full shadow-lg transition-all duration-300 ${
+                  isDarkMode 
+                    ? 'bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white' 
+                    : 'bg-white/80 hover:bg-white text-gray-600'
+                }`}
               >
-                <X size={20} className="text-gray-600" />
+                <X size={20} />
               </button>
               
-              <div className="p-5 border-b border-gray-200 text-center bg-gradient-to-r from-blue-50 to-orange-50 rounded-t-3xl">
-                <QrCode size={36} className="mx-auto text-blue-600 mb-2" />
-                <h2 className="text-lg font-bold text-gray-900">Visitor Pass Generated</h2>
-                <p className="text-sm text-gray-600 mt-1">Digital pass for {selectedVisitor.name}</p>
+              <div className={`p-5 border-b text-center rounded-t-3xl ${
+                isDarkMode 
+                  ? 'border-dark-border bg-gradient-to-r from-blue-900/20 to-orange-900/20' 
+                  : 'border-gray-200 bg-gradient-to-r from-blue-50 to-orange-50'
+              }`}>
+                <QrCode size={36} className={`mx-auto mb-2 ${
+                  isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                }`} />
+                <h2 className={`text-lg font-bold ${
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                }`}>Visitor Pass Generated</h2>
+                <p className={`text-sm mt-1 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                }`}>Digital pass for {selectedVisitor.name}</p>
               </div>
               
               <div className="p-5">
                 {/* Pass Preview - Compact design */}
-                <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-4 rounded-xl border border-gray-200">
+                <div className={`p-4 rounded-xl border ${
+                  isDarkMode 
+                    ? 'bg-gradient-to-br from-gray-800 to-gray-700 border-dark-border' 
+                    : 'bg-gradient-to-br from-slate-50 to-blue-50 border-gray-200'
+                }`}>
                   {/* Header */}
                   <div className="bg-blue-600 text-white text-center py-2 rounded-lg -mt-4 -mx-4 mb-3">
                     <h3 className="font-bold text-base">VISITOR PASS</h3>
@@ -2254,12 +2695,18 @@ const VisitorManagement = ({ user }) => {
                   
                   {/* Company Info */}
                   <div className="mb-3">
-                    <p className="font-bold text-gray-800 text-base">{selectedVisitor.company || 'Individual'}</p>
-                    <p className="text-gray-600 text-xs">HITS Portal</p>
+                    <p className={`font-bold text-base ${
+                      isDarkMode ? 'text-white' : 'text-gray-800'
+                    }`}>{selectedVisitor.company || 'Individual'}</p>
+                    <p className={`text-xs ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                    }`}>HITS Portal</p>
                   </div>
                   
                   {/* Separator */}
-                  <div className="border-t border-gray-300 mb-3"></div>
+                  <div className={`border-t mb-3 ${
+                    isDarkMode ? 'border-gray-600' : 'border-gray-300'
+                  }`}></div>
                   
                   {/* Photo and QR Code Row */}
                   <div className="flex gap-4 mb-3">
@@ -2269,11 +2716,15 @@ const VisitorManagement = ({ user }) => {
                         <img 
                           src={selectedVisitor.photo} 
                           alt={selectedVisitor.name} 
-                          className="w-20 h-20 rounded-lg object-cover mx-auto border-2 border-gray-300" 
+                          className={`w-20 h-20 rounded-lg object-cover mx-auto border-2 ${
+                            isDarkMode ? 'border-gray-600' : 'border-gray-300'
+                          }`} 
                         />
                       ) : (
-                        <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center mx-auto">
-                          <User size={24} className="text-gray-400" />
+                        <div className={`w-20 h-20 rounded-lg flex items-center justify-center mx-auto ${
+                          isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+                        }`}>
+                          <User size={24} className={isDarkMode ? 'text-gray-400' : 'text-gray-400'} />
                         </div>
                       )}
                     </div>
@@ -2284,20 +2735,32 @@ const VisitorManagement = ({ user }) => {
                         <img 
                           src={selectedVisitor.qrCode} 
                           alt="QR Code" 
-                          className="w-20 h-20 mx-auto border border-gray-300 rounded-lg" 
+                          className={`w-20 h-20 mx-auto border rounded-lg ${
+                            isDarkMode ? 'border-gray-600' : 'border-gray-300'
+                          }`} 
                         />
                       ) : (
-                        <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center mx-auto">
-                          <QrCode size={24} className="text-gray-400" />
+                        <div className={`w-20 h-20 rounded-lg flex items-center justify-center mx-auto ${
+                          isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+                        }`}>
+                          <QrCode size={24} className={isDarkMode ? 'text-gray-400' : 'text-gray-400'} />
                         </div>
                       )}
-                      <p className="text-xs text-gray-600 mt-1">{new Date().toLocaleDateString()}</p>
+                      <p className={`text-xs mt-1 ${
+                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                      }`}>{new Date().toLocaleDateString()}</p>
                     </div>
                   </div>
                   
                   {/* Visitor Details - Compact */}
-                  <div className="space-y-1.5 text-xs text-gray-700 bg-white p-3 rounded-lg border border-gray-200">
-                    <p className="font-bold text-base text-gray-800">{selectedVisitor.name}</p>
+                  <div className={`space-y-1.5 text-xs p-3 rounded-lg border ${
+                    isDarkMode 
+                      ? 'text-gray-300 bg-gray-800 border-dark-border' 
+                      : 'text-gray-700 bg-white border-gray-200'
+                  }`}>
+                    <p className={`font-bold text-base ${
+                      isDarkMode ? 'text-white' : 'text-gray-800'
+                    }`}>{selectedVisitor.name}</p>
                     <div className="grid grid-cols-2 gap-x-3 gap-y-1">
                       <p><span className="font-semibold">Phone:</span> {selectedVisitor.phone}</p>
                       {selectedVisitor.email && (
@@ -2445,84 +2908,112 @@ const VisitorManagement = ({ user }) => {
         {/* Analytics Modal */}
         {showAnalytics && (
           <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-7xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-blue-50 rounded-t-2xl">
+            <div className={`rounded-2xl shadow-2xl max-w-7xl w-full max-h-[90vh] overflow-y-auto ${
+              isDarkMode 
+                ? 'bg-dark-bg border border-dark-border' 
+                : 'bg-white'
+            }`}>
+              <div className={`p-6 border-b rounded-t-2xl ${
+                isDarkMode 
+                  ? 'border-dark-border bg-gradient-to-r from-orange-900/20 to-blue-900/20' 
+                  : 'border-gray-200 bg-gradient-to-r from-orange-50 to-blue-50'
+              }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-gradient-to-r from-orange-500 to-blue-600 text-white rounded-xl">
                       <BarChart3 size={20} />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900">Visitor Analytics Dashboard</h2>
-                      <p className="text-gray-600 mt-1">Comprehensive insights into visitor patterns and trends</p>
+                      <h2 className={`text-2xl font-bold ${
+                        isDarkMode ? 'text-white' : 'text-gray-900'
+                      }`}>Visitor Analytics Dashboard</h2>
+                      <p className={`mt-1 ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                      }`}>Comprehensive insights into visitor patterns and trends</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setShowAnalytics(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className={`p-2 rounded-full transition-colors ${
+                      isDarkMode 
+                        ? 'hover:bg-gray-800 text-gray-300 hover:text-white' 
+                        : 'hover:bg-gray-100 text-gray-600'
+                    }`}
                   >
-                    <X size={24} className="text-gray-600" />
+                    <X size={24} />
                   </button>
                 </div>
                 
                 {/* Analytics Navigation */}
                 <div className="mt-6">
                   <div className="flex flex-wrap gap-2">
-                                          <button
-                        onClick={() => setAnalyticsView('overview')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                          analyticsView === 'overview'
-                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                    <button
+                      onClick={() => setAnalyticsView('overview')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        analyticsView === 'overview'
+                          ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                          : isDarkMode
+                            ? 'bg-dark-surface text-gray-300 hover:bg-gray-800 border border-dark-border'
                             : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                        }`}
-                      >
-                        Overview
-                      </button>
-                      <button
-                        onClick={() => setAnalyticsView('hourly')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                          analyticsView === 'hourly'
-                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                      }`}
+                    >
+                      Overview
+                    </button>
+                    <button
+                      onClick={() => setAnalyticsView('hourly')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        analyticsView === 'hourly'
+                          ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                          : isDarkMode
+                            ? 'bg-dark-surface text-gray-300 hover:bg-gray-800 border border-dark-border'
                             : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                        }`}
-                      >
-                        Hourly Patterns
-                      </button>
-                      <button
-                        onClick={() => setAnalyticsView('daily')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                          analyticsView === 'daily'
-                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                      }`}
+                    >
+                      Hourly Patterns
+                    </button>
+                    <button
+                      onClick={() => setAnalyticsView('daily')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        analyticsView === 'daily'
+                          ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                          : isDarkMode
+                            ? 'bg-dark-surface text-gray-300 hover:bg-gray-800 border border-dark-border'
                             : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                        }`}
-                      >
-                        Daily Trends
-                      </button>
-                      <button
-                        onClick={() => setAnalyticsView('weekly')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                          analyticsView === 'weekly'
-                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                      }`}
+                    >
+                      Daily Trends
+                    </button>
+                    <button
+                      onClick={() => setAnalyticsView('weekly')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        analyticsView === 'weekly'
+                          ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                          : isDarkMode
+                            ? 'bg-dark-surface text-gray-300 hover:bg-gray-800 border border-dark-border'
                             : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                        }`}
-                      >
-                        Weekly Analysis
-                      </button>
-                      <button
-                        onClick={() => setAnalyticsView('monthly')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                          analyticsView === 'monthly'
-                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                      }`}
+                    >
+                      Weekly Analysis
+                    </button>
+                    <button
+                      onClick={() => setAnalyticsView('monthly')}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                        analyticsView === 'monthly'
+                          ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                          : isDarkMode
+                            ? 'bg-dark-surface text-gray-300 hover:bg-gray-800 border border-dark-border'
                             : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                        }`}
-                      >
-                        Monthly Trends
-                      </button>
+                      }`}
+                    >
+                      Monthly Trends
+                    </button>
                   </div>
                 </div>
               </div>
               
-              <div className="p-6">
+              <div className={`p-6 ${
+                isDarkMode ? 'bg-dark-bg' : 'bg-white'
+              }`}>
                 {renderAnalyticsContent()}
               </div>
             </div>

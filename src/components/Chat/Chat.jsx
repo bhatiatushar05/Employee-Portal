@@ -68,7 +68,7 @@ export function Chat() {
   };
 
   return (
-    <div className="w-full h-full p-6">
+    <div className="w-full h-full p-6 ">
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
@@ -187,8 +187,8 @@ export function Chat() {
             ) : (
               <div className="h-18 flex items-center justify-center border-b border-gray-200 dark:border-dark-border bg-gradient-to-r from-orange-50 via-blue-50 to-orange-50 dark:from-orange-900/10 dark:via-blue-900/10 dark:to-orange-900/10">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 mt-3 bg-gradient-to-br from-orange-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                   </div>

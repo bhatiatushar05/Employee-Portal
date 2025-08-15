@@ -22,12 +22,10 @@ export function ChatMessageInput({ onSendMessage, replyTo, onClearReply }) {
   };
 
   const handleAttachment = () => {
-    // Handle file attachment
     console.log('Attachment clicked');
   };
 
   const handleEmoji = () => {
-    // Handle emoji picker
     console.log('Emoji clicked');
   };
 
@@ -58,9 +56,9 @@ export function ChatMessageInput({ onSendMessage, replyTo, onClearReply }) {
       )}
 
       {/* Message Input Form */}
-      <form onSubmit={handleSubmit} className="flex items-end gap-3">
+      <form onSubmit={handleSubmit} className="flex items-center gap-3">
         {/* Attachment and Emoji Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 h-11">
           <button
             type="button"
             onClick={handleAttachment}
@@ -89,7 +87,7 @@ export function ChatMessageInput({ onSendMessage, replyTo, onClearReply }) {
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type a message..."
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+            className="w-full px-4 py-2 h-11 border border-gray-300 dark:border-gray-600 rounded-lg resize-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             rows="1"
             style={{ minHeight: '44px', maxHeight: '120px' }}
           />
@@ -99,7 +97,7 @@ export function ChatMessageInput({ onSendMessage, replyTo, onClearReply }) {
         <button
           type="submit"
           disabled={!message.trim()}
-          className="px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
+          className="h-11 px-5 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

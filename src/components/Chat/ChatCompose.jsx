@@ -29,7 +29,7 @@ export function ChatCompose({ contacts, onStartConversation, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-dark-card rounded-2xl shadow-2xl max-w-md w-full max-h-[80vh] flex flex-col overflow-hidden">
+      <div className="bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100 dark:bg-dark-card rounded-2xl shadow-2xl max-w-md w-full max-h-[80vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between p-4 border-b border-gray-200 dark:border-dark-border">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">New Conversation</h2>
