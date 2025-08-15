@@ -163,7 +163,7 @@ const Dashboard = ({ user }) => {
         <TopRightHeader user={user} />
         
         {/* Main Content with proper spacing */}
-        <div className="pt-16 sm:pt-20 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        <div className="pt-6 sm:pt-20 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
           {/* Header Section Skeleton */}
           <div className="mb-8 mt-8">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
@@ -324,7 +324,7 @@ const Dashboard = ({ user }) => {
       <TopRightHeader user={user} />
       
       {/* Main Content with proper spacing */}
-      <div className="pt-20 pb-2 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
+      <div className="pt-6 pb-2 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
         {/* Header Section */}
         <div className="bg-white rounded-xl shadow-md border border-gray-100 p-3 sm:p-4">
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">

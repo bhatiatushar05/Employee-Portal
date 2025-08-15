@@ -309,8 +309,8 @@ const EmployeePortal = ({ user }) => {
       // create new
       const request = {
         id: generateNextId(),
-        employeeName: isEmployee() ? newRequest.employeeName : 'Admin User',
-        employeeId: isEmployee() ? newRequest.employeeId : 'ADMIN',
+        employeeName: newRequest.employeeName,
+        employeeId: newRequest.employeeId,
         type,
         amount: Math.round(amountNumber * 100) / 100,
         submittedDate: newRequest.submittedDate,
@@ -508,7 +508,7 @@ const EmployeePortal = ({ user }) => {
       <TopRightHeader user={user} />
       
       {/* Main Content with compact spacing */}
-      <div className="pt-16 pb-2 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="pt-6 pb-2 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">

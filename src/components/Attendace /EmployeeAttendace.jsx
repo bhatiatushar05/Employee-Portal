@@ -6,7 +6,7 @@ import Pooja from '../../assets/Pooja.png';
 
 
 const EmployeeAttendance = ({ user }) => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, isEmployee } = useAuth();
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [currentStatus, setCurrentStatus] = useState(null);
   const [todayRecord, setTodayRecord] = useState(null);
