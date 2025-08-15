@@ -380,7 +380,7 @@ const EmployeeAttendance = ({ user }) => {
     }
     
     const now = new Date();
-    const checkInTime = new Date(`${new Date(todayRecord.date).toDateString()} ${todayRecord.checkInTime}`);
+            const checkInTime = new Date(`${new Date(todayRecord.date).toDateString()} ${todayRecord.checkInTime}`);
     const workingHours = ((now - checkInTime) / (1000 * 60 * 60)).toFixed(2);
     
     const updatedRecord = {
@@ -560,20 +560,20 @@ const EmployeeAttendance = ({ user }) => {
       new Date(record.date).toLocaleDateString(),
       record.checkInTime,
       record.checkOutTime || 'Not checked out',
-      record.workingHours ? `${record.workingHours} hrs` : 'In progress',
+              record.workingHours ? `${record.workingHours} hrs` : 'In progress',
       record.status === 'checked-in' ? 'Checked In' : 'Checked Out',
       record.location
     ]);
     
     const csvContent = [headers, ...csvData]
-      .map(row => row.map(field => `"${field}"`).join(','))
+              .map(row => row.map(field => `"${field}"`).join(','))
       .join('\n');
     
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `attendance_data_₹{new Date().toISOString().split('T')[0]}.csv`);
+          link.setAttribute('download', `attendance_data_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -703,7 +703,7 @@ const EmployeeAttendance = ({ user }) => {
         <tbody className="bg-white divide-y divide-gray-50">
           {filteredRecords.length > 0 ? (
             filteredRecords.map((record, index) => (
-              <tr key={record.id} className={`₹{index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-200`}>
+              <tr key={record.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-200`}>
                 <td className="px-4 py-3 text-sm text-gray-900 font-medium">
                   {record.employeeName}
                 </td>
@@ -842,7 +842,7 @@ const EmployeeAttendance = ({ user }) => {
       )}
       
       {/* Main Content with proper spacing */}
-      <div className="pt-16 sm:pt-20 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
+      <div className="pt-16 sm:pt-6 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-md border border-gray-100 p-3 sm:p-4">
           <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
@@ -1017,12 +1017,12 @@ const EmployeeAttendance = ({ user }) => {
 
             <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className={`p-2 rounded-lg flex-shrink-0 ₹{currentStatus === 'checked-in' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                <div className={`p-2 rounded-lg flex-shrink-0 ${currentStatus === 'checked-in' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
                   {currentStatus === 'checked-in' ? <CheckCircle size={16} /> : <XCircle size={16} />}
               </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="font-medium text-gray-700 text-xs truncate">Status</h3>
-                  <p className={`text-sm font-bold mt-1 truncate ₹{currentStatus === 'checked-in' ? 'text-green-600' : 'text-gray-600'}`}>
+                  <p className={`text-sm font-bold mt-1 truncate ${currentStatus === 'checked-in' ? 'text-green-600' : 'text-gray-600'}`}>
                   {currentStatus === 'checked-in' ? 'Checked In' : 
                    currentStatus === 'checked-out' ? 'Checked Out' : 'Not Checked In'}
                 </p>
@@ -1045,7 +1045,7 @@ const EmployeeAttendance = ({ user }) => {
         )}
 
         {/* Employee Check-in/Check-out Section */}
-        {!isAdmin() && (
+        {isEmployee() && (
           <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100">
             <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Attendance Actions</h2>
           
@@ -1087,7 +1087,7 @@ const EmployeeAttendance = ({ user }) => {
               onClick={() => setShowCheckInModal(true)}
               disabled={currentStatus === 'checked-in'}
                 className={`flex-1 py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl font-medium text-white transition-all duration-300 
-                ₹{currentStatus === 'checked-in' 
+                ${currentStatus === 'checked-in' 
                   ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 shadow-md hover:shadow-lg transform hover:scale-105'
                   }`}
@@ -1103,7 +1103,7 @@ const EmployeeAttendance = ({ user }) => {
               onClick={() => setShowCheckOutModal(true)}
               disabled={currentStatus !== 'checked-in'}
                 className={`flex-1 py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl font-medium text-white transition-all duration-300
-                ₹{currentStatus !== 'checked-in'
+                ${currentStatus !== 'checked-in'
                   ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-md hover:shadow-lg transform hover:scale-105'
                   }`}
@@ -1206,7 +1206,7 @@ const EmployeeAttendance = ({ user }) => {
                   <div className="flex bg-gray-100 rounded-xl p-1">
                 <button
                   onClick={() => setViewMode('table')}
-                      className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ₹{
+                      className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
                     viewMode === 'table' 
                       ? 'bg-blue-500 text-white shadow-sm' 
                       : 'text-gray-600 hover:text-gray-800'
@@ -1217,7 +1217,7 @@ const EmployeeAttendance = ({ user }) => {
                 </button>
                 <button
                   onClick={() => setViewMode('grid')}
-                      className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ₹{
+                      className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
                     viewMode === 'grid' 
                       ? 'bg-blue-500 text-white shadow-sm' 
                       : 'text-gray-600 hover:text-gray-800'
@@ -1516,7 +1516,7 @@ const EmployeeAttendance = ({ user }) => {
                       <div className="w-full bg-gray-200 rounded-full h-3">
                         <div 
                           className="bg-green-500 h-3 rounded-full transition-all duration-500"
-                          style={{ width: `₹{(analyticsData.checkInAnalysis.early / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.onTime + analyticsData.checkInAnalysis.late)) * 100}%` }}
+                          style={{ width: `${(analyticsData.checkInAnalysis.early / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.onTime + analyticsData.checkInAnalysis.late)) * 100}%` }}
                         ></div>
                       </div>
                       
@@ -1527,7 +1527,7 @@ const EmployeeAttendance = ({ user }) => {
                       <div className="w-full bg-gray-200 rounded-full h-3">
                         <div 
                           className="bg-blue-500 h-3 rounded-full transition-all duration-500"
-                          style={{ width: `₹{(analyticsData.checkInAnalysis.onTime / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.onTime + analyticsData.checkInAnalysis.late)) * 100}%` }}
+                          style={{ width: `${(analyticsData.checkInAnalysis.onTime / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.onTime + analyticsData.checkInAnalysis.late)) * 100}%` }}
                         ></div>
                       </div>
                       
@@ -1538,7 +1538,7 @@ const EmployeeAttendance = ({ user }) => {
                       <div className="w-full bg-gray-200 rounded-full h-3">
                         <div 
                           className="bg-red-500 h-3 rounded-full transition-all duration-500"
-                          style={{ width: `₹{(analyticsData.checkInAnalysis.late / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.late)) * 100}%` }}
+                          style={{ width: `${(analyticsData.checkInAnalysis.late / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.late)) * 100}%` }}
                         ></div>
                       </div>
                     </div>
@@ -1557,7 +1557,7 @@ const EmployeeAttendance = ({ user }) => {
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div 
                               className="bg-blue-500 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `₹{(data.present / data.total) * 100}%` }}
+                              style={{ width: `${(data.present / data.total) * 100}%` }}
                             ></div>
                           </div>
                         </div>
@@ -1624,3 +1624,4 @@ const EmployeeAttendance = ({ user }) => {
   );
 };
 
+export default EmployeeAttendance;
