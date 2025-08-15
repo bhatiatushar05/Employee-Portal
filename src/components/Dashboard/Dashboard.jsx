@@ -17,7 +17,7 @@ import {
   Video,
   Sparkles,
   ArrowRight,
-  DollarSign,
+  IndianRupee,
   Eye,
   Shield,
   Activity,
@@ -42,7 +42,7 @@ const Dashboard = ({ user }) => {
   useEffect(() => {
     const loadingTimer = setTimeout(() => {
       setIsLoading(false);
-    }, 1500);
+    }, 500);
 
     return () => clearTimeout(loadingTimer);
   }, []);
@@ -56,11 +56,11 @@ const Dashboard = ({ user }) => {
       rejectedRequests: 7,
       lastActivity: "2 hours ago",
       recentRequests: [
-        { id: "#001", type: "Travel Expenses", amount: "$150.00", status: "Processing", employee: "John Doe", department: "Sales" },
-        { id: "#002", type: "Office Supplies", amount: "$45.00", status: "Under Review", employee: "Sarah Johnson", department: "Marketing" },
-        { id: "#003", type: "Travel Expenses", amount: "$320.00", status: "Under Review", employee: "Mike Chen", department: "Engineering" },
-        { id: "#004", type: "Software License", amount: "$89.99", status: "Approved", employee: "Emma Davis", department: "IT" },
-        { id: "#005", type: "Training Course", amount: "$199.00", status: "Processing", employee: "Alex Wilson", department: "HR" }
+        { id: "#001", type: "Travel Expenses", amount: "₹12,450.00", status: "Processing", employee: "John Doe", department: "Sales" },
+        { id: "#002", type: "Office Supplies", amount: "₹3,735.00", status: "Under Review", employee: "Sarah Johnson", department: "Marketing" },
+        { id: "#003", type: "Travel Expenses", amount: "₹26,560.00", status: "Under Review", employee: "Mike Chen", department: "Engineering" },
+        { id: "#004", type: "Software License", amount: "₹7,469.17", status: "Approved", employee: "Emma Davis", department: "IT" },
+        { id: "#005", type: "Training Course", amount: "₹16,517.00", status: "Processing", employee: "Alex Wilson", department: "HR" }
       ]
     },
 
@@ -89,9 +89,9 @@ const Dashboard = ({ user }) => {
     },
 
     financialOverview: {
-      monthlyBudget: "$125,000",
-      spentThisMonth: "$89,450",
-      remainingBudget: "$35,550",
+      monthlyBudget: "₹12,50,000",
+      spentThisMonth: "₹8,94,500",
+      remainingBudget: "₹3,55,500",
       topExpenseCategory: "Travel & Accommodation"
     }
   };
@@ -118,21 +118,21 @@ const Dashboard = ({ user }) => {
       icon: <Users className="w-8 h-8 text-blue-600" />,
       title: "Total Employees",
       value: dashboardData.employeeStats.totalEmployees,
-      change: `+${dashboardData.employeeStats.newHires} this month`,
+              change: `+${dashboardData.employeeStats.newHires} this month`,
       color: "bg-blue-50 border-blue-200"
     },
     {
       icon: <CreditCard className="w-8 h-8 text-orange-600" />,
       title: "Pending Requests",
       value: dashboardData.employeePortal.pendingRequests,
-      change: `${dashboardData.employeePortal.rejectedRequests} rejected`,
+              change: `${dashboardData.employeePortal.rejectedRequests} rejected`,
       color: "bg-orange-50 border-orange-200"
     },
     {
-      icon: <DollarSign className="w-8 h-8 text-green-600" />,
-      title: "Monthly Budget",
+      icon: <IndianRupee className="w-8 h-8 text-green-600" />,
+              title: "Monthly Budget (₹)",
       value: dashboardData.financialOverview.remainingBudget,
-      change: `${dashboardData.financialOverview.spentThisMonth} spent`,
+              change: `${dashboardData.financialOverview.spentThisMonth} spent`,
       color: "bg-green-50 border-green-200"
     },
     {
@@ -423,7 +423,7 @@ const Dashboard = ({ user }) => {
                 
                 <button className="flex flex-col items-center p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-xl border border-orange-200 hover:bg-orange-100 transition-all duration-300 hover:scale-[1.02] cursor-pointer group">
                   <div className="p-3 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg mb-3 group-hover:scale-[1.05] transition-transform duration-300">
-                    <DollarSign className="w-6 h-6 text-white" />
+                    <IndianRupee className="w-6 h-6 text-white" />
                   </div>
                   <span className="font-medium text-orange-900 text-sm text-center">Budget Report</span>
                 </button>
@@ -695,7 +695,7 @@ const Dashboard = ({ user }) => {
             <div className="bg-white rounded-xl shadow-md border border-gray-100 p-3 sm:p-4">
               <div className="flex items-center mb-3 sm:mb-4">
                 <div className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg mr-2 sm:mr-3">
-                  <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  <IndianRupee className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
                 <h2 className="text-base sm:text-lg font-bold text-gray-900">Financial Overview</h2>
               </div>

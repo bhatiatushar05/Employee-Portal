@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Clock, Calendar, Users, CheckCircle, XCircle, Timer, MapPin, User, Camera, Grid, List, Filter, TrendingUp, X, BarChart3, PieChart, Activity, Search, Download, Eye, ChevronDown, RefreshCw, Bell } from 'lucide-react';
 import TopRightHeader from '../TopRightHeader/TopRightHeader';
 import { useAuth } from '../../contexts/AuthContext';
+import Pooja from '../../assets/Pooja.png';
+
 
 const EmployeeAttendance = ({ user }) => {
   const { isAdmin } = useAuth();
@@ -59,8 +61,8 @@ const EmployeeAttendance = ({ user }) => {
       const sampleRecords = [
         {
           id: 1,
-          employeeId: 'john@company.com',
-          employeeName: 'John Doe',
+          employeeId: 'Vikas@company.com',
+          employeeName: 'Vikas',
           date: new Date().toISOString(),
           checkInTime: '09:00:00',
           checkOutTime: null,
@@ -72,8 +74,8 @@ const EmployeeAttendance = ({ user }) => {
         },
         {
           id: 2,
-          employeeId: 'john@company.com',
-          employeeName: 'John Doe',
+          employeeId: 'Viraj@company.com',
+          employeeName: 'Viraj',
           date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
           checkInTime: '09:15:00',
           checkOutTime: '18:30:00',
@@ -85,42 +87,42 @@ const EmployeeAttendance = ({ user }) => {
         },
         {
           id: 3,
-          employeeId: 'sarah@company.com',
-          employeeName: 'Sarah Johnson',
+          employeeId: 'Pooja@company.com',
+          employeeName: 'Pooja',
           date: new Date().toISOString(),
           checkInTime: '08:45:00',
           checkOutTime: null,
           status: 'checked-in',
           location: '12.9716, 77.5946',
           workingHours: 0,
-          checkInPhoto: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+          checkInPhoto: Pooja,
           checkOutPhoto: ''
         },
         {
           id: 4,
-          employeeId: 'mike@company.com',
-          employeeName: 'Mike Chen',
+          employeeId: 'Nirmal@company.com',
+          employeeName: 'Nirmal',
           date: new Date().toISOString(),
           checkInTime: '09:30:00',
           checkOutTime: null,
           status: 'checked-in',
           location: '12.9716, 77.5946',
           workingHours: 0,
-          checkInPhoto: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-          checkOutPhoto: ''
+          checkInPhoto: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+          checkOutPhoto: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
         },
         {
           id: 5,
-          employeeId: 'emma@company.com',
-          employeeName: 'Emma Davis',
+          employeeId: 'Avnish@company.com',
+          employeeName: 'Avnish Ji',
           date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
           checkInTime: '08:30:00',
           checkOutTime: '17:45:00',
           status: 'checked-out',
           location: '12.9716, 77.5946',
           workingHours: 9.25,
-          checkInPhoto: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-          checkOutPhoto: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
+          checkInPhoto: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+          checkOutPhoto: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
         }
       ];
       setAttendanceRecords(sampleRecords);
@@ -428,12 +430,7 @@ const EmployeeAttendance = ({ user }) => {
     setTimeout(() => setShowNotification(false), 5000); // Hide after 5 seconds
   };
 
-  // Test notification function
-  const testNotification = () => {
-    if (isAdmin()) {
-      showNotificationMessage('Test notification - Employee checked in at ' + new Date().toLocaleTimeString());
-    }
-  };
+
 
   // Date filtering functions
   const getFilteredRecords = () => {
@@ -576,7 +573,7 @@ const EmployeeAttendance = ({ user }) => {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `attendance_data_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `attendance_data_₹{new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -706,7 +703,7 @@ const EmployeeAttendance = ({ user }) => {
         <tbody className="bg-white divide-y divide-gray-50">
           {filteredRecords.length > 0 ? (
             filteredRecords.map((record, index) => (
-              <tr key={record.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-200`}>
+              <tr key={record.id} className={`₹{index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-200`}>
                 <td className="px-4 py-3 text-sm text-gray-900 font-medium">
                   {record.employeeName}
                 </td>
@@ -924,33 +921,7 @@ const EmployeeAttendance = ({ user }) => {
                   <span className="sm:hidden">R</span>
                 </button>
                 
-                {/* Debug Button - Admin Only */}
-                <button 
-                  onClick={() => {
-                    console.log('=== DEBUG INFO ===');
-                    console.log('Current attendance records:', attendanceRecords);
-                    console.log('Current user:', user);
-                    console.log('Current status:', currentStatus);
-                    console.log('Today record:', todayRecord);
-                    console.log('LocalStorage data:', localStorage.getItem('hits_attendance_records'));
-                    console.log('==================');
-                  }}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-sm font-medium"
-                >
-                  <Activity size={12} className="sm:w-3.5 sm:h-3.5" />
-                  <span className="hidden sm:inline">Debug</span>
-                                    <span className="sm:hidden">D</span>
-                </button>
                 
-                {/* Test Notification Button - Admin Only */}
-                <button 
-                  onClick={testNotification}
-                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 md:px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all duration-300 shadow-md hover:shadow-lg text-xs sm:text-sm font-medium"
-                >
-                  <Bell size={12} className="sm:w-3.5 sm:h-3.5" />
-                  <span className="hidden sm:inline">Test Notif</span>
-                  <span className="sm:hidden">TN</span>
-                </button>
                 </div>
               ) : (
               <div className="flex items-center gap-3">
@@ -1046,12 +1017,12 @@ const EmployeeAttendance = ({ user }) => {
 
             <div className="bg-white rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 hover:shadow-lg transition-all duration-300">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className={`p-2 rounded-lg flex-shrink-0 ${currentStatus === 'checked-in' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                <div className={`p-2 rounded-lg flex-shrink-0 ₹{currentStatus === 'checked-in' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
                   {currentStatus === 'checked-in' ? <CheckCircle size={16} /> : <XCircle size={16} />}
               </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="font-medium text-gray-700 text-xs truncate">Status</h3>
-                  <p className={`text-sm font-bold mt-1 truncate ${currentStatus === 'checked-in' ? 'text-green-600' : 'text-gray-600'}`}>
+                  <p className={`text-sm font-bold mt-1 truncate ₹{currentStatus === 'checked-in' ? 'text-green-600' : 'text-gray-600'}`}>
                   {currentStatus === 'checked-in' ? 'Checked In' : 
                    currentStatus === 'checked-out' ? 'Checked Out' : 'Not Checked In'}
                 </p>
@@ -1116,7 +1087,7 @@ const EmployeeAttendance = ({ user }) => {
               onClick={() => setShowCheckInModal(true)}
               disabled={currentStatus === 'checked-in'}
                 className={`flex-1 py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl font-medium text-white transition-all duration-300 
-                ${currentStatus === 'checked-in' 
+                ₹{currentStatus === 'checked-in' 
                   ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 shadow-md hover:shadow-lg transform hover:scale-105'
                   }`}
@@ -1132,7 +1103,7 @@ const EmployeeAttendance = ({ user }) => {
               onClick={() => setShowCheckOutModal(true)}
               disabled={currentStatus !== 'checked-in'}
                 className={`flex-1 py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl font-medium text-white transition-all duration-300
-                ${currentStatus !== 'checked-in'
+                ₹{currentStatus !== 'checked-in'
                   ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-md hover:shadow-lg transform hover:scale-105'
                   }`}
@@ -1235,7 +1206,7 @@ const EmployeeAttendance = ({ user }) => {
                   <div className="flex bg-gray-100 rounded-xl p-1">
                 <button
                   onClick={() => setViewMode('table')}
-                      className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
+                      className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ₹{
                     viewMode === 'table' 
                       ? 'bg-blue-500 text-white shadow-sm' 
                       : 'text-gray-600 hover:text-gray-800'
@@ -1246,7 +1217,7 @@ const EmployeeAttendance = ({ user }) => {
                 </button>
                 <button
                   onClick={() => setViewMode('grid')}
-                      className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
+                      className={`flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ₹{
                     viewMode === 'grid' 
                       ? 'bg-blue-500 text-white shadow-sm' 
                       : 'text-gray-600 hover:text-gray-800'
@@ -1545,7 +1516,7 @@ const EmployeeAttendance = ({ user }) => {
                       <div className="w-full bg-gray-200 rounded-full h-3">
                         <div 
                           className="bg-green-500 h-3 rounded-full transition-all duration-500"
-                          style={{ width: `${(analyticsData.checkInAnalysis.early / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.onTime + analyticsData.checkInAnalysis.late)) * 100}%` }}
+                          style={{ width: `₹{(analyticsData.checkInAnalysis.early / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.onTime + analyticsData.checkInAnalysis.late)) * 100}%` }}
                         ></div>
                       </div>
                       
@@ -1556,7 +1527,7 @@ const EmployeeAttendance = ({ user }) => {
                       <div className="w-full bg-gray-200 rounded-full h-3">
                         <div 
                           className="bg-blue-500 h-3 rounded-full transition-all duration-500"
-                          style={{ width: `${(analyticsData.checkInAnalysis.onTime / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.onTime + analyticsData.checkInAnalysis.late)) * 100}%` }}
+                          style={{ width: `₹{(analyticsData.checkInAnalysis.onTime / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.onTime + analyticsData.checkInAnalysis.late)) * 100}%` }}
                         ></div>
                       </div>
                       
@@ -1567,7 +1538,7 @@ const EmployeeAttendance = ({ user }) => {
                       <div className="w-full bg-gray-200 rounded-full h-3">
                         <div 
                           className="bg-red-500 h-3 rounded-full transition-all duration-500"
-                          style={{ width: `${(analyticsData.checkInAnalysis.late / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.late)) * 100}%` }}
+                          style={{ width: `₹{(analyticsData.checkInAnalysis.late / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.late)) * 100}%` }}
                         ></div>
                       </div>
                     </div>
@@ -1586,7 +1557,7 @@ const EmployeeAttendance = ({ user }) => {
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div 
                               className="bg-blue-500 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${(data.present / data.total) * 100}%` }}
+                              style={{ width: `₹{(data.present / data.total) * 100}%` }}
                             ></div>
                           </div>
                         </div>
@@ -1653,4 +1624,3 @@ const EmployeeAttendance = ({ user }) => {
   );
 };
 
-export default EmployeeAttendance;

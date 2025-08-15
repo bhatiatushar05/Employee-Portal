@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { 
   Plus, Search, Download, 
-  Calendar, DollarSign, Clock, CheckCircle,
+  Calendar, IndianRupee, Clock, CheckCircle,
   AlertCircle, XCircle, Banknote, TrendingUp,
   FileText, Eye, Edit, Trash2, X, MoreVertical, LayoutGrid, List, ChevronDown, Building2
 } from 'lucide-react';
@@ -249,7 +249,7 @@ const EmployeePortal = ({ user }) => {
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+              currency: 'INR'
     }).format(amount);
   };
 
@@ -284,7 +284,7 @@ const EmployeePortal = ({ user }) => {
       return Number.isFinite(num) && num > max ? num : max;
     }, 0);
     const next = String(maxId + 1).padStart(3, '0');
-    return `#${next}`;
+            return `#${next}`;
   }, [requests]);
 
   const handleCreateRequest = useCallback((e) => {
@@ -328,7 +328,7 @@ const EmployeePortal = ({ user }) => {
   }, []);
 
   const handleStatusChange = useCallback((id, currentStatus) => {
-    const newStatus = prompt(`Change status for request ${id}:\n\nCurrent: ${getStatusConfig(currentStatus).label}\n\nEnter new status:\n- pending\n- under_verification\n- payment_processing\n- approved\n- reimbursed\n- rejected`);
+          const newStatus = prompt(`Change status for request ${id}:\n\nCurrent: ${getStatusConfig(currentStatus).label}\n\nEnter new status:\n- pending\n- under_verification\n- payment_processing\n- approved\n- reimbursed\n- rejected`);
     
     if (newStatus && ['pending', 'under_verification', 'payment_processing', 'approved', 'reimbursed', 'rejected'].includes(newStatus)) {
       setRequests(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
@@ -365,7 +365,7 @@ const EmployeePortal = ({ user }) => {
       r.category
     ]);
     
-    const csv = [header, ...rows].map(cols => cols.map(String).map(s => `"${s.replace(/"/g, '""')}"`).join(',')).join('\n');
+            const csv = [header, ...rows].map(cols => cols.map(String).map(s => `"${s.replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -397,7 +397,7 @@ const EmployeePortal = ({ user }) => {
       action: 'Bulk Action',
       requestIds: selectedRequests,
       newStatus: newStatus,
-      details: `Bulk ${action} for ${selectedRequests.length} requests`
+              details: `Bulk ${action} for ${selectedRequests.length} requests`
     };
     setAuditLog(prev => [logEntry, ...prev]);
     
@@ -421,7 +421,7 @@ const EmployeePortal = ({ user }) => {
     const monthlyData = {};
     requests.forEach(request => {
       const date = new Date(request.submittedDate);
-      const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+              const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       if (!monthlyData[monthYear]) {
         monthlyData[monthYear] = { count: 0, totalAmount: 0, month: monthYear };
       }
@@ -567,7 +567,7 @@ const EmployeePortal = ({ user }) => {
                     <p className="text-2xl font-bold text-gray-900">{formatCurrency(summaryStats.total)}</p>
                   </div>
                   <div className="p-2.5 bg-blue-100 rounded-lg shrink-0">
-                    <DollarSign className="w-5 h-5 text-blue-600" />
+                    <IndianRupee className="w-5 h-5 text-blue-600" />
                   </div>
                 </div>
               </div>
@@ -1041,8 +1041,8 @@ const EmployeePortal = ({ user }) => {
         <div className="mt-4 flex items-center justify-between text-base text-gray-500">
           <span>
             {isEmployee() 
-              ? `Showing ${filteredAndSortedRequests.length} of ${requests.length} submitted requests`
-              : `Showing ${filteredAndSortedRequests.length} of ${requests.length} requests`
+                              ? `Showing ${filteredAndSortedRequests.length} of ${requests.length} submitted requests`
+                : `Showing ${filteredAndSortedRequests.length} of ${requests.length} requests`
             }
           </span>
           {isAdmin() && (
@@ -1280,7 +1280,7 @@ const EmployeePortal = ({ user }) => {
                           <p className="text-sm text-green-600 font-medium">Total Amount</p>
                           <p className="text-2xl font-bold text-green-900">{formatCurrency(analyticsData.totalAmount)}</p>
                         </div>
-                        <DollarSign className="w-8 h-8 text-green-600" />
+                        <IndianRupee className="w-8 h-8 text-green-600" />
                       </div>
                     </div>
                     <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200">
@@ -1354,8 +1354,8 @@ const EmployeePortal = ({ user }) => {
                                   </div>
                                   <div className="flex-1 bg-gray-100 rounded-full h-3">
                                     <div 
-                                      className={`h-3 rounded-full transition-all duration-300 ${statusConfig.className.replace('border', 'bg').split(' ')[0]}`}
-                                      style={{ width: `${percentage}%` }}
+                                                      className={`h-3 rounded-full transition-all duration-300 ${statusConfig.className.replace('border', 'bg').split(' ')[0]}`}
+                style={{ width: `${percentage}%` }}
                                     />
                                   </div>
                                   <div className="w-16 text-right text-sm font-medium text-gray-900">

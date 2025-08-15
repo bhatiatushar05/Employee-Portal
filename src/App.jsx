@@ -10,7 +10,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import EmployeePortal from './components/EmployeePortal/EmployeePortal';
 
 import CCTVMonitoring from './components/CCTVMonitoring/CCTVMonitoring';
-import EmployeeAttendance from './components/attendance/EmployeeAttendace';
+import EmployeeAttendance from './components/Attendance/EmployeeAttendace';
 import VisitorManagement from './components/Vistor /Vistor';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 

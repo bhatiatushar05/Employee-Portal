@@ -1,7 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Users, UserPlus, QrCode, Clock, MapPin, Phone, Mail, Building, CheckCircle, XCircle, Download, Camera, Grid, List, Filter, Calendar, TrendingUp, X, User } from 'lucide-react';
+import { Users, UserPlus, QrCode, Clock, MapPin, Phone, Mail, Building, CheckCircle, XCircle, Download, Camera, Grid, List, Filter, Calendar, TrendingUp, X, User, BarChart3, PieChart, Activity, Search, Download as DownloadIcon, Eye, ChevronDown, RefreshCw } from 'lucide-react';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement } from 'chart.js';
+import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import QRCode from 'qrcode';
 import TopRightHeader from '../TopRightHeader/TopRightHeader';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+);
 
 const VisitorManagement = ({ user }) => {
   const [visitors, setVisitors] = useState([]);
@@ -17,6 +32,8 @@ const VisitorManagement = ({ user }) => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedVisitorForDetails, setSelectedVisitorForDetails] = useState(null);
   const [openActionMenu, setOpenActionMenu] = useState(null);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [analyticsView, setAnalyticsView] = useState('overview'); // 'overview', 'hourly', 'daily', 'weekly', 'monthly'
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   
@@ -32,46 +49,57 @@ const VisitorManagement = ({ user }) => {
     photo: ''
   });
 
-  // Load visitors from state (replacing localStorage)
+  // Enhanced sample data with more realistic patterns
   useEffect(() => {
-    // Initialize with some sample data if empty
     if (visitors.length === 0) {
-      const sampleVisitors = [
-        {
-          id: 1,
-          name: 'John Doe',
-          email: 'john@example.com',
-          phone: '+91 9876543210',
-          company: 'Tech Corp',
-          purpose: 'Business Meeting',
-          hostEmployee: 'Alice Johnson',
-          vehicleNumber: 'KA01AB1234',
-          idProof: 'driving-license',
-          checkInTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toLocaleString(),
-          checkOutTime: null,
-          status: 'checked-in',
-          validUntil: new Date(Date.now() + 22 * 60 * 60 * 1000).toLocaleString(),
-          createdBy: user?.email || 'admin@company.com',
-          photo: ''
-        },
-        {
-          id: 2,
-          name: 'Jane Smith',
-          email: 'jane@consulting.com',
-          phone: '+91 9876543211',
-          company: 'Consulting Ltd',
-          purpose: 'Client Consultation',
-          hostEmployee: 'Bob Wilson',
-          vehicleNumber: 'MH02CD5678',
-          idProof: 'aadhar',
-          checkInTime: new Date(Date.now() - 24 * 60 * 60 * 1000).toLocaleString(),
-          checkOutTime: new Date(Date.now() - 20 * 60 * 60 * 1000).toLocaleString(),
-          status: 'checked-out',
-          validUntil: new Date(Date.now() - 20 * 60 * 60 * 1000).toLocaleString(),
-          createdBy: user?.email || 'admin@company.com',
-          photo: ''
+      const now = new Date();
+      const sampleVisitors = [];
+      
+      // Generate realistic visitor data for the last 30 days
+      for (let i = 0; i < 30; i++) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - i);
+        
+        // Generate 2-8 visitors per day with realistic patterns
+        const visitorsPerDay = Math.floor(Math.random() * 7) + 2;
+        
+        for (let j = 0; j < visitorsPerDay; j++) {
+          const checkInHour = Math.floor(Math.random() * 12) + 8; // 8 AM to 8 PM
+          const checkInMinute = Math.floor(Math.random() * 60);
+          const checkInTime = new Date(date);
+          checkInTime.setHours(checkInHour, checkInMinute, 0, 0);
+          
+          const duration = Math.floor(Math.random() * 4) + 1; // 1-4 hours
+          const checkOutTime = new Date(checkInTime.getTime() + duration * 60 * 60 * 1000);
+          
+          const companies = ['Tech Corp', 'Consulting Ltd', 'TechStart Inc', 'Design Co', 'Innovate Labs', 'Global Solutions', 'Digital Dynamics', 'Creative Hub', 'Research Institute', 'Business Partners'];
+          const purposes = ['Business Meeting', 'Client Consultation', 'Product Demo', 'Creative Workshop', 'Research Collaboration', 'Contract Signing', 'Training Session', 'Interview', 'Vendor Meeting', 'Site Visit'];
+          const hostEmployees = ['Alice Johnson', 'Bob Wilson', 'Carol Davis', 'David Brown', 'Emma Wilson', 'Frank Miller', 'Grace Lee', 'Henry Chen', 'Ivy Patel', 'Jack Thompson'];
+          
+          const visitor = {
+            id: Date.now() + Math.random(),
+            name: `Visitor ${i * 10 + j + 1}`,
+            email: `visitor${i * 10 + j + 1}@example.com`,
+            phone: `+91 ${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+            company: companies[Math.floor(Math.random() * companies.length)],
+            purpose: purposes[Math.floor(Math.random() * purposes.length)],
+            hostEmployee: hostEmployees[Math.floor(Math.random() * hostEmployees.length)],
+            vehicleNumber: `KA${Math.floor(Math.random() * 100)}AB${Math.floor(Math.random() * 10000)}`,
+            idProof: ['driving-license', 'aadhar', 'pan', 'passport', 'voter-id'][Math.floor(Math.random() * 5)],
+            checkInTime: checkInTime.toLocaleString(),
+            checkOutTime: Math.random() > 0.3 ? checkOutTime.toLocaleString() : null,
+            status: Math.random() > 0.3 ? 'checked-out' : 'checked-in',
+            validUntil: new Date(checkInTime.getTime() + 24 * 60 * 60 * 1000).toLocaleString(),
+            createdBy: user?.email || 'admin@company.com',
+            photo: '',
+            duration: duration,
+            location: `${Math.random() * 0.1 + 12.9716}, ${Math.random() * 0.1 + 77.5946}` // Bangalore coordinates
+          };
+          
+          sampleVisitors.push(visitor);
         }
-      ];
+      }
+      
       setVisitors(sampleVisitors);
     }
   }, []);
@@ -373,7 +401,7 @@ const VisitorManagement = ({ user }) => {
     ctx.fillStyle = '#1e293b';
     ctx.font = 'bold 20px Arial, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(`Pass ID: ${visitor.id}`, 30, 120);
+          ctx.fillText(`Pass ID: ${visitor.id}`, 30, 120);
     
     ctx.fillStyle = '#64748b';
     ctx.font = 'bold 16px Arial, sans-serif';
@@ -502,6 +530,914 @@ const VisitorManagement = ({ user }) => {
   };
 
   const filteredVisitors = getFilteredVisitors();
+
+  // Analytics functions
+  const getHourlyDistribution = () => {
+    const hourlyData = Array(24).fill(0);
+    const today = new Date().toDateString();
+    
+    visitors.forEach(visitor => {
+      if (new Date(visitor.checkInTime).toDateString() === today) {
+        const hour = new Date(visitor.checkInTime).getHours();
+        hourlyData[hour]++;
+      }
+    });
+    
+    return hourlyData.map((count, hour) => ({
+              hour: `${hour}:00`,
+        count,
+        label: `${hour}:00`
+    }));
+  };
+
+  const getDailyTrends = (days = 7) => {
+    const dailyData = [];
+    const today = new Date();
+    
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toDateString();
+      
+      const dayVisitors = visitors.filter(visitor => 
+        new Date(visitor.checkInTime).toDateString() === dateStr
+      );
+      
+      dailyData.push({
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        count: dayVisitors.length,
+        checkedIn: dayVisitors.filter(v => v.status === 'checked-in').length,
+        checkedOut: dayVisitors.filter(v => v.status === 'checked-out').length
+      });
+    }
+    
+    return dailyData;
+  };
+
+  const getWeeklyTrends = (weeks = 4) => {
+    const weeklyData = [];
+    const today = new Date();
+    
+    for (let i = weeks - 1; i >= 0; i--) {
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - (today.getDay() + 7 * i));
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+      
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      
+      const weekVisitors = visitors.filter(visitor => {
+        const visitorDate = new Date(visitor.checkInTime);
+        return visitorDate >= weekStart && visitorDate <= weekEnd;
+      });
+      
+      weeklyData.push({
+        week: `Week ${weeks - i}`,
+        count: weekVisitors.length,
+        avgDaily: Math.round((weekVisitors.length / 7) * 10) / 10
+      });
+    }
+    
+    return weeklyData;
+  };
+
+  const getMonthlyTrends = (months = 6) => {
+    const monthlyData = [];
+    const today = new Date();
+    
+    for (let i = months - 1; i >= 0; i--) {
+      const month = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const monthStr = month.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      
+      const monthVisitors = visitors.filter(visitor => {
+        const visitorDate = new Date(visitor.checkInTime);
+        return visitorDate.getMonth() === month.getMonth() && 
+               visitorDate.getFullYear() === month.getFullYear();
+      });
+      
+      monthlyData.push({
+        month: month.toLocaleDateString('en-US', { month: 'short' }),
+        count: monthVisitors.length,
+        avgDaily: Math.round((monthVisitors.length / new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate()) * 10) / 10
+      });
+    }
+    
+    return monthlyData;
+  };
+
+  const getCompanyDistribution = () => {
+    const companyStats = {};
+    
+    visitors.forEach(visitor => {
+      const company = visitor.company || 'Individual';
+      if (!companyStats[company]) {
+        companyStats[company] = { count: 0, checkedIn: 0, checkedOut: 0 };
+      }
+      companyStats[company].count++;
+      if (visitor.status === 'checked-in') {
+        companyStats[company].checkedIn++;
+      } else {
+        companyStats[company].checkedOut++;
+      }
+    });
+    
+    return Object.entries(companyStats)
+      .map(([company, stats]) => ({
+        company,
+        ...stats
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8); // Top 8 companies
+  };
+
+  const getPurposeDistribution = () => {
+    const purposeStats = {};
+    
+    visitors.forEach(visitor => {
+      const purpose = visitor.purpose;
+      if (!purposeStats[purpose]) {
+        purposeStats[purpose] = 0;
+      }
+      purposeStats[purpose]++;
+    });
+    
+    return Object.entries(purposeStats)
+      .map(([purpose, count]) => ({ purpose, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6); // Top 6 purposes
+  };
+
+  const getPeakHours = () => {
+    const hourlyData = getHourlyDistribution();
+    const maxCount = Math.max(...hourlyData.map(h => h.count));
+    return hourlyData.filter(h => h.count === maxCount).map(h => h.hour);
+  };
+
+  const getAverageDailyVisitors = () => {
+    const today = new Date();
+    const lastWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const weekVisitors = visitors.filter(visitor => 
+      new Date(visitor.checkInTime) >= lastWeek
+    );
+    return Math.round((weekVisitors.length / 7) * 10) / 10;
+  };
+
+  // Enhanced Analytics Functions
+  const getAdvancedHourlyDistribution = () => {
+    const hourlyData = Array(24).fill(0);
+    const hourlyDuration = Array(24).fill(0);
+    const hourlyCount = Array(24).fill(0);
+    
+    const today = new Date().toDateString();
+    
+    visitors.forEach(visitor => {
+      if (new Date(visitor.checkInTime).toDateString() === today) {
+        const hour = new Date(visitor.checkInTime).getHours();
+        hourlyData[hour]++;
+        hourlyCount[hour]++;
+        if (visitor.duration) {
+          hourlyDuration[hour] += visitor.duration;
+        }
+      }
+    });
+    
+    return hourlyData.map((count, hour) => ({
+      hour: `${hour.toString().padStart(2, '0')}:00`,
+      count,
+      avgDuration: hourlyCount[hour] > 0 ? (hourlyDuration[hour] / hourlyCount[hour]).toFixed(1) : 0,
+      percentage: count > 0 ? ((count / Math.max(...hourlyData)) * 100).toFixed(1) : 0
+    }));
+  };
+
+  const getAdvancedDailyTrends = (days = 30) => {
+    const dailyData = [];
+    const today = new Date();
+    
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      
+      const dateStr = date.toDateString();
+      
+      const dayVisitors = visitors.filter(visitor => 
+        new Date(visitor.checkInTime).toDateString() === dateStr
+      );
+      
+      const totalDuration = dayVisitors.reduce((sum, v) => sum + (v.duration || 0), 0);
+      const avgDuration = dayVisitors.length > 0 ? (totalDuration / dayVisitors.length).toFixed(1) : 0;
+      
+      dailyData.push({
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        count: dayVisitors.length,
+        checkedIn: dayVisitors.filter(v => v.status === 'checked-in').length,
+        checkedOut: dayVisitors.filter(v => v.status === 'checked-out').length,
+        avgDuration: parseFloat(avgDuration),
+        totalDuration: totalDuration,
+        trend: i < days - 1 ? (dayVisitors.length - dailyData[dailyData.length - 1]?.count || 0) : 0
+      });
+    }
+    
+    return dailyData;
+  };
+
+  const getPredictiveInsights = () => {
+    const dailyData = getAdvancedDailyTrends(30);
+    const recentData = dailyData.slice(-7);
+    const avgRecent = recentData.reduce((sum, d) => sum + d.count, 0) / recentData.length;
+    
+    // Simple trend prediction
+    const trend = recentData[recentData.length - 1]?.count - recentData[0]?.count || 0;
+    const predictedNext = Math.max(0, Math.round(avgRecent + (trend * 0.1)));
+    
+    // Peak day prediction
+    const dayOfWeekCounts = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
+    dailyData.forEach(day => {
+      const date = new Date();
+      const dayOfWeek = date.getDay();
+      dayOfWeekCounts[dayOfWeek] += day.count;
+    });
+    const peakDay = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayOfWeekCounts.indexOf(Math.max(...dayOfWeekCounts))];
+    
+    return {
+      predictedNext,
+      trend: trend > 0 ? 'increasing' : trend < 0 ? 'decreasing' : 'stable',
+      peakDay,
+      avgRecent: Math.round(avgRecent),
+      confidence: Math.min(95, Math.max(60, 85 + Math.abs(trend)))
+    };
+  };
+
+  const getVisitorBehaviorInsights = () => {
+    const companies = getCompanyDistribution();
+    const purposes = getPurposeDistribution();
+    const hourlyData = getAdvancedHourlyDistribution();
+    
+    const peakHour = hourlyData.reduce((max, hour) => hour.count > max.count ? hour : max);
+    const avgDuration = visitors.reduce((sum, v) => sum + (v.duration || 0), 0) / visitors.length;
+    
+    const topCompany = companies[0];
+    const topPurpose = purposes[0];
+    
+    return {
+      peakHour: peakHour.hour,
+      peakHourCount: peakHour.count,
+      avgDuration: avgDuration.toFixed(1),
+      topCompany: topCompany?.company || 'N/A',
+      topCompanyCount: topCompany?.count || 0,
+      topPurpose: topPurpose?.purpose || 'N/A',
+      topPurposeCount: topPurpose?.count || 0,
+      totalVisitors: visitors.length,
+      activeVisitors: visitors.filter(v => v.status === 'checked-in').length
+    };
+  };
+
+  // Chart.js Chart Rendering Functions
+  const renderBarChart = (data, title, xKey, yKey, color = 'blue') => {
+    const chartData = {
+      labels: data.map(item => item[xKey]),
+      datasets: [{
+        label: title,
+        data: data.map(item => item[yKey]),
+        backgroundColor: color === 'blue' ? 'rgba(59, 130, 246, 0.8)' : 
+                       color === 'orange' ? 'rgba(249, 115, 22, 0.8)' :
+                       color === 'green' ? 'rgba(34, 197, 94, 0.8)' :
+                       color === 'purple' ? 'rgba(147, 51, 234, 0.8)' :
+                       color === 'indigo' ? 'rgba(99, 102, 241, 0.8)' :
+                       color === 'pink' ? 'rgba(236, 72, 153, 0.8)' :
+                       'rgba(59, 130, 246, 0.8)',
+        borderColor: color === 'blue' ? 'rgb(59, 130, 246)' :
+                    color === 'orange' ? 'rgb(249, 115, 22)' :
+                    color === 'green' ? 'rgb(34, 197, 94)' :
+                    color === 'purple' ? 'rgb(147, 51, 234)' :
+                    color === 'indigo' ? 'rgb(99, 102, 241)' :
+                    color === 'pink' ? 'rgb(236, 72, 153)' :
+                    'rgb(59, 130, 246)',
+        borderWidth: 2,
+        borderRadius: 8,
+        borderSkipped: false,
+      }]
+    };
+
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: 'white',
+          bodyColor: 'white',
+          borderColor: 'rgba(59, 130, 246, 0.5)',
+          borderWidth: 1,
+          cornerRadius: 8,
+          displayColors: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            color: '#6b7280',
+            font: {
+              size: 12
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: '#6b7280',
+            font: {
+              size: 11
+            }
+          }
+        }
+      }
+    };
+
+    return (
+      <div className="space-y-4">
+        <h4 className="font-semibold text-gray-800 text-sm">{title}</h4>
+        <div className="h-64">
+          <Bar data={chartData} options={options} />
+        </div>
+      </div>
+    );
+  };
+
+  const renderLineChart = (data, title, xKey, yKey, color = 'blue', showArea = false) => {
+    const chartData = {
+      labels: data.map(item => item[xKey]),
+      datasets: [{
+        label: title,
+        data: data.map(item => item[yKey]),
+        borderColor: color === 'blue' ? 'rgb(59, 130, 246)' :
+                    color === 'orange' ? 'rgb(249, 115, 22)' :
+                    color === 'green' ? 'rgb(34, 197, 94)' :
+                    color === 'purple' ? 'rgb(147, 51, 234)' :
+                    color === 'indigo' ? 'rgb(99, 102, 241)' :
+                    color === 'pink' ? 'rgb(236, 72, 153)' :
+                    'rgb(59, 130, 246)',
+        backgroundColor: showArea ? (color === 'blue' ? 'rgba(59, 130, 246, 0.1)' :
+                                   color === 'orange' ? 'rgba(249, 115, 22, 0.1)' :
+                                   color === 'green' ? 'rgba(34, 197, 94, 0.1)' :
+                                   color === 'purple' ? 'rgba(147, 51, 234, 0.1)' :
+                                   color === 'indigo' ? 'rgba(99, 102, 241, 0.1)' :
+                                   color === 'pink' ? 'rgba(236, 72, 153, 0.1)' :
+                                   'rgba(59, 130, 246, 0.1)') : 'transparent',
+        borderWidth: 3,
+        fill: showArea,
+        tension: 0.4,
+        pointBackgroundColor: color === 'blue' ? 'rgb(59, 130, 246)' :
+                             color === 'orange' ? 'rgb(249, 115, 22)' :
+                             color === 'green' ? 'rgb(34, 197, 94)' :
+                             color === 'purple' ? 'rgb(147, 51, 234)' :
+                             color === 'indigo' ? 'rgb(99, 102, 241)' :
+                             color === 'pink' ? 'rgb(236, 72, 153)' :
+                             'rgb(59, 130, 246)',
+        pointBorderColor: 'white',
+        pointBorderWidth: 2,
+        pointRadius: 6,
+        pointHoverRadius: 8
+      }]
+    };
+
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: 'white',
+          bodyColor: 'white',
+          borderColor: 'rgba(59, 130, 246, 0.5)',
+          borderWidth: 1,
+          cornerRadius: 8,
+          displayColors: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)',
+            drawBorder: false
+          },
+          ticks: {
+            color: '#6b7280',
+            font: {
+              size: 12
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: '#6b7280',
+            font: {
+              size: 11
+            }
+          }
+        }
+      }
+    };
+
+    return (
+      <div className="space-y-4">
+        <h4 className="font-semibold text-gray-800 text-sm">{title}</h4>
+        <div className="h-64">
+          <Line data={chartData} options={options} />
+        </div>
+      </div>
+    );
+  };
+
+  const renderPieChart = (data, title) => {
+    const colors = [
+      'rgba(59, 130, 246, 0.8)',   // Blue
+      'rgba(249, 115, 22, 0.8)',   // Orange
+      'rgba(99, 102, 241, 0.8)',   // Indigo
+      'rgba(236, 72, 153, 0.8)',   // Pink
+      'rgba(16, 185, 129, 0.8)',   // Emerald
+      'rgba(245, 158, 11, 0.8)',   // Amber
+      'rgba(34, 197, 94, 0.8)',    // Green
+      'rgba(147, 51, 234, 0.8)'    // Purple
+    ];
+
+    const chartData = {
+      labels: data.map(item => item.company || item.purpose),
+      datasets: [{
+        data: data.map(item => item.count),
+        backgroundColor: colors.slice(0, data.length),
+        borderColor: colors.slice(0, data.length).map(color => color.replace('0.8', '1')),
+        borderWidth: 2,
+        hoverOffset: 4
+      }]
+    };
+
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 20,
+            usePointStyle: true,
+            pointStyle: 'circle',
+            font: {
+              size: 12
+            },
+            color: '#374151'
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: 'white',
+          bodyColor: 'white',
+          borderColor: 'rgba(59, 130, 246, 0.5)',
+          borderWidth: 1,
+          cornerRadius: 8,
+          callbacks: {
+            label: function(context) {
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = ((context.parsed / total) * 100).toFixed(1);
+              return `${context.label}: ${context.parsed} (${percentage}%)`;
+            }
+          }
+        }
+      }
+    };
+
+    return (
+      <div className="space-y-4">
+        <h4 className="font-semibold text-gray-800 text-sm">{title}</h4>
+        <div className="h-64">
+          <Pie data={chartData} options={options} />
+        </div>
+      </div>
+    );
+  };
+
+  const renderAnalyticsOverview = () => (
+    <div className="space-y-6">
+      {/* Key Metrics Dashboard */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-xl shadow-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-100 text-sm">Total Visitors</p>
+              <p className="text-2xl font-bold">{visitors.length}</p>
+            </div>
+            <Users className="w-8 h-8 text-blue-200" />
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-xl shadow-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-orange-100 text-sm">Currently In</p>
+              <p className="text-2xl font-bold">{getActiveVisitors().length}</p>
+            </div>
+            <CheckCircle className="w-8 h-8 text-orange-200" />
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-xl shadow-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-100 text-sm">Avg Duration</p>
+              <p className="text-2xl font-bold">
+                {visitors.length > 0 ? (visitors.reduce((sum, v) => sum + (v.duration || 0), 0) / visitors.length).toFixed(1) : 0}h
+              </p>
+            </div>
+            <Clock className="w-8 h-8 text-blue-200" />
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-xl shadow-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-orange-100 text-sm">Peak Hour</p>
+              <p className="text-2xl font-bold">{getVisitorBehaviorInsights().peakHour}</p>
+            </div>
+            <TrendingUp className="w-8 h-8 text-orange-200" />
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Hourly Distribution */}
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          {renderBarChart(getAdvancedHourlyDistribution(), 'Hourly Visitor Distribution', 'hour', 'count', 'blue')}
+        </div>
+        
+        {/* Daily Trends */}
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          {renderLineChart(getAdvancedDailyTrends(7), 'Daily Visitor Trends (Last 7 Days)', 'date', 'count', 'orange', true)}
+        </div>
+        
+        {/* Company Distribution */}
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          {renderPieChart(getCompanyDistribution(), 'Top Companies by Visitors')}
+        </div>
+        
+        {/* Purpose Distribution */}
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+          {renderPieChart(getPurposeDistribution(), 'Visit Purpose Distribution')}
+        </div>
+      </div>
+
+      {/* Predictive Insights */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+            <TrendingUp className="w-5 h-5" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-900">Predictive Insights</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {(() => {
+            const insights = getPredictiveInsights();
+            return (
+              <>
+                <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                  <div className="text-2xl font-bold text-blue-600">{insights.predictedNext}</div>
+                  <div className="text-sm text-blue-700">Predicted Tomorrow</div>
+                  <div className="text-xs text-blue-500 mt-1">{insights.confidence}% confidence</div>
+                </div>
+                
+                <div className="text-center p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg border border-orange-200">
+                  <div className="text-2xl font-bold text-orange-600">{insights.peakDay}</div>
+                  <div className="text-sm text-orange-700">Peak Day</div>
+                  <div className="text-xs text-orange-500 mt-1">Most visitors</div>
+                </div>
+                
+                <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-orange-50 rounded-lg border border-blue-200">
+                  <div className="text-2xl font-bold text-blue-600">{insights.trend}</div>
+                  <div className="text-sm text-blue-700">Trend</div>
+                  <div className="text-xs text-blue-500 mt-1">Last 7 days</div>
+                </div>
+              </>
+            );
+          })()}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderHourlyAnalytics = () => (
+    <div className="space-y-6">
+      {/* Peak Hours Analysis */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Peak Hours Analysis</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">{getVisitorBehaviorInsights().peakHour}</div>
+            <div className="text-sm text-blue-700">Peak Hour</div>
+            <div className="text-xs text-blue-500 mt-1">{getVisitorBehaviorInsights().peakHourCount} visitors</div>
+          </div>
+          <div className="text-center p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg">
+            <div className="text-2xl font-bold text-orange-600">{getVisitorBehaviorInsights().avgDuration}</div>
+            <div className="text-sm text-orange-700">Avg Duration</div>
+            <div className="text-xs text-orange-500 mt-1">hours per visit</div>
+          </div>
+          <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-orange-50 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">{getVisitorBehaviorInsights().activeVisitors}</div>
+            <div className="text-sm text-blue-700">Currently In</div>
+            <div className="text-xs text-blue-500 mt-1">active visitors</div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Detailed Hourly Chart */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Detailed Hourly Distribution</h3>
+        {renderBarChart(getAdvancedHourlyDistribution(), '', 'hour', 'count', 'blue')}
+      </div>
+
+      {/* Hourly Duration Analysis */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Hourly Duration Patterns</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="font-semibold text-gray-700 mb-3">Average Duration by Hour</h4>
+            <div className="space-y-2">
+              {getAdvancedHourlyDistribution()
+                .filter(hour => hour.avgDuration > 0)
+                .sort((a, b) => b.avgDuration - a.avgDuration)
+                .slice(0, 5)
+                .map((hour, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-sm text-gray-700">{hour.hour}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-20 bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-blue-500 h-2 rounded-full"
+                          style={{ width: `${(hour.avgDuration / 4) * 100}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">{hour.avgDuration}h</span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="font-semibold text-gray-700 mb-3">Visitor Density by Hour</h4>
+            <div className="space-y-2">
+              {getAdvancedHourlyDistribution()
+                .filter(hour => hour.count > 0)
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5)
+                .map((hour, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-sm text-gray-700">{hour.hour}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-20 bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-orange-500 h-2 rounded-full"
+                          style={{ width: `${hour.percentage}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">{hour.count}</span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderDailyAnalytics = () => (
+    <div className="space-y-6">
+      {/* Daily Trends with Multiple Metrics */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Daily Visitor Trends</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {renderLineChart(getAdvancedDailyTrends(7), 'Total Visitors (Last 7 Days)', 'date', 'count', 'blue', true)}
+          {renderLineChart(getAdvancedDailyTrends(7), 'Average Duration (Last 7 Days)', 'date', 'avgDuration', 'orange', true)}
+        </div>
+      </div>
+      
+      {/* Daily Statistics */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Daily Statistics</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {getAdvancedDailyTrends(7).map((day, index) => (
+            <div key={index} className="text-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+              <div className="text-lg font-bold text-gray-900">{day.count}</div>
+              <div className="text-xs text-gray-600">{day.date}</div>
+              <div className="text-xs text-green-600">+{day.checkedIn}</div>
+              <div className="text-xs text-blue-600">-{day.checkedOut}</div>
+              {day.trend !== 0 && (
+                <div className={`text-xs mt-1 ${day.trend > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {day.trend > 0 ? '↗' : '↘'} {Math.abs(day.trend)}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Trend Analysis */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Trend Analysis</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {(() => {
+            const dailyData = getAdvancedDailyTrends(7);
+            const totalVisitors = dailyData.reduce((sum, day) => sum + day.count, 0);
+            const avgVisitors = totalVisitors / 7;
+            const trend = dailyData[dailyData.length - 1]?.count - dailyData[0]?.count || 0;
+            
+            return (
+              <>
+                <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">{avgVisitors.toFixed(1)}</div>
+                  <div className="text-sm text-blue-700">Daily Average</div>
+                  <div className="text-xs text-blue-500 mt-1">Last 7 days</div>
+                </div>
+                
+                <div className="text-center p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg">
+                  <div className="text-2xl font-bold text-orange-600">{totalVisitors}</div>
+                  <div className="text-sm text-orange-700">Total Visitors</div>
+                  <div className="text-xs text-orange-500 mt-1">This week</div>
+                </div>
+                
+                <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-orange-50 rounded-lg">
+                  <div className={`text-2xl font-bold ${trend > 0 ? 'text-green-600' : trend < 0 ? 'text-red-600' : 'text-blue-600'}`}>
+                    {trend > 0 ? '+' : ''}{trend}
+                  </div>
+                  <div className="text-sm text-gray-700">Weekly Trend</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {trend > 0 ? 'Increasing' : trend < 0 ? 'Decreasing' : 'Stable'}
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderWeeklyAnalytics = () => (
+    <div className="space-y-6">
+      {/* Weekly Trends */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Weekly Visitor Patterns</h3>
+        {renderBarChart(getWeeklyTrends(4), 'Weekly Visitor Count (Last 4 Weeks)', 'week', 'count', 'orange')}
+      </div>
+      
+      {/* Weekly Averages */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Weekly Averages</h3>
+        {renderLineChart(getWeeklyTrends(4), 'Average Daily Visitors per Week', 'week', 'avgDaily', 'blue', true)}
+      </div>
+
+      {/* Week-over-Week Comparison */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Week-over-Week Comparison</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="font-semibold text-gray-700 mb-3">Visitor Growth</h4>
+            <div className="space-y-3">
+              {getWeeklyTrends(4).map((week, index) => {
+                if (index === 0) return null;
+                const prevWeek = getWeeklyTrends(4)[index - 1];
+                const growth = ((week.count - prevWeek.count) / prevWeek.count) * 100;
+                
+                return (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <span className="text-sm text-gray-700">{week.week}</span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-sm font-medium ${growth > 0 ? 'text-green-600' : growth < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                        {growth > 0 ? '+' : ''}{growth.toFixed(1)}%
+                      </span>
+                      <div className={`w-2 h-2 rounded-full ${growth > 0 ? 'bg-green-500' : growth < 0 ? 'bg-red-500' : 'bg-gray-500'}`}></div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="font-semibold text-gray-700 mb-3">Performance Metrics</h4>
+            <div className="space-y-3">
+              {getWeeklyTrends(4).map((week, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                  <span className="text-sm text-gray-700">{week.week}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-900">{week.count}</span>
+                    <span className="text-xs text-gray-500">visitors</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderMonthlyAnalytics = () => (
+    <div className="space-y-6">
+      {/* Monthly Trends */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Monthly Visitor Trends</h3>
+        {renderBarChart(getMonthlyTrends(6), 'Monthly Visitor Count (Last 6 Months)', 'month', 'count', 'blue')}
+      </div>
+      
+      {/* Monthly Averages */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Monthly Averages</h3>
+        {renderLineChart(getMonthlyTrends(6), 'Average Daily Visitors per Month', 'month', 'avgDaily', 'orange', true)}
+      </div>
+
+      {/* Seasonal Analysis */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Seasonal Analysis</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="font-semibold text-gray-700 mb-3">Monthly Performance</h4>
+            <div className="space-y-2">
+              {getMonthlyTrends(6).map((month, index) => {
+                const performance = (month.count / Math.max(...getMonthlyTrends(6).map(m => m.count))) * 100;
+                return (
+                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-sm text-gray-700">{month.month}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-20 bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-blue-500 h-2 rounded-full"
+                          style={{ width: `${performance}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">{month.count}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="font-semibold text-gray-700 mb-3">Growth Rate</h4>
+            <div className="space-y-2">
+              {getMonthlyTrends(6).map((month, index) => {
+                if (index === 0) return null;
+                const prevMonth = getMonthlyTrends(6)[index - 1];
+                const growth = ((month.count - prevMonth.count) / prevMonth.count) * 100;
+                
+                return (
+                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <span className="text-sm text-gray-700">{month.month}</span>
+                    <span className={`text-sm font-medium ${growth > 0 ? 'text-green-600' : growth < 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                      {growth > 0 ? '+' : ''}{growth.toFixed(1)}%
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderAnalyticsContent = () => {
+    switch (analyticsView) {
+      case 'hourly':
+        return renderHourlyAnalytics();
+      case 'daily':
+        return renderDailyAnalytics();
+      case 'weekly':
+        return renderWeeklyAnalytics();
+      case 'monthly':
+        return renderMonthlyAnalytics();
+      default:
+        return renderAnalyticsOverview();
+    }
+  };
 
   // Render functions for different view modes
   const renderTableView = () => (
@@ -855,7 +1791,7 @@ const VisitorManagement = ({ user }) => {
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-r from-blue-600 to-orange-500 text-white rounded-xl shadow-lg">
+              <div className="p-2 bg-gradient-to-r from-orange-500 to-blue-600 text-white rounded-xl shadow-lg">
                 <Users size={18} />
               </div>
               <div>
@@ -863,15 +1799,26 @@ const VisitorManagement = ({ user }) => {
                 <p className="text-base text-gray-600 mt-1">Manage visitor check-ins and issue QR passes</p>
               </div>
             </div>
-            <button
-              onClick={() => setShowAddForm(true)}
-              className="bg-gradient-to-r from-blue-600 to-orange-500 text-white px-4 py-2 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
-            >
-              <div className="flex items-center gap-2">
-                <UserPlus size={16} />
-                Add New Visitor
-              </div>
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowAnalytics(true)}
+                className="bg-gradient-to-r from-orange-500 to-blue-600 text-white px-4 py-2 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <BarChart3 size={16} />
+                  Analytics
+                </div>
+              </button>
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="bg-gradient-to-r from-blue-600 to-orange-500 text-white px-4 py-2 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <UserPlus size={16} />
+                  Add New Visitor
+                </div>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -879,12 +1826,12 @@ const VisitorManagement = ({ user }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white rounded-xl shadow-lg p-3 border border-gray-100 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-gradient-to-r from-green-100 to-green-200 text-green-700 rounded-lg">
+              <div className="p-2 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-700 rounded-lg">
                 <Users size={18} />
               </div>
               <div>
                 <h3 className="font-semibold text-gray-700 text-xs">Today's Visitors</h3>
-                <p className="text-xl font-bold text-green-600 mt-0.5">{getTodayVisitors().length}</p>
+                <p className="text-xl font-bold text-orange-600 mt-0.5">{getTodayVisitors().length}</p>
               </div>
             </div>
           </div>
@@ -903,7 +1850,7 @@ const VisitorManagement = ({ user }) => {
 
           <div className="bg-white rounded-xl shadow-lg p-3 border border-gray-100 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-700 rounded-lg">
+              <div className="p-2 bg-gradient-to-r from-orange-100 to-blue-100 text-orange-700 rounded-lg">
                 <TrendingUp size={18} />
               </div>
               <div>
@@ -915,12 +1862,12 @@ const VisitorManagement = ({ user }) => {
 
           <div className="bg-white rounded-xl shadow-lg p-3 border border-gray-100 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-gradient-to-r from-purple-100 to-purple-200 text-purple-700 rounded-lg">
+              <div className="p-2 bg-gradient-to-r from-blue-100 to-orange-100 text-blue-700 rounded-lg">
                 <Clock size={18} />
               </div>
               <div>
                 <h3 className="font-semibold text-gray-700 text-xs">Current Time</h3>
-                <p className="text-base font-bold text-purple-600 mt-0.5">
+                <p className="text-base font-bold text-blue-600 mt-0.5">
                   {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
@@ -939,7 +1886,7 @@ const VisitorManagement = ({ user }) => {
                   onClick={() => setViewMode('table')}
                   className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
                     viewMode === 'table' 
-                      ? 'bg-blue-500 text-white shadow-sm' 
+                      ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-sm' 
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
@@ -950,7 +1897,7 @@ const VisitorManagement = ({ user }) => {
                   onClick={() => setViewMode('list')}
                   className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
                     viewMode === 'list' 
-                      ? 'bg-blue-500 text-white shadow-sm' 
+                      ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-sm' 
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
@@ -961,7 +1908,7 @@ const VisitorManagement = ({ user }) => {
                   onClick={() => setViewMode('grid')}
                   className={`px-3 py-1 rounded-lg text-xs font-medium transition-all duration-300 ${
                     viewMode === 'grid' 
-                      ? 'bg-blue-500 text-white shadow-sm' 
+                      ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-sm' 
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
@@ -978,7 +1925,7 @@ const VisitorManagement = ({ user }) => {
                 <select
                   value={dateFilter}
                   onChange={(e) => setDateFilter(e.target.value)}
-                  className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
                   <option value="all">All Time</option>
                   <option value="today">Today</option>
@@ -991,12 +1938,12 @@ const VisitorManagement = ({ user }) => {
               {/* Custom Date Range */}
               {dateFilter === 'custom' && (
                 <div className="flex items-center gap-2 text-sm">
-                  <input
-                    type="date"
-                    value={customDateRange.start}
-                    onChange={(e) => setCustomDateRange(prev => ({ ...prev, start: e.target.value }))}
-                    className="px-2 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
+                                      <input
+                      type="date"
+                      value={customDateRange.start}
+                      onChange={(e) => setCustomDateRange(prev => ({ ...prev, start: e.target.value }))}
+                      className="px-2 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    />
                   <span className="text-gray-500">to</span>
                   <input
                     type="date"
@@ -1012,7 +1959,7 @@ const VisitorManagement = ({ user }) => {
 
         {/* Visitor List */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-          <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-orange-50">
+          <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-orange-50 to-blue-50">
             <h2 className="text-xl font-bold text-gray-900">Visitor Records</h2>
             <p className="text-gray-600 mt-1 text-sm">Track all visitor activities and manage check-ins/check-outs</p>
           </div>
@@ -1490,6 +2437,93 @@ const VisitorManagement = ({ user }) => {
                     Close
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Analytics Modal */}
+        {showAnalytics && (
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-7xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-blue-50 rounded-t-2xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-r from-orange-500 to-blue-600 text-white rounded-xl">
+                      <BarChart3 size={20} />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900">Visitor Analytics Dashboard</h2>
+                      <p className="text-gray-600 mt-1">Comprehensive insights into visitor patterns and trends</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowAnalytics(false)}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <X size={24} className="text-gray-600" />
+                  </button>
+                </div>
+                
+                {/* Analytics Navigation */}
+                <div className="mt-6">
+                  <div className="flex flex-wrap gap-2">
+                                          <button
+                        onClick={() => setAnalyticsView('overview')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          analyticsView === 'overview'
+                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                        }`}
+                      >
+                        Overview
+                      </button>
+                      <button
+                        onClick={() => setAnalyticsView('hourly')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          analyticsView === 'hourly'
+                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                        }`}
+                      >
+                        Hourly Patterns
+                      </button>
+                      <button
+                        onClick={() => setAnalyticsView('daily')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          analyticsView === 'daily'
+                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                        }`}
+                      >
+                        Daily Trends
+                      </button>
+                      <button
+                        onClick={() => setAnalyticsView('weekly')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          analyticsView === 'weekly'
+                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                        }`}
+                      >
+                        Weekly Analysis
+                      </button>
+                      <button
+                        onClick={() => setAnalyticsView('monthly')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          analyticsView === 'monthly'
+                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                            : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                        }`}
+                      >
+                        Monthly Trends
+                      </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                {renderAnalyticsContent()}
               </div>
             </div>
           </div>
