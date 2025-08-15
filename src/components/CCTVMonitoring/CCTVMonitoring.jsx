@@ -1,280 +1,288 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { Search, User, Menu, X, Camera, MapPin, Settings, Eye } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Camera, MapPin, Settings, Eye, Wifi, WifiOff, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import { useTheme } from '../../contexts/ThemeContext';
 import TopRightHeader from '../TopRightHeader/TopRightHeader';
 
-// Mock camera data
+// Enhanced camera data with more information
 const CAMERAS = [
-  { id: 1, name: 'Main Entrance', location: 'Building A - Front Door', status: 'active', type: 'live' },
-  { id: 2, name: 'Reception Area', location: 'Building A - Lobby', status: 'active', type: 'fake' },
-  { id: 3, name: 'Parking Lot', location: 'Outdoor - Section B', status: 'active', type: 'fake' },
-  { id: 4, name: 'Break Room', location: 'Building A - 2nd Floor', status: 'maintenance', type: 'fake' },
-  { id: 5, name: 'Conference Room', location: 'Building A - 3rd Floor', status: 'active', type: 'fake' },
-  { id: 6, name: 'Server Room', location: 'Building A - Basement', status: 'active', type: 'fake' }
+  { 
+    id: 1, 
+    name: 'Main Entrance', 
+    location: 'Building A - Front Door', 
+    status: 'active', 
+    type: 'live',
+    resolution: '4K',
+    fps: '30',
+    lastMaintenance: '2024-01-15',
+    uptime: '99.8%',
+    recording: true,
+    motionDetection: true,
+    nightVision: true
+  },
+  { 
+    id: 2, 
+    name: 'Reception Area', 
+    location: 'Building A - Lobby', 
+    status: 'active', 
+    type: 'live',
+    resolution: '1080p',
+    fps: '25',
+    lastMaintenance: '2024-01-10',
+    uptime: '99.9%',
+    recording: true,
+    motionDetection: true,
+    nightVision: false
+  },
+  { 
+    id: 3, 
+    name: 'Parking Lot', 
+    location: 'Outdoor - Section B', 
+    status: 'active', 
+    type: 'live',
+    resolution: '4K',
+    fps: '30',
+    lastMaintenance: '2024-01-12',
+    uptime: '98.5%',
+    recording: true,
+    motionDetection: true,
+    nightVision: true
+  },
+  { 
+    id: 4, 
+    name: 'Break Room', 
+    location: 'Building A - 2nd Floor', 
+    status: 'maintenance', 
+    type: 'offline',
+    resolution: '1080p',
+    fps: '25',
+    lastMaintenance: '2024-01-20',
+    uptime: '0%',
+    recording: false,
+    motionDetection: false,
+    nightVision: false
+  },
+  { 
+    id: 5, 
+    name: 'Conference Room', 
+    location: 'Building A - 3rd Floor', 
+    status: 'active', 
+    type: 'live',
+    resolution: '1080p',
+    fps: '25',
+    lastMaintenance: '2024-01-08',
+    uptime: '99.7%',
+    recording: true,
+    motionDetection: true,
+    nightVision: false
+  },
+  { 
+    id: 6, 
+    name: 'Server Room', 
+    location: 'Building A - Basement', 
+    status: 'active', 
+    type: 'live',
+    resolution: '4K',
+    fps: '30',
+    lastMaintenance: '2024-01-18',
+    uptime: '99.9%',
+    recording: true,
+    motionDetection: true,
+    nightVision: true
+  },
+  { 
+    id: 7, 
+    name: 'Loading Dock', 
+    location: 'Building B - Rear', 
+    status: 'active', 
+    type: 'live',
+    resolution: '1080p',
+    fps: '25',
+    lastMaintenance: '2024-01-14',
+    uptime: '99.2%',
+    recording: true,
+    motionDetection: true,
+    nightVision: true
+  },
+  { 
+    id: 8, 
+    name: 'Security Office', 
+    location: 'Building A - 1st Floor', 
+    status: 'active', 
+    type: 'live',
+    resolution: '1080p',
+    fps: '25',
+    lastMaintenance: '2024-01-16',
+    uptime: '99.8%',
+    recording: true,
+    motionDetection: true,
+    nightVision: false
+  }
 ];
 
-const FaceRecognitionAttendance = ({ onCheckInOut, currentCamera }) => {
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const [status, setStatus] = useState('idle');
-  const [liveness, setLiveness] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  // Mock face detection for live camera
-  useEffect(() => {
-    if (currentCamera.type === 'live') {
-      // Start webcam for live camera
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then((stream) => {
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-        })
-        .catch(() => {
-          setStatus('fail');
-        });
-
-      // Mock face detection
-      const interval = setInterval(() => {
-        setStatus(Math.random() > 0.3 ? 'success' : 'fail');
-      }, 1000);
-
-      return () => {
-        clearInterval(interval);
-        if (videoRef.current && videoRef.current.srcObject) {
-          const tracks = videoRef.current.srcObject.getTracks();
-          tracks.forEach(track => track.stop());
-        }
-      };
-    }
-  }, [currentCamera]);
-
-  const handleLiveness = () => {
-    setLiveness(true);
-    setTimeout(() => setLiveness(false), 1000);
-  };
-
-  const handleCheckInOut = () => {
-    if (status === 'success' && videoRef.current) {
-      const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth || 640;
-      canvas.height = videoRef.current.videoHeight || 480;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-      const photo = canvas.toDataURL('image/png');
-      onCheckInOut(photo);
-    }
-  };
-
-  // Render fake camera feed
-  if (currentCamera.type === 'fake') {
-    return (
-      <div className="bg-gray-800 rounded-lg overflow-hidden mb-6 flex flex-col items-center p-4">
-        <div className="relative w-full max-w-md aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
-          <div className="text-center text-white">
-            <Camera size={48} className="mx-auto mb-2 opacity-50" />
-            <p className="text-lg font-semibold">{currentCamera.name}</p>
-            <p className="text-sm opacity-75">{currentCamera.location}</p>
-            <div className="mt-4 flex items-center justify-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-xs">Recording</span>
-            </div>
-          </div>
-          <div className="absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold bg-green-600 text-white">
-            Camera Active
-          </div>
-          <div className="absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold bg-blue-600 text-white">
-            {currentCamera.id}/6
-          </div>
-        </div>
-        <div className="mt-4 text-center text-gray-400">
-          <p className="text-sm">Mock Camera Feed</p>
-          <p className="text-xs">Face recognition not available on this camera</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Render live camera feed
-  return (
-    <div className="bg-gray-800 rounded-lg overflow-hidden mb-6 flex flex-col items-center p-4">
-      <div className="relative w-full max-w-md aspect-video">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          playsInline
-          width="100%"
-          height="auto"
-          className="rounded-lg shadow-lg bg-gray-900"
-          style={{ width: '100%', height: 'auto' }}
-        />
-        <canvas
-          ref={canvasRef}
-          className="absolute top-0 left-0 w-full h-full pointer-events-none"
-          width={640}
-          height={480}
-        />
-        <div 
-          className="absolute top-2 left-2 px-2 py-1 rounded text-xs font-bold"
-          style={{ background: status === 'success' ? '#22c55e' : '#ef4444', color: 'white' }}
-        >
-          {status === 'success' ? 'Face Detected' : 'No Face'}
-        </div>
-        <div className="absolute top-2 right-2 px-2 py-1 rounded text-xs font-bold bg-red-600 text-white flex items-center space-x-1">
-          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-          <span>LIVE</span>
-        </div>
-      </div>
-      <button
-        onClick={handleLiveness}
-        className="mt-4 px-4 py-2 bg-yellow-500 text-black rounded-lg shadow hover:bg-yellow-600 transition-colors"
-      >
-        Simulate Blink (Liveness)
-      </button>
-      <button
-        onClick={handleCheckInOut}
-        disabled={status !== 'success'}
-        className="mt-3 px-8 py-3 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed transition-colors"
-      >
-        Tap to Check In/Out
-      </button>
-      {liveness && (
-        <div className="mt-2 text-green-400 font-bold animate-pulse">
-          Liveness Detected!
-        </div>
-      )}
-    </div>
-  );
-};
-
-const EmployeeCheckTabs = ({ activeTab, setActiveTab, attendanceLogs }) => {
-  const tabs = ['Check-In', 'Check-Out'];
+const CameraFeed = ({ camera }) => {
+  const { isDarkMode } = useTheme();
   
-  const mockData = [
-    { name: 'John', time: 'Fri, Jul 26, 2025 at 10:02 AM', avatar: '👨' },
-    { name: 'Caroline', time: 'Fri, Jul 26, 2025 at 9:25 AM', avatar: '👩' },
-    { name: 'Unknown', time: 'Fri, Jul 26, 2025 at 8:48 AM', avatar: '👤' },
-    { name: 'Sarah Johnson', time: 'Fri, Jul 26, 2025 at 8:30 AM', avatar: '👩' },
-    { name: 'Mike Chen', time: 'Fri, Jul 26, 2025 at 9:15 AM', avatar: '👨' }
-  ];
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'active': return 'bg-green-500';
+      case 'maintenance': return 'bg-yellow-500';
+      case 'offline': return 'bg-red-500';
+      default: return 'bg-gray-500';
+    }
+  };
 
-  const allLogs = [...attendanceLogs, ...mockData];
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'active': return 'Online';
+      case 'maintenance': return 'Maintenance';
+      case 'offline': return 'Offline';
+      default: return 'Unknown';
+    }
+  };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 h-fit">
-      <div className="flex space-x-1 mb-6 bg-gray-100 rounded-lg p-1">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${
-              activeTab === tab
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-      
-      <div className="space-y-3 max-h-96 overflow-y-auto">
-        {allLogs.slice(0, 6).map((log, index) => (
-          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-            <div className="flex items-center space-x-3">
-              {log.photo ? (
-                <img 
-                  src={log.photo} 
-                  alt={log.name}
-                  className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
-                />
-              ) : (
-                <span className="text-2xl">{log.avatar || '👤'}</span>
-              )}
-              <div>
-                <div className="font-medium text-gray-900">{log.name}</div>
-                <div className="text-sm text-gray-500">{log.time}</div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                IN
-              </span>
-              <button className="text-gray-400 hover:text-gray-600">
-                <Settings size={16} />
-              </button>
-            </div>
+    <div className={`rounded-xl shadow-lg border overflow-hidden transition-all duration-300 hover:shadow-xl ${
+      isDarkMode 
+        ? 'bg-dark-card border-dark-border hover:border-orange-500/50' 
+        : 'bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100'
+    }`}>
+      {/* Camera Header */}
+      <div className={`p-3 border-b ${
+        isDarkMode ? 'border-dark-border bg-dark-surface' : 'border-gray-200 bg-gray-50'
+      }`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Camera size={16} className={`${
+              isDarkMode ? 'text-orange-400' : 'text-orange-600'
+            }`} />
+            <span className={`font-semibold text-sm ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}>{camera.name}</span>
           </div>
-        ))}
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${getStatusColor(camera.status)}`}></div>
+            <span className={`text-xs font-medium ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-600'
+            }`}>{getStatusText(camera.status)}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1 mt-1">
+          <MapPin size={12} className={`${
+            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+          }`} />
+          <span className={`text-xs ${
+            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+          }`}>{camera.location}</span>
+        </div>
       </div>
-    </div>
-  );
-};
 
-const CameraMenu = ({ cameras, currentCamera, onCameraSelect, isOpen, onClose }) => {
-  if (!isOpen) return null;
+      {/* Camera Feed */}
+      <div className="relative">
+        <div className={`aspect-video ${
+          isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
+        } flex items-center justify-center relative overflow-hidden`}>
+          {camera.status === 'active' ? (
+            <>
+              {/* Mock camera feed with animated elements */}
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900 animate-pulse"></div>
+              <div className="relative z-10 text-center">
+                <Camera size={48} className={`mx-auto mb-2 ${
+                  isDarkMode ? 'text-orange-400' : 'text-orange-600'
+                } opacity-75`} />
+                <p className={`text-sm font-medium ${
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                }`}>{camera.name}</p>
+                <p className={`text-xs ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                }`}>{camera.location}</p>
+              </div>
+              
+              {/* Live indicator */}
+              <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-red-600 text-white text-xs font-bold rounded">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                LIVE
+              </div>
+              
+              {/* Camera info overlay */}
+              <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/70 text-white text-xs rounded">
+                {camera.resolution} • {camera.fps}fps
+              </div>
+            </>
+          ) : (
+            <div className="text-center">
+              <AlertTriangle size={48} className={`mx-auto mb-2 ${
+                isDarkMode ? 'text-yellow-400' : 'text-yellow-600'
+              }`} />
+              <p className={`text-sm font-medium ${
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              }`}>Camera Offline</p>
+              <p className={`text-xs ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              }`}>{camera.status === 'maintenance' ? 'Under Maintenance' : 'Connection Lost'}</p>
+            </div>
+          )}
+        </div>
+      </div>
 
-  return (
-    <div className="fixed inset-0 z-50 flex">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
-        onClick={onClose}
-      ></div>
-      
-      {/* Menu Panel */}
-      <div className="relative bg-white w-80 h-full shadow-2xl overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Camera Selection</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X size={20} />
-          </button>
+      {/* Camera Details */}
+      <div className={`p-3 space-y-2 ${
+        isDarkMode ? 'bg-dark-surface' : 'bg-gray-50'
+      }`}>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="flex items-center gap-1">
+            <span className={`${
+              isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}>Resolution:</span>
+            <span className={`font-medium ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}>{camera.resolution}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className={`${
+              isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}>FPS:</span>
+            <span className={`font-medium ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}>{camera.fps}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className={`${
+              isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}>Uptime:</span>
+            <span className={`font-medium ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}>{camera.uptime}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className={`${
+              isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}>Recording:</span>
+            <span className={`font-medium ${
+              camera.recording 
+                ? (isDarkMode ? 'text-green-400' : 'text-green-600')
+                : (isDarkMode ? 'text-red-400' : 'text-red-600')
+            }`}>{camera.recording ? 'Yes' : 'No'}</span>
+          </div>
         </div>
         
-        <div className="p-4 space-y-2">
-          {cameras.map((camera) => (
-            <button
-              key={camera.id}
-              onClick={() => {
-                onCameraSelect(camera);
-                onClose();
-              }}
-              className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                currentCamera.id === camera.id
-                  ? 'border-emerald-500 bg-emerald-50'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center space-x-2">
-                  <Camera size={18} className="text-gray-600" />
-                  <span className="font-medium text-gray-900">{camera.name}</span>
-                </div>
-                <div className={`w-2 h-2 rounded-full ${
-                  camera.status === 'active' ? 'bg-green-500' : 'bg-red-500'
-                }`}></div>
-              </div>
-              <div className="flex items-center space-x-1 text-sm text-gray-500">
-                <MapPin size={14} />
-                <span>{camera.location}</span>
-              </div>
-              <div className="mt-2 flex items-center justify-between">
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  camera.status === 'active' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {camera.status}
-                </span>
-                <span className="text-xs text-gray-400">
-                  {camera.type === 'live' ? 'Live Feed' : 'Mock Feed'}
-                </span>
-              </div>
-            </button>
-          ))}
+        {/* Feature indicators */}
+        <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+          {camera.motionDetection && (
+            <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-xs rounded-full">
+              <Eye size={12} />
+              Motion
+            </div>
+          )}
+          {camera.nightVision && (
+            <div className="flex items-center gap-1 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 text-xs rounded-full">
+              <Eye size={12} />
+              Night
+            </div>
+          )}
+          <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 text-xs rounded-full">
+            <Clock size={12} />
+            {camera.lastMaintenance}
+          </div>
         </div>
       </div>
     </div>
@@ -282,102 +290,166 @@ const CameraMenu = ({ cameras, currentCamera, onCameraSelect, isOpen, onClose })
 };
 
 const CCTVMonitoring = ({ user }) => {
-  const [activeTab, setActiveTab] = useState('Check-In');
-  const [attendanceLogs, setAttendanceLogs] = useState([]);
-  const [currentCamera, setCurrentCamera] = useState(CAMERAS[0]);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isDarkMode } = useTheme();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
-  const handleCheckInOut = (photo) => {
-    setAttendanceLogs((prev) => [
-      {
-        name: 'User',
-        time: new Date().toLocaleString(),
-        photo,
-        avatar: '👤'
-      },
-      ...prev,
-    ]);
+  const filteredCameras = CAMERAS.filter(camera => {
+    const matchesSearch = camera.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         camera.location.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || camera.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const getStatusCounts = () => {
+    const counts = { active: 0, maintenance: 0, offline: 0 };
+    CAMERAS.forEach(camera => {
+      counts[camera.status]++;
+    });
+    return counts;
   };
 
+  const statusCounts = getStatusCounts();
+
   return (
-    <div className="flex-1 min-h-0 h-full bg-gradient-to-br from-blue-50 to-indigo-100 overflow-y-auto">
+    <div className={`bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100 flex-1 min-h-0 h-full overflow-y-auto ${
+      isDarkMode 
+        ? 'bg-gradient-to-br from-dark-bg via-dark-surface to-dark-card' 
+        : 'bg-gradient-to-br from-blue-50 to-indigo-100'
+    }`}>
       {/* Top right header */}
       <TopRightHeader user={user} />
       
       {/* Main Content */}
-      <div className="pt-16 sm:pt-20 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
+      <div className="bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100 pt-16 sm:pt-20 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="bg-white rounded-xl shadow-md border border-gray-100 p-3 sm:p-4">
+        <div className={`rounded-xl shadow-md border p-3 sm:p-4 ${
+          isDarkMode 
+            ? 'bg-dark-card border-dark-border shadow-dark' 
+            : 'bg-white border-gray-100'
+        }`}>
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="p-2 bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-lg shadow-md">
                 <Camera size={16} />
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 leading-tight">
-                  <span className="text-gray-900">CCTV</span> <span className="text-orange-500">Real-Time Monitoring</span>
+                <h1 className={`text-lg sm:text-xl md:text-2xl font-bold leading-tight ${
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                }`}>
+                  <span className={isDarkMode ? 'text-white' : 'text-gray-900'}>CCTV</span>{' '}
+                  <span className="text-orange-500">Real-Time Monitoring</span>
                 </h1>
-                <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                  {currentCamera.name} - {currentCamera.location}
+                <p className={`text-xs sm:text-sm mt-1 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                }`}>
+                  {CAMERAS.length} Cameras • Real-time surveillance and monitoring
                 </p>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-2">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse"></div>
-                    <span className="text-xs sm:text-sm text-gray-600 font-medium">Live Monitoring</span>
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className={`text-xs sm:text-sm font-medium ${
+                      isDarkMode ? 'text-green-400' : 'text-green-600'
+                    }`}>{statusCounts.active} Active</span>
                   </div>
-                  <div className="hidden sm:block w-px h-4 bg-gray-300"></div>
-                  <span className="text-xs sm:text-sm text-gray-500">{CAMERAS.length} Active Cameras</span>
+                  <div className="hidden sm:block w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-yellow-500 rounded-full"></div>
+                    <span className={`text-xs sm:text-sm ${
+                      isDarkMode ? 'text-yellow-400' : 'text-yellow-600'
+                    }`}>{statusCounts.maintenance} Maintenance</span>
+                  </div>
+                  <div className="hidden sm:block w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full"></div>
+                    <span className={`text-xs sm:text-sm ${
+                      isDarkMode ? 'text-red-400' : 'text-red-600'
+                    }`}>{statusCounts.offline} Offline</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                onClick={() => setIsMenuOpen(true)}
-                className="p-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-600 text-white hover:from-orange-600 hover:to-red-700 transition-all duration-300 hover:scale-105 shadow-md"
-              >
-                <Menu size={16} />
-              </button>
-              <div className="text-right">
-                <div className="text-xs sm:text-sm text-gray-500">Current Time</div>
-                <div className="text-base sm:text-lg font-bold text-blue-600">
-                  {new Date().toLocaleTimeString()}
-                </div>
+            <div className="text-right">
+              <div className={`text-xs sm:text-sm ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              }`}>Current Time</div>
+              <div className={`text-base sm:text-lg font-bold ${
+                isDarkMode ? 'text-orange-400' : 'text-blue-600'
+              }`}>
+                {new Date().toLocaleTimeString()}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
-          {/* Left Column - Face Recognition Attendance */}
-          <div className="xl:col-span-2">
-            <div className="bg-white rounded-xl shadow-md border border-gray-100 p-3 sm:p-4">
-              <FaceRecognitionAttendance 
-                onCheckInOut={handleCheckInOut} 
-                currentCamera={currentCamera}
+        {/* Controls */}
+        <div className={`rounded-xl shadow-md border p-4 ${
+          isDarkMode 
+            ? 'bg-dark-card border-dark-border shadow-dark' 
+            : 'bg-white border-gray-100'
+        }`}>
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search size={20} className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              }`} />
+              <input
+                type="text"
+                placeholder="Search cameras by name or location..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg text-sm transition-colors duration-200 ${
+                  isDarkMode 
+                    ? 'bg-dark-surface border-dark-border text-white placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500' 
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500'
+                }`}
               />
             </div>
-          </div>
-          {/* Right Sidebar */}
-          <div className="xl:col-span-1">
-            <div className="bg-white rounded-xl shadow-md border border-gray-100 p-3 sm:p-4">
-              <EmployeeCheckTabs 
-                activeTab={activeTab} 
-                setActiveTab={setActiveTab} 
-                attendanceLogs={attendanceLogs} 
-              />
-            </div>
+            
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className={`px-4 py-2 border rounded-lg text-sm transition-colors duration-200 ${
+                isDarkMode 
+                  ? 'bg-dark-surface border-dark-border text-white focus:ring-orange-500 focus:border-orange-500' 
+                  : 'bg-white border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500'
+              }`}
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="offline">Offline</option>
+            </select>
           </div>
         </div>
 
-        {/* Camera Selection Menu */}
-        <CameraMenu
-          cameras={CAMERAS}
-          currentCamera={currentCamera}
-          onCameraSelect={setCurrentCamera}
-          isOpen={isMenuOpen}
-          onClose={() => setIsMenuOpen(false)}
-        />
+        {/* Camera Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          {filteredCameras.map((camera) => (
+            <CameraFeed key={camera.id} camera={camera} />
+          ))}
+        </div>
+
+        {/* No Results */}
+        {filteredCameras.length === 0 && (
+          <div className={`text-center py-12 rounded-xl ${
+            isDarkMode 
+              ? 'bg-dark-card border border-dark-border' 
+              : 'bg-white border border-gray-200'
+          }`}>
+            <Camera size={48} className={`mx-auto mb-4 ${
+              isDarkMode ? 'text-gray-500' : 'text-gray-400'
+            }`} />
+            <h3 className={`text-lg font-semibold mb-2 ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}>No cameras found</h3>
+            <p className={`${
+              isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}>Try adjusting your search or filter criteria.</p>
+          </div>
+        )}
         
         {/* Footer Blank Space */}
         <div className="h-16 sm:h-20 md:h-24"></div>
