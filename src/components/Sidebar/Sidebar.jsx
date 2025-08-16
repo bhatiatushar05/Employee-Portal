@@ -64,16 +64,16 @@ const Sidebar = ({
       <button 
         onClick={onClick}
         className={`
-          group relative w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 sm:py-2.5 rounded-lg
+          group relative w-full flex items-center gap-2 sm:gap-3 px-2 sm:gap-3 py-2 sm:py-2.5 rounded-lg
           text-xs sm:text-sm font-medium transition-all duration-200 text-left
           ${sidebarCollapsed ? 'justify-center px-2' : ''}
           ${isDarkMode 
             ? isActive 
-              ? 'bg-orange-500/20 text-orange-300 shadow-sm border border-orange-500/30' 
-              : 'text-orange-300 hover:text-orange-200 hover:bg-orange-500/10'
+              ? 'bg-blue-500/20 text-blue-300 shadow-sm border border-blue-500/30' 
+              : 'text-blue-200 hover:text-blue-100 hover:bg-blue-500/10'
             : isActive 
-              ? 'bg-white/10 text-white shadow-sm border border-white/10' 
-              : 'text-gray-300 hover:text-white hover:bg-white/5'
+              ? 'bg-blue-500/20 text-blue-600 shadow-sm border border-blue-500/30' 
+              : 'text-black hover:text-blue-600 hover:bg-blue-500/10'
           }
         `}
         title={sidebarCollapsed ? item.label : ''}
@@ -81,7 +81,7 @@ const Sidebar = ({
         <div className={`
           flex-shrink-0 p-1 sm:p-1.5 rounded-md transition-all duration-200
           ${isDarkMode 
-            ? isActive ? 'bg-orange-500/20' : 'group-hover:bg-orange-500/10'
+            ? isActive ? 'bg-blue-500/20' : 'group-hover:bg-blue-500/10'
             : isActive ? 'bg-white/15' : 'group-hover:bg-white/10'
           }
         `}>
@@ -95,7 +95,7 @@ const Sidebar = ({
         {isActive && (
           <div className={`
             absolute w-1 h-5 sm:h-6 rounded-r-full transition-all duration-200
-            ${isDarkMode ? 'bg-orange-400' : 'bg-orange-400'}
+            bg-blue-500
             ${sidebarCollapsed ? '-right-4' : '-right-3'}
           `} />
         )}
@@ -110,9 +110,9 @@ const Sidebar = ({
         onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
         className={`
           hidden md:flex fixed top-4 z-50 w-8 h-8 
-          shadow-lg border rounded-lg
+          shadow-lg border rounded-xl
           items-center justify-center transition-all duration-300 hover:shadow-xl
-          ${sidebarCollapsed ? 'left-20' : 'left-64'}
+          ${sidebarCollapsed ? 'left-24' : 'left-72'}
           ${isDarkMode 
             ? 'bg-gradient-to-r from-blue-900 to-black border-orange-500/30 text-orange-400 hover:text-orange-300 shadow-orange-500/20' 
             : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900'
@@ -126,7 +126,7 @@ const Sidebar = ({
       {/* Mobile Menu Button */}
       <button
         onClick={() => setSidebarOpen(true)}
-        className={`md:hidden fixed top-4 left-4 z-40 w-10 h-10 shadow-lg border rounded-lg flex items-center justify-center ${
+        className={`md:hidden fixed top-4 left-4 z-40 w-10 h-10 shadow-lg border rounded-xl flex items-center justify-center ${
           isDarkMode 
             ? 'bg-gradient-to-r from-blue-900 to-black border-orange-500/30 text-orange-400 shadow-orange-500/20' 
             : 'bg-white border-gray-200 text-gray-600'
@@ -135,7 +135,10 @@ const Sidebar = ({
         <Menu size={18} />
       </button>
 
-      <div className="flex h-screen">
+      <div className="flex h-screen relative">
+        {/* Full page gradient background (light mode) to match content */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100 dark:from-dark-bg dark:via-dark-surface dark:to-dark-card"></div>
+        
         {/* Mobile Backdrop */}
         {sidebarOpen && (
           <div 
@@ -148,45 +151,52 @@ const Sidebar = ({
       <aside className={`
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
         md:translate-x-0 
-        ${sidebarCollapsed ? 'md:w-16' : 'md:w-64'}
-        fixed md:relative z-50 md:z-auto w-72 sm:w-64 h-full
-        flex flex-col
+        ${sidebarCollapsed ? 'md:w-20' : 'md:w-64'}
+        fixed md:fixed z-50 w-72 sm:w-64 h-full
+        flex flex-col relative overflow-hidden
         transition-all duration-300 ease-in-out
-        shadow-xl md:shadow-none
+        shadow-2xl md:shadow-2xl
         ${isDarkMode 
-          ? 'bg-gradient-to-br from-blue-950 via-blue-900 to-black border-r border-orange-500/30' 
-          : 'bg-gradient-to-br from-slate-700 via-blue-500 to-indigo-600 border-r border-slate-700/30'
+          ? 'bg-black border-r border-orange-500/30' 
+          : 'bg-white border-r border-gray-200'
         }
-        text-white
+        ${isDarkMode ? 'text-white' : 'text-black'}
+        rounded-2xl md:rounded-2xl
+        m-4 md:m-4
+        h-[calc(100vh-2rem)]
       `}>
+        {/* Subtle top-left orange accent (light mode only) */}
+        {!isDarkMode && (
+          <div className="pointer-events-none absolute -top-12 -left-12 w-56 h-56 rounded-full bg-gradient-to-br from-orange-400/25 via-orange-300/10 to-transparent blur-2xl" />
+        )}
         
         {/* Header */}
         <div className={`
           flex items-center justify-between p-3 sm:p-4 border-b 
           ${sidebarCollapsed ? 'px-2' : ''}
           ${isDarkMode 
-            ? 'border-orange-500/30 bg-gradient-to-r from-blue-900/50 to-black/50' 
-            : 'border-slate-700/30'
+            ? 'border-orange-500/30 bg-black' 
+            : 'border-slate-900/30'
           }
         `}>
           {/* Sidebar Header with Logo */}
-          <div className={`flex items-center gap-2 sm:gap-3 p-3 sm:p-4 border-b ${sidebarCollapsed ? 'px-2 justify-center' : ''} ${
+          <div className={`flex items-center gap-2 sm:gap-3 p-3 sm:p-4 border-b rounded-xl ${sidebarCollapsed ? 'px-2 justify-center' : ''} ${
             isDarkMode 
               ? 'border-orange-500/30 bg-gradient-to-r from-blue-900/50 to-black/50' 
-              : 'border-slate-700/30'
+              : 'border-gray-200 bg-gray-50'
           }`}>
             <img
               src={HLogo}
               alt="Company Logo"
-              className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+              className={`${sidebarCollapsed ? 'w-8 h-8 sm:w-10 sm:h-10' : 'w-10 h-10 sm:w-12 sm:h-12'} object-contain`}
             />
             {!sidebarCollapsed && (
               <div>
                 <h1 className={`text-base sm:text-lg font-bold ${
-                  isDarkMode ? 'text-orange-400' : 'text-white'
+                  isDarkMode ? 'text-orange-400' : 'text-black'
                 }`}>HITS</h1>
-                <p className={`text-xs ${
-                  isDarkMode ? 'text-orange-300/70' : 'text-gray-400'
+                <p className={`text-xs font-semibold ${
+                  isDarkMode ? 'text-orange-300/70' : 'text-gray-700'
                 }`}>Employee System</p>
               </div>
             )}
@@ -209,26 +219,26 @@ const Sidebar = ({
         {user && (
           <div className={`p-3 sm:p-4 border-b ${sidebarCollapsed ? 'px-2' : ''} ${
             isDarkMode 
-              ? 'border-orange-500/30 bg-gradient-to-r from-blue-900/50 to-black/50' 
-              : 'border-slate-700/30'
+              ? 'border-orange-500/30 bg-black' 
+              : 'border-gray-200 bg-gray-50'
           }`}>
             {!sidebarCollapsed ? (
-              <div className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border ${
+              <div className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl border ${
                 isDarkMode 
                   ? 'bg-orange-500/10 border-orange-500/30' 
-                  : 'bg-white/5 border-white/10'
+                  : 'bg-gray-100 border-gray-200'
               }`}>
                 <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
                   <User size={12} className="sm:w-[14px] sm:h-[14px]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-xs sm:text-sm font-medium truncate ${
-                    isDarkMode ? 'text-orange-300' : 'text-white'
+                  <p className={`text-xs sm:text-sm font-bold truncate ${
+                    isDarkMode ? 'text-orange-300' : 'text-black'
                   }`}>
                     {user.fullName ? user.fullName.split(' ')[0] : 'User'}
                   </p>
-                  <p className={`text-xs truncate ${
-                    isDarkMode ? 'text-orange-400/70' : 'text-gray-400'
+                  <p className={`text-xs font-semibold truncate ${
+                    isDarkMode ? 'text-orange-400/70' : 'text-gray-700'
                   }`}>
                     {user.email || 'employee@hits.com'}
                   </p>
@@ -250,7 +260,7 @@ const Sidebar = ({
           <div className="space-y-2">
             {!sidebarCollapsed && (
               <h3 className={`text-xs font-semibold uppercase tracking-wider px-2 sm:px-3 ${
-                isDarkMode ? 'text-orange-300' : 'text-slate-300'
+                isDarkMode ? 'text-orange-300' : 'text-gray-700'
               }`}>
                 Main
               </h3>
@@ -272,14 +282,14 @@ const Sidebar = ({
             <div className="space-y-2">
               {!sidebarCollapsed && (
                 <h3 className={`text-xs font-semibold uppercase tracking-wider px-2 sm:px-3 ${
-                  isDarkMode ? 'text-orange-300' : 'text-slate-300'
+                  isDarkMode ? 'text-orange-300' : 'text-gray-700'
                 }`}>
                   Tools
                 </h3>
               )}
               {sidebarCollapsed && (
                 <div className={`border-t ${
-                  isDarkMode ? 'border-orange-500/40' : 'border-blue-700/40'
+                  isDarkMode ? 'border-orange-500/40' : 'border-gray-200'
                 }`} />
               )}
               <div className="space-y-1">
@@ -299,19 +309,19 @@ const Sidebar = ({
         {/* Footer */}
         <div className={`p-4 border-t space-y-1 ${sidebarCollapsed ? 'px-2' : ''} ${
           isDarkMode 
-            ? 'border-orange-500/40 bg-gradient-to-r from-blue-900/50 to-black/50' 
-            : 'border-blue-700/40'
+            ? 'border-orange-500/40 bg-black' 
+            : 'border-gray-200 bg-gray-50'
         }`}>
           {/* Profile Button */}
           <button 
             onClick={() => setShowProfile(true)}
             className={`
-              group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+              group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
               text-sm font-medium transition-all duration-200 text-left
               ${sidebarCollapsed ? 'justify-center px-2' : ''}
               ${isDarkMode 
                 ? 'text-orange-300 hover:text-orange-200 hover:bg-orange-500/20' 
-                : 'text-blue-100 hover:text-white hover:bg-white/10'
+                : 'text-black font-semibold hover:text-blue-600 hover:bg-blue-50'
               }
             `}
             title={sidebarCollapsed ? 'Profile' : ''}
@@ -319,7 +329,7 @@ const Sidebar = ({
             <div className={`flex-shrink-0 p-1.5 rounded-md transition-all duration-200 ${
               isDarkMode 
                 ? 'group-hover:bg-orange-500/20' 
-                : 'group-hover:bg-white/10'
+                : 'group-hover:bg-blue-100'
             }`}>
               <User size={16} />
             </div>
@@ -330,12 +340,12 @@ const Sidebar = ({
           <button 
             onClick={() => setShowSettings(true)}
             className={`
-              group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+              group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
               text-sm font-medium transition-all duration-200 text-left
               ${sidebarCollapsed ? 'justify-center px-2' : ''}
               ${isDarkMode 
                 ? 'text-orange-300 hover:text-orange-200 hover:bg-orange-500/20' 
-                : 'text-blue-100 hover:text-white hover:bg-white/10'
+                : 'text-black font-semibold hover:text-blue-600 hover:bg-blue-50'
               }
             `}
             title={sidebarCollapsed ? 'Settings' : ''}
@@ -343,7 +353,7 @@ const Sidebar = ({
             <div className={`flex-shrink-0 p-1.5 rounded-md transition-all duration-200 ${
               isDarkMode 
                 ? 'group-hover:bg-orange-500/20' 
-                : 'group-hover:bg-white/10'
+                : 'group-hover:bg-blue-100'
             }`}>
               <Settings size={16} />
             </div>
@@ -355,12 +365,12 @@ const Sidebar = ({
             <button 
               onClick={onLogout}
               className={`
-                group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+                group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
                 text-sm font-medium transition-all duration-200 text-left
                 ${sidebarCollapsed ? 'justify-center px-2' : ''}
                 ${isDarkMode 
                   ? 'text-orange-300 hover:text-orange-200 hover:bg-gradient-to-r hover:from-red-500/20 hover:to-red-600/20' 
-                  : 'text-orange-200 hover:text-white hover:bg-gradient-to-r hover:from-orange-500/20 hover:to-blue-500/20'
+                  : 'text-black font-semibold hover:text-red-600 hover:bg-red-50'
                 }
               `}
               title={sidebarCollapsed ? 'Logout' : ''}
@@ -368,7 +378,7 @@ const Sidebar = ({
               <div className={`flex-shrink-0 p-1.5 rounded-md transition-all duration-200 ${
                 isDarkMode 
                   ? 'group-hover:bg-orange-500/20' 
-                  : 'group-hover:bg-white/10'
+                  : 'group-hover:bg-red-100'
               }`}>
                 <LogOut size={16} />
               </div>
@@ -557,8 +567,13 @@ const Sidebar = ({
         </div>
       )}
       
-      {/* Footer Blank Space */}
-      <div className="h-16 sm:h-20 md:h-24"></div>
+      {/* Main Content Area with proper spacing */}
+      <main className={`flex-1 transition-all duration-300 ${
+        sidebarCollapsed ? 'md:ml-20' : 'md:ml-64'
+      }`}>
+        {/* Your main content goes here */}
+        <div className="h-16 sm:h-20 md:h-24"></div>
+      </main>
     </div>
     </>
   );

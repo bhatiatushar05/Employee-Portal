@@ -5,11 +5,28 @@ import {
   AlertCircle, XCircle, Banknote, TrendingUp,
   FileText, Eye, Edit, Trash2, X, MoreVertical, LayoutGrid, List, ChevronDown, Building2
 } from 'lucide-react';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement } from 'chart.js';
+import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import TopRightHeader from '../TopRightHeader/TopRightHeader';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+);
 
 const EmployeePortal = ({ user }) => {
   const { isAdmin, isEmployee } = useAuth();
+  const { isDarkMode } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('date');
@@ -503,7 +520,7 @@ const EmployeePortal = ({ user }) => {
   }, [requests]);
 
   return (
-    <div className="flex-1 min-h-0 h-full overflow-y-auto bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100 dark:from-dark-bg dark:via-dark-surface dark:to-dark-card transition-colors duration-300">
+    <div className="flex-1 min-h-0 h-full overflow-y-auto dark:from-dark-bg dark:via-dark-surface dark:to-dark-card transition-colors duration-300">
       {/* Top right header */}
       <TopRightHeader user={user} />
       
@@ -1306,70 +1323,140 @@ const EmployeePortal = ({ user }) => {
                   {/* Charts Row */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Monthly Trends Chart */}
-                    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Monthly Request Trends</h4>
+                    <div className="bg-white dark:bg-dark-card p-6 rounded-xl border border-gray-200 dark:border-dark-border shadow-sm">
+                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Monthly Request Trends</h4>
                       <div className="h-64">
                         {analyticsData.monthlyData.length > 0 ? (
-                          <div className="space-y-3">
-                            {analyticsData.monthlyData.map((month) => (
-                              <div key={month.month} className="flex items-center gap-3">
-                                <div className="w-24 text-sm text-gray-600">
-                                  {new Date(month.month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                                </div>
-                                <div className="flex-1 bg-gray-100 rounded-full h-3">
-                                  <div 
-                                    className="bg-gradient-to-r from-orange-400 to-blue-500 h-3 rounded-full transition-all duration-300"
-                                    style={{ width: `${(month.count / Math.max(...analyticsData.monthlyData.map(m => m.count))) * 100}%` }}
-                                  />
-                                </div>
-                                <div className="w-16 text-right text-sm font-medium text-gray-900">
-                                  {month.count}
-                                </div>
-                                <div className="w-20 text-right text-sm text-gray-600">
-                                  {formatCurrency(month.totalAmount)}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                          <Line 
+                            data={{
+                              labels: analyticsData.monthlyData.map(month => 
+                                new Date(month.month + '-01').toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                              ),
+                              datasets: [
+                                {
+                                  label: 'Request Count',
+                                  data: analyticsData.monthlyData.map(month => month.count),
+                                  borderColor: '#3b82f6',
+                                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                  borderWidth: 3,
+                                  tension: 0.4,
+                                  fill: true,
+                                  yAxisID: 'y'
+                                },
+                                {
+                                  label: 'Total Amount (₹)',
+                                  data: analyticsData.monthlyData.map(month => month.totalAmount),
+                                  borderColor: '#10b981',
+                                  backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                  borderWidth: 3,
+                                  tension: 0.4,
+                                  fill: true,
+                                  yAxisID: 'y1'
+                                }
+                              ]
+                            }}
+                            options={{
+                              responsive: true,
+                              maintainAspectRatio: false,
+                              plugins: {
+                                legend: {
+                                  labels: {
+                                    color: isDarkMode ? '#e5e7eb' : '#374151',
+                                    font: { size: 12 }
+                                  }
+                                },
+                                tooltip: {
+                                  backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                                  titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                                  bodyColor: isDarkMode ? '#d1d5db' : '#374151',
+                                  borderColor: isDarkMode ? '#374151' : '#d1d5db',
+                                  borderWidth: 1
+                                }
+                              },
+                              scales: {
+                                x: {
+                                  ticks: { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                                  grid: { color: isDarkMode ? '#374151' : '#e5e7eb' }
+                                },
+                                y: {
+                                  type: 'linear',
+                                  display: true,
+                                  position: 'left',
+                                  ticks: { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                                  grid: { color: isDarkMode ? '#374151' : '#e5e7eb' }
+                                },
+                                y1: {
+                                  type: 'linear',
+                                  display: true,
+                                  position: 'right',
+                                  ticks: { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                                  grid: { drawOnChartArea: false }
+                                }
+                              }
+                            }}
+                          />
                         ) : (
-                          <div className="text-center text-gray-500 py-8">No monthly data available</div>
+                          <div className="text-center text-gray-500 dark:text-gray-400 py-8">No monthly data available</div>
                         )}
                       </div>
                     </div>
 
                     {/* Status Distribution Chart */}
-                    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Status Distribution</h4>
+                    <div className="bg-white dark:bg-dark-card p-6 rounded-xl border border-gray-200 dark:border-dark-border shadow-sm">
+                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Status Distribution</h4>
                       <div className="h-64">
                         {Object.keys(analyticsData.statusDistribution).length > 0 ? (
-                          <div className="space-y-3">
-                            {Object.entries(analyticsData.statusDistribution).map(([status, count]) => {
-                              const percentage = (count / analyticsData.totalRequests) * 100;
-                              const statusConfig = getStatusConfig(status);
-                              return (
-                                <div key={status} className="flex items-center gap-3">
-                                  <div className="w-32 flex items-center gap-2">
-                                    <div className={`w-3 h-3 rounded-full ${statusConfig.className.replace('border', 'bg').split(' ')[0]}`} />
-                                    <span className="text-sm text-gray-700 capitalize">{statusConfig.label}</span>
-                                  </div>
-                                  <div className="flex-1 bg-gray-100 rounded-full h-3">
-                                    <div 
-                                                      className={`h-3 rounded-full transition-all duration-300 ${statusConfig.className.replace('border', 'bg').split(' ')[0]}`}
-                style={{ width: `${percentage}%` }}
-                                    />
-                                  </div>
-                                  <div className="w-16 text-right text-sm font-medium text-gray-900">
-                                    {count}
-                                  </div>
-                                  <div className="w-16 text-right text-sm text-gray-600">
-                                    {percentage.toFixed(1)}%
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
+                          <Doughnut 
+                            data={{
+                              labels: Object.keys(analyticsData.statusDistribution).map(status => 
+                                getStatusConfig(status).label
+                              ),
+                              datasets: [{
+                                data: Object.values(analyticsData.statusDistribution),
+                                backgroundColor: [
+                                  '#10b981', // green
+                                  '#f59e0b', // yellow
+                                  '#ef4444', // red
+                                  '#3b82f6', // blue
+                                  '#8b5cf6', // purple
+                                  '#06b6d4'  // cyan
+                                ],
+                                borderColor: [
+                                  '#059669',
+                                  '#d97706',
+                                  '#dc2626',
+                                  '#2563eb',
+                                  '#7c3aed',
+                                  '#0891b2'
+                                ],
+                                borderWidth: 2,
+                                hoverOffset: 4
+                              }]
+                            }}
+                            options={{
+                              responsive: true,
+                              maintainAspectRatio: false,
+                              plugins: {
+                                legend: {
+                                  position: 'bottom',
+                                  labels: {
+                                    color: isDarkMode ? '#e5e7eb' : '#374151',
+                                    font: { size: 12 },
+                                    padding: 20
+                                  }
+                                },
+                                tooltip: {
+                                  backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                                  titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                                  bodyColor: isDarkMode ? '#d1d5db' : '#374151',
+                                  borderColor: isDarkMode ? '#374151' : '#d1d5db',
+                                  borderWidth: 1
+                                }
+                              }
+                            }}
+                          />
                         ) : (
-                          <div className="text-center text-gray-500 py-8">No status data available</div>
+                          <div className="text-center text-gray-500 dark:text-gray-400 py-8">No status data available</div>
                         )}
                       </div>
                     </div>
@@ -1378,65 +1465,155 @@ const EmployeePortal = ({ user }) => {
                   {/* Department and Category Charts */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Department Performance */}
-                    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Department Performance</h4>
+                    <div className="bg-white dark:bg-dark-card p-6 rounded-xl border border-gray-200 dark:border-dark-border shadow-sm">
+                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Department Performance</h4>
                       <div className="h-64">
                         {analyticsData.departmentData.length > 0 ? (
-                          <div className="space-y-3">
-                            {analyticsData.departmentData.slice(0, 8).map((dept) => (
-                              <div key={dept.department} className="flex items-center gap-3">
-                                <div className="w-16 text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded text-center">
-                                  {dept.department}
-                                </div>
-                                <div className="flex-1 bg-gray-100 rounded-full h-3">
-                                  <div 
-                                    className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-300"
-                                    style={{ width: `${(dept.totalAmount / Math.max(...analyticsData.departmentData.map(d => d.totalAmount))) * 100}%` }}
-                                  />
-                                </div>
-                                <div className="w-16 text-right text-sm font-medium text-gray-900">
-                                  {dept.count}
-                                </div>
-                                <div className="w-24 text-right text-sm text-gray-600">
-                                  {formatCurrency(dept.totalAmount)}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                          <Bar 
+                            data={{
+                              labels: analyticsData.departmentData.slice(0, 8).map(dept => dept.department),
+                              datasets: [{
+                                label: 'Total Amount (₹)',
+                                data: analyticsData.departmentData.slice(0, 8).map(dept => dept.totalAmount),
+                                backgroundColor: [
+                                  'rgba(16, 185, 129, 0.8)',
+                                  'rgba(59, 130, 246, 0.8)',
+                                  'rgba(139, 92, 246, 0.8)',
+                                  'rgba(245, 158, 11, 0.8)',
+                                  'rgba(239, 68, 68, 0.8)',
+                                  'rgba(6, 182, 212, 0.8)',
+                                  'rgba(236, 72, 153, 0.8)',
+                                  'rgba(34, 197, 94, 0.8)'
+                                ],
+                                borderColor: [
+                                  '#10b981',
+                                  '#3b82f6',
+                                  '#8b5cf6',
+                                  '#f59e0b',
+                                  '#ef4444',
+                                  '#06b6d4',
+                                  '#ec4899',
+                                  '#22c55e'
+                                ],
+                                borderWidth: 2,
+                                borderRadius: 8,
+                                borderSkipped: false
+                              }]
+                            }}
+                            options={{
+                              responsive: true,
+                              maintainAspectRatio: false,
+                              plugins: {
+                                legend: {
+                                  display: false
+                                },
+                                tooltip: {
+                                  backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                                  titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                                  bodyColor: isDarkMode ? '#d1d5db' : '#374151',
+                                  borderColor: isDarkMode ? '#374151' : '#d1d5db',
+                                  borderWidth: 1,
+                                  callbacks: {
+                                    label: function(context) {
+                                      return `Amount: ${formatCurrency(context.parsed.y)}`;
+                                    }
+                                  }
+                                }
+                              },
+                              scales: {
+                                x: {
+                                  ticks: { 
+                                    color: isDarkMode ? '#9ca3af' : '#6b7280',
+                                    maxRotation: 45
+                                  },
+                                  grid: { color: isDarkMode ? '#374151' : '#e5e7eb' }
+                                },
+                                y: {
+                                  ticks: { 
+                                    color: isDarkMode ? '#9ca3af' : '#6b7280',
+                                    callback: function(value) {
+                                      return formatCurrency(value);
+                                    }
+                                  },
+                                  grid: { color: isDarkMode ? '#374151' : '#e5e7eb' }
+                                }
+                              }
+                            }}
+                          />
                         ) : (
-                          <div className="text-center text-gray-500 py-8">No department data available</div>
+                          <div className="text-center text-gray-500 dark:text-gray-400 py-8">No department data available</div>
                         )}
                       </div>
                     </div>
 
                     {/* Expense Category Trends */}
-                    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Expense Category Trends</h4>
+                    <div className="bg-white dark:bg-dark-card p-6 rounded-xl border border-gray-200 dark:border-dark-border shadow-sm">
+                      <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Expense Category Trends</h4>
                       <div className="h-64">
                         {analyticsData.categoryData.length > 0 ? (
-                          <div className="space-y-3">
-                            {analyticsData.categoryData.slice(0, 8).map((category) => (
-                              <div key={category.category} className="flex items-center gap-3">
-                                <div className="w-24 text-sm font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded text-center capitalize">
-                                  {category.category}
-                                </div>
-                                <div className="flex-1 bg-gray-100 rounded-full h-3">
-                                  <div 
-                                    className="bg-gradient-to-r from-purple-400 to-pink-500 h-3 rounded-full transition-all duration-300"
-                                    style={{ width: `${(category.totalAmount / Math.max(...analyticsData.categoryData.map(c => c.totalAmount))) * 100}%` }}
-                                  />
-                                </div>
-                                <div className="w-16 text-right text-sm font-medium text-gray-900">
-                                  {category.count}
-                                </div>
-                                <div className="w-24 text-right text-sm text-gray-600">
-                                  {formatCurrency(category.totalAmount)}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                          <Pie 
+                            data={{
+                              labels: analyticsData.categoryData.slice(0, 8).map(category => 
+                                category.category.charAt(0).toUpperCase() + category.category.slice(1)
+                              ),
+                              datasets: [{
+                                data: analyticsData.categoryData.slice(0, 8).map(category => category.totalAmount),
+                                backgroundColor: [
+                                  '#8b5cf6',
+                                  '#ec4899',
+                                  '#f59e0b',
+                                  '#10b981',
+                                  '#3b82f6',
+                                  '#ef4444',
+                                  '#06b6d4',
+                                  '#84cc16'
+                                ],
+                                borderColor: [
+                                  '#7c3aed',
+                                  '#db2777',
+                                  '#d97706',
+                                  '#059669',
+                                  '#2563eb',
+                                  '#dc2626',
+                                  '#0891b2',
+                                  '#65a30d'
+                                ],
+                                borderWidth: 2,
+                                hoverOffset: 4
+                              }]
+                            }}
+                            options={{
+                              responsive: true,
+                              maintainAspectRatio: false,
+                              plugins: {
+                                legend: {
+                                  position: 'bottom',
+                                  labels: {
+                                    color: isDarkMode ? '#e5e7eb' : '#374151',
+                                    font: { size: 11 },
+                                    padding: 15,
+                                    usePointStyle: true
+                                  }
+                                },
+                                tooltip: {
+                                  backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                                  titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                                  bodyColor: isDarkMode ? '#d1d5db' : '#374151',
+                                  borderColor: isDarkMode ? '#374151' : '#d1d5db',
+                                  borderWidth: 1,
+                                  callbacks: {
+                                    label: function(context) {
+                                      const total = analyticsData.categoryData.reduce((sum, cat) => sum + cat.totalAmount, 0);
+                                      const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                      return `${context.label}: ${formatCurrency(context.parsed)} (${percentage}%)`;
+                                    }
+                                  }
+                                }
+                              }
+                            }}
+                          />
                         ) : (
-                          <div className="text-center text-gray-500 py-8">No category data available</div>
+                          <div className="text-center text-gray-500 dark:text-gray-400 py-8">No category data available</div>
                         )}
                       </div>
                     </div>
@@ -1445,57 +1622,105 @@ const EmployeePortal = ({ user }) => {
                   {/* High-Value Requests and Frequent Submitters */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* High-Value Requests */}
-                    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">High-Value Requests</h4>
+                    <div className={`p-6 rounded-xl border shadow-sm ${
+                      isDarkMode 
+                        ? 'bg-dark-card border-dark-border' 
+                        : 'bg-white border-gray-200'
+                    }`}>
+                      <h4 className={`text-lg font-semibold mb-4 ${
+                        isDarkMode ? 'text-white' : 'text-gray-900'
+                      }`}>High-Value Requests</h4>
                       <div className="space-y-3">
                         {analyticsData.highValueRequests.length > 0 ? (
                           analyticsData.highValueRequests.map((request, index) => (
-                            <div key={request.id} className="flex items-center justify-between p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-orange-200">
+                            <div key={request.id} className={`flex items-center justify-between p-3 rounded-lg border ${
+                              isDarkMode 
+                                ? 'bg-gradient-to-r from-yellow-900/20 to-orange-900/20 border-orange-700' 
+                                : 'bg-gradient-to-r from-yellow-50 to-orange-50 border-orange-200'
+                            }`}>
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-sm">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                                  isDarkMode 
+                                    ? 'bg-orange-800/30 text-orange-300' 
+                                    : 'bg-orange-100 text-orange-600'
+                                }`}>
                                   #{index + 1}
                                 </div>
                                 <div>
-                                  <div className="font-medium text-gray-900">{request.employeeName}</div>
-                                  <div className="text-sm text-gray-600">{request.type}</div>
+                                  <div className={`font-medium ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                  }`}>{request.employeeName}</div>
+                                  <div className={`text-sm ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                  }`}>{request.type}</div>
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className="font-bold text-lg text-orange-600">{formatCurrency(request.amount)}</div>
-                                <div className="text-xs text-gray-500">{formatDate(request.date)}</div>
+                                <div className={`font-bold text-lg ${
+                                  isDarkMode ? 'text-orange-400' : 'text-orange-600'
+                                }`}>{formatCurrency(request.amount)}</div>
+                                <div className={`text-xs ${
+                                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                }`}>{formatDate(request.date)}</div>
                               </div>
                             </div>
                           ))
                         ) : (
-                          <div className="text-center text-gray-500 py-8">No high-value requests</div>
+                          <div className={`text-center py-8 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                          }`}>No high-value requests</div>
                         )}
                       </div>
                     </div>
 
                     {/* Frequent Submitters */}
-                    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">Frequent Submitters</h4>
+                    <div className={`p-6 rounded-xl border shadow-sm ${
+                      isDarkMode 
+                        ? 'bg-dark-card border-dark-border' 
+                        : 'bg-white border-gray-200'
+                    }`}>
+                      <h4 className={`text-lg font-semibold mb-4 ${
+                        isDarkMode ? 'text-white' : 'text-gray-900'
+                      }`}>Frequent Submitters</h4>
                       <div className="space-y-3">
                         {analyticsData.frequentSubmitters.length > 0 ? (
                           analyticsData.frequentSubmitters.map((submitter, index) => (
-                            <div key={submitter.submitter} className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+                            <div key={submitter.submitter} className={`flex items-center justify-between p-3 rounded-lg border ${
+                              isDarkMode 
+                                ? 'bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border-blue-700' 
+                                : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'
+                            }`}>
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                                  isDarkMode 
+                                    ? 'bg-blue-800/30 text-blue-300' 
+                                    : 'bg-blue-100 text-blue-600'
+                                }`}>
                                   #{index + 1}
                                 </div>
                                 <div>
-                                  <div className="font-medium text-gray-900">{submitter.submitter}</div>
-                                  <div className="text-sm text-gray-600">{submitter.count} requests</div>
+                                  <div className={`font-medium ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                  }`}>{submitter.submitter}</div>
+                                  <div className={`text-sm ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                  }`}>{submitter.count} requests</div>
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className="font-bold text-lg text-blue-600">{formatCurrency(submitter.totalAmount)}</div>
-                                <div className="text-xs text-gray-500">Total spent</div>
+                                <div className={`font-bold text-lg ${
+                                  isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                }`}>{formatCurrency(submitter.totalAmount)}</div>
+                                <div className={`text-xs ${
+                                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                }`}>Total spent</div>
                               </div>
                             </div>
                           ))
                         ) : (
-                          <div className="text-center text-gray-500 py-8">No frequent submitters</div>
+                          <div className={`text-center py-8 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                          }`}>No frequent submitters</div>
                         )}
                       </div>
                     </div>
@@ -1519,21 +1744,39 @@ const EmployeePortal = ({ user }) => {
           </button>
           
           {showAuditLog && (
-            <div className="absolute bottom-16 right-0 w-96 bg-white rounded-lg shadow-xl border border-gray-200 max-h-96 overflow-y-auto">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="font-semibold text-gray-900">Audit Log</h3>
-                <p className="text-sm text-gray-600">Recent admin actions</p>
+            <div className={`absolute bottom-16 right-0 w-96 rounded-lg shadow-xl border max-h-96 overflow-y-auto ${
+              isDarkMode 
+                ? 'bg-dark-card border-dark-border' 
+                : 'bg-white border-gray-200'
+            }`}>
+              <div className={`p-4 border-b ${
+                isDarkMode ? 'border-dark-border' : 'border-gray-200'
+              }`}>
+                <h3 className={`font-semibold ${
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                }`}>Audit Log</h3>
+                <p className={`text-sm ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                }`}>Recent admin actions</p>
               </div>
               <div className="p-4">
                 {auditLog.length === 0 ? (
-                  <p className="text-gray-500 text-sm">No actions logged yet</p>
+                  <p className={`text-sm ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  }`}>No actions logged yet</p>
                 ) : (
                   <div className="space-y-3">
                     {auditLog.slice(0, 10).map((log) => (
                       <div key={log.id} className="text-sm border-l-2 border-blue-500 pl-3">
-                        <div className="font-medium text-gray-900">{log.action}</div>
-                        <div className="text-gray-600">{log.details}</div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className={`font-medium ${
+                          isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>{log.action}</div>
+                        <div className={`${
+                          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                        }`}>{log.details}</div>
+                        <div className={`text-xs mt-1 ${
+                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
                           {new Date(log.timestamp).toLocaleString()} by {log.adminUser}
                         </div>
                       </div>

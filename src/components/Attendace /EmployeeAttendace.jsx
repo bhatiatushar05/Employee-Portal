@@ -1,12 +1,28 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Clock, Calendar, Users, CheckCircle, XCircle, Timer, MapPin, User, Camera, Grid, List, Filter, TrendingUp, X, BarChart3, PieChart, Activity, Search, Download, Eye, ChevronDown, RefreshCw, Bell } from 'lucide-react';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement, BarElement } from 'chart.js';
+import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 import TopRightHeader from '../TopRightHeader/TopRightHeader';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import Pooja from '../../assets/Pooja.png';
 
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+);
 
 const EmployeeAttendance = ({ user }) => {
   const { isAdmin, isEmployee } = useAuth();
+  const { isDarkMode } = useTheme();
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [currentStatus, setCurrentStatus] = useState(null);
   const [todayRecord, setTodayRecord] = useState(null);
@@ -821,7 +837,7 @@ const EmployeeAttendance = ({ user }) => {
   );
 
   return (
-    <div className="flex-1 min-h-0 h-full bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100 dark:from-dark-bg dark:via-dark-surface dark:to-dark-card overflow-y-auto transition-colors duration-300">
+    <div className="flex-1 min-h-0 h-full dark:from-dark-bg dark:via-dark-surface dark:to-dark-card overflow-y-auto transition-colors duration-300">
       {/* Top right header */}
       <TopRightHeader user={user} />
       
@@ -1508,64 +1524,209 @@ const EmployeeAttendance = ({ user }) => {
                   {/* Check-in Time Distribution */}
                   <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-xl p-6 transition-colors duration-300">
                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Check-in Time Distribution</h4>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">Early Check-ins (Before 9:00 AM)</span>
-                        <span className="font-semibold text-green-600 dark:text-green-400 transition-colors duration-300">{analyticsData.checkInAnalysis.early}</span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                        <div 
-                          className="bg-green-500 h-3 rounded-full transition-all duration-500"
-                          style={{ width: `${(analyticsData.checkInAnalysis.early / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.onTime + analyticsData.checkInAnalysis.late)) * 100}%` }}
-                        ></div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">On Time (9:00 - 9:30 AM)</span>
-                        <span className="font-semibold text-blue-600 dark:text-blue-400 transition-colors duration-300">{analyticsData.checkInAnalysis.onTime}</span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                        <div 
-                          className="bg-blue-500 h-3 rounded-full transition-all duration-500"
-                          style={{ width: `${(analyticsData.checkInAnalysis.onTime / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.onTime + analyticsData.checkInAnalysis.late)) * 100}%` }}
-                        ></div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">Late Check-ins (After 9:30 AM)</span>
-                        <span className="font-semibold text-red-600 dark:text-red-400 transition-colors duration-300">{analyticsData.checkInAnalysis.late}</span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                        <div 
-                          className="bg-red-500 h-3 rounded-full transition-all duration-500"
-                          style={{ width: `${(analyticsData.checkInAnalysis.late / (analyticsData.checkInAnalysis.early + analyticsData.checkInAnalysis.late)) * 100}%` }}
-                        ></div>
-                      </div>
+                    <div className="h-64">
+                      <Doughnut 
+                        data={{
+                          labels: ['Early (Before 9:00 AM)', 'On Time (9:00-9:30 AM)', 'Late (After 9:30 AM)'],
+                          datasets: [{
+                            data: [
+                              analyticsData.checkInAnalysis.early,
+                              analyticsData.checkInAnalysis.onTime,
+                              analyticsData.checkInAnalysis.late
+                            ],
+                            backgroundColor: ['#10b981', '#3b82f6', '#ef4444'],
+                            borderColor: ['#059669', '#2563eb', '#dc2626'],
+                            borderWidth: 2,
+                            hoverOffset: 4
+                          }]
+                        }}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              position: 'bottom',
+                              labels: {
+                                color: isDarkMode ? '#e5e7eb' : '#374151',
+                                font: { size: 12 },
+                                padding: 20
+                              }
+                            },
+                            tooltip: {
+                              backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                              titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                              bodyColor: isDarkMode ? '#d1d5db' : '#374151',
+                              borderColor: isDarkMode ? '#374151' : '#d1d5db',
+                              borderWidth: 1
+                            }
+                          }
+                        }}
+                      />
                     </div>
                   </div>
                   
                   {/* Department Performance */}
                   <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-xl p-6 transition-colors duration-300">
                     <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Department Attendance</h4>
-                    <div className="space-y-4">
-                      {Object.entries(analyticsData.departmentData).map(([dept, data]) => (
-                        <div key={dept}>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors duration-300">{dept}</span>
-                            <span className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">{data.present}/{data.total}</span>
-                          </div>
-                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                            <div 
-                              className="bg-blue-500 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${(data.present / data.total) * 100}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="h-64">
+                      <Bar 
+                        data={{
+                          labels: Object.keys(analyticsData.departmentData),
+                          datasets: [{
+                            label: 'Present',
+                            data: Object.values(analyticsData.departmentData).map(data => data.present),
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                            borderColor: '#3b82f6',
+                            borderWidth: 2,
+                            borderRadius: 8
+                          }, {
+                            label: 'Absent',
+                            data: Object.values(analyticsData.departmentData).map(data => data.absent),
+                            backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                            borderColor: '#ef4444',
+                            borderWidth: 2,
+                            borderRadius: 8
+                          }]
+                        }}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              labels: {
+                                color: isDarkMode ? '#e5e7eb' : '#374151',
+                                font: { size: 12 }
+                              }
+                            },
+                            tooltip: {
+                              backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                              titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                              bodyColor: isDarkMode ? '#d1d5db' : '#374151',
+                              borderColor: isDarkMode ? '#374151' : '#d1d5db',
+                              borderWidth: 1
+                            }
+                          },
+                          scales: {
+                            x: {
+                              ticks: { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                              grid: { color: isDarkMode ? '#374151' : '#e5e7eb' }
+                            },
+                            y: {
+                              ticks: { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                              grid: { color: isDarkMode ? '#374151' : '#e5e7eb' }
+                            }
+                          }
+                        }}
+                      />
                     </div>
                   </div>
                 </div>
                 
+                {/* Additional Charts Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                  {/* Weekly Working Hours Trend */}
+                  <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-xl p-6 transition-colors duration-300">
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Weekly Working Hours Trend</h4>
+                    <div className="h-64">
+                      <Line 
+                        data={{
+                          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                          datasets: [{
+                            label: 'Average Hours',
+                            data: [8.5, 8.2, 8.8, 8.1],
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                          }]
+                        }}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              labels: {
+                                color: isDarkMode ? '#e5e7eb' : '#374151',
+                                font: { size: 12 }
+                              }
+                            },
+                            tooltip: {
+                              backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                              titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                              bodyColor: isDarkMode ? '#d1d5db' : '#374151',
+                              borderColor: isDarkMode ? '#374151' : '#d1d5db',
+                              borderWidth: 1
+                            }
+                          },
+                          scales: {
+                            x: {
+                              ticks: { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                              grid: { color: isDarkMode ? '#374151' : '#e5e7eb' }
+                            },
+                            y: {
+                              ticks: { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                              grid: { color: isDarkMode ? '#374151' : '#e5e7eb' }
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Employee Performance Comparison */}
+                  <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-xl p-6 transition-colors duration-300">
+                    <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Employee Performance Comparison</h4>
+                    <div className="h-64">
+                      <Bar 
+                        data={{
+                          labels: Object.values(analyticsData.employeeStats).map(emp => emp.name),
+                          datasets: [{
+                            label: 'Average Hours',
+                            data: Object.values(analyticsData.employeeStats).map(emp => emp.averageHours),
+                            backgroundColor: 'rgba(139, 92, 246, 0.8)',
+                            borderColor: '#8b5cf6',
+                            borderWidth: 2,
+                            borderRadius: 8
+                          }]
+                        }}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              labels: {
+                                color: isDarkMode ? '#e5e7eb' : '#374151',
+                                font: { size: 12 }
+                              }
+                            },
+                            tooltip: {
+                              backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                              titleColor: isDarkMode ? '#e5e7eb' : '#111827',
+                              bodyColor: isDarkMode ? '#d1d5db' : '#374151',
+                              borderColor: isDarkMode ? '#374151' : '#d1d5db',
+                              borderWidth: 1
+                            }
+                          },
+                          scales: {
+                            x: {
+                              ticks: { 
+                                color: isDarkMode ? '#9ca3af' : '#6b7280',
+                                maxRotation: 45
+                              },
+                              grid: { color: isDarkMode ? '#374151' : '#e5e7eb' }
+                            },
+                            y: {
+                              ticks: { color: isDarkMode ? '#9ca3af' : '#6b7280' },
+                              grid: { color: isDarkMode ? '#374151' : '#e5e7eb' }
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 {/* Employee Performance Table */}
                 <div className="bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-xl p-6 transition-colors duration-300">
                   <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Employee Performance Summary</h4>

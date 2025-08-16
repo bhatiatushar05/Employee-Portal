@@ -319,7 +319,7 @@ const Dashboard = ({ user }) => {
   }
 
   return (
-    <div className="flex-1 min-h-0 h-full bg-gradient-to-br from-orange-50 via-blue-50 to-orange-100 dark:from-dark-bg dark:via-dark-surface dark:to-dark-card overflow-y-auto transition-colors duration-300">
+    <div className="flex-1 min-h-0 h-full dark:from-dark-bg dark:via-dark-surface dark:to-dark-card overflow-y-auto transition-colors duration-300">
       {/* Top right header */}
       <TopRightHeader user={user} />
       

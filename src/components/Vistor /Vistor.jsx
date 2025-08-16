@@ -320,10 +320,10 @@ const VisitorManagement = ({ user }) => {
         default: return 'bg-gray-900/30 text-gray-400 border border-gray-700/50';
       }
     } else {
-      switch (status) {
-        case 'checked-in': return 'bg-green-100 text-green-800';
-        case 'checked-out': return 'bg-blue-100 text-blue-800';
-        default: return 'bg-gray-100 text-gray-800';
+    switch (status) {
+      case 'checked-in': return 'bg-green-100 text-green-800';
+      case 'checked-out': return 'bg-blue-100 text-blue-800';
+      default: return 'bg-gray-100 text-gray-800';
       }
     }
   };
@@ -996,7 +996,7 @@ const VisitorManagement = ({ user }) => {
           <div className={`text-sm ${
             isDarkMode ? 'text-blue-300' : 'text-blue-700'
           }`}>Total Visitors</div>
-        </div>
+            </div>
         <div className={`text-center p-6 rounded-xl shadow-lg border ${
           isDarkMode 
             ? 'bg-dark-card border-dark-border shadow-dark' 
@@ -1006,7 +1006,7 @@ const VisitorManagement = ({ user }) => {
           <div className={`text-sm ${
             isDarkMode ? 'text-green-300' : 'text-green-700'
           }`}>Currently In</div>
-        </div>
+          </div>
         <div className={`text-center p-6 rounded-xl shadow-lg border ${
           isDarkMode 
             ? 'bg-dark-card border-dark-border shadow-dark' 
@@ -1026,9 +1026,9 @@ const VisitorManagement = ({ user }) => {
           <div className={`text-sm ${
             isDarkMode ? 'text-purple-300' : 'text-purple-700'
           }`}>This Week</div>
+          </div>
         </div>
-      </div>
-
+        
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className={`rounded-xl shadow-lg p-6 border ${
@@ -1040,7 +1040,7 @@ const VisitorManagement = ({ user }) => {
             isDarkMode ? 'text-white' : 'text-gray-900'
           }`}>Visitor Status Distribution</h3>
           {renderPieChart(getVisitorStatusDistribution(), 'Status', 'count', 'status')}
-        </div>
+            </div>
         <div className={`rounded-xl shadow-lg p-6 border ${
           isDarkMode 
             ? 'bg-dark-card border-dark-border shadow-dark' 
@@ -1050,9 +1050,9 @@ const VisitorManagement = ({ user }) => {
             isDarkMode ? 'text-white' : 'text-gray-900'
           }`}>Recent Activity</h3>
           {renderLineChart(getRecentActivity(7), 'Last 7 Days', 'date', 'count', 'blue', true)}
+          </div>
         </div>
-      </div>
-
+        
       {/* Predictive Insights */}
       <div className={`rounded-xl shadow-lg p-6 border ${
         isDarkMode 
@@ -1080,9 +1080,9 @@ const VisitorManagement = ({ user }) => {
               }`}>{insight.description}</div>
             </div>
           ))}
+          </div>
         </div>
       </div>
-    </div>
   );
 
   // Helper functions for analytics
@@ -2137,7 +2137,7 @@ const VisitorManagement = ({ user }) => {
     <div className={`flex-1 min-h-0 h-full overflow-y-auto ${
       isDarkMode 
         ? 'bg-gradient-to-br from-dark-bg via-dark-surface to-dark-card' 
-        : 'bg-gradient-to-br from-blue-50 to-orange-50'
+        : 'bg-gray-50'
     }`}>
       {/* Top right header */}
       <TopRightHeader user={user} />
@@ -2339,10 +2339,10 @@ const VisitorManagement = ({ user }) => {
               {/* Custom Date Range */}
               {dateFilter === 'custom' && (
                 <div className="flex items-center gap-2 text-sm">
-                  <input
-                    type="date"
-                    value={customDateRange.start}
-                    onChange={(e) => setCustomDateRange(prev => ({ ...prev, start: e.target.value }))}
+                                      <input
+                      type="date"
+                      value={customDateRange.start}
+                      onChange={(e) => setCustomDateRange(prev => ({ ...prev, start: e.target.value }))}
                     className={`px-2 py-1 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 ${
                       isDarkMode 
                         ? 'bg-dark-surface border-dark-border text-white' 
@@ -2947,66 +2947,66 @@ const VisitorManagement = ({ user }) => {
                 {/* Analytics Navigation */}
                 <div className="mt-6">
                   <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => setAnalyticsView('overview')}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                        analyticsView === 'overview'
-                          ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                                          <button
+                        onClick={() => setAnalyticsView('overview')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          analyticsView === 'overview'
+                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
                           : isDarkMode
                             ? 'bg-dark-surface text-gray-300 hover:bg-gray-800 border border-dark-border'
                             : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                      }`}
-                    >
-                      Overview
-                    </button>
-                    <button
-                      onClick={() => setAnalyticsView('hourly')}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                        analyticsView === 'hourly'
-                          ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                        }`}
+                      >
+                        Overview
+                      </button>
+                      <button
+                        onClick={() => setAnalyticsView('hourly')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          analyticsView === 'hourly'
+                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
                           : isDarkMode
                             ? 'bg-dark-surface text-gray-300 hover:bg-gray-800 border border-dark-border'
                             : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                      }`}
-                    >
-                      Hourly Patterns
-                    </button>
-                    <button
-                      onClick={() => setAnalyticsView('daily')}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                        analyticsView === 'daily'
-                          ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                        }`}
+                      >
+                        Hourly Patterns
+                      </button>
+                      <button
+                        onClick={() => setAnalyticsView('daily')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          analyticsView === 'daily'
+                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
                           : isDarkMode
                             ? 'bg-dark-surface text-gray-300 hover:bg-gray-800 border border-dark-border'
                             : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                      }`}
-                    >
-                      Daily Trends
-                    </button>
-                    <button
-                      onClick={() => setAnalyticsView('weekly')}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                        analyticsView === 'weekly'
-                          ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                        }`}
+                      >
+                        Daily Trends
+                      </button>
+                      <button
+                        onClick={() => setAnalyticsView('weekly')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          analyticsView === 'weekly'
+                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
                           : isDarkMode
                             ? 'bg-dark-surface text-gray-300 hover:bg-gray-800 border border-dark-border'
                             : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                      }`}
-                    >
-                      Weekly Analysis
-                    </button>
-                    <button
-                      onClick={() => setAnalyticsView('monthly')}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                        analyticsView === 'monthly'
-                          ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
+                        }`}
+                      >
+                        Weekly Analysis
+                      </button>
+                      <button
+                        onClick={() => setAnalyticsView('monthly')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+                          analyticsView === 'monthly'
+                            ? 'bg-gradient-to-r from-orange-500 to-blue-600 text-white shadow-md'
                           : isDarkMode
                             ? 'bg-dark-surface text-gray-300 hover:bg-gray-800 border border-dark-border'
                             : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
-                      }`}
-                    >
-                      Monthly Trends
-                    </button>
+                        }`}
+                      >
+                        Monthly Trends
+                      </button>
                   </div>
                 </div>
               </div>

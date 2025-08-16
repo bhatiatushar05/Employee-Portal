@@ -7,6 +7,7 @@ const TopRightHeader = ({ user }) => {
   const [showSearch, setShowSearch] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isScrolled, setIsScrolled] = useState(false);
   
   const searchRef = useRef(null);
   const notificationsRef = useRef(null);
@@ -43,6 +44,32 @@ const TopRightHeader = ({ user }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Apply glass (frosted) effect when any scrollable container (or window) is scrolled
+  useEffect(() => {
+    const getScrollState = () => {
+      // Window scroll
+      if (window.scrollY > 8) return true;
+      // Any scrollable area used in app layout
+      const scrollers = document.querySelectorAll('.overflow-auto, .overflow-y-auto');
+      for (const el of scrollers) {
+        if (el.scrollTop > 8) return true;
+      }
+      return false;
+    };
+
+    const update = () => setIsScrolled(getScrollState());
+    update();
+
+    window.addEventListener('scroll', update, { passive: true });
+    const scrollers = Array.from(document.querySelectorAll('.overflow-auto, .overflow-y-auto'));
+    scrollers.forEach((el) => el.addEventListener('scroll', update, { passive: true }));
+
+    return () => {
+      window.removeEventListener('scroll', update);
+      scrollers.forEach((el) => el.removeEventListener('scroll', update));
+    };
+  }, []);
+
   // Search results
   const searchResults = [
     { name: 'User', path: '/dashboard/user/dashboard', category: 'Overview', icon: '👤' },
@@ -67,7 +94,11 @@ const TopRightHeader = ({ user }) => {
 
   return (
     <>
-      <div className="fixed top-4 sm:top-6 right-3 sm:right-6 md:right-8 z-50 flex items-center gap-3 sm:gap-4 md:gap-6">
+      <div className={`fixed top-4 sm:top-6 right-3 sm:right-6 md:right-8 z-50 flex items-center gap-3 sm:gap-4 md:gap-6 transition-all duration-300 ${
+        isScrolled
+          ? 'backdrop-blur-md bg-white/60 dark:bg-black/40 border border-white/30 dark:border-white/10 rounded-full px-2 py-1 shadow-lg'
+          : ''
+      }`}>
         {/* Dark Mode Toggle */}
         <button 
           onClick={toggleDarkMode}
