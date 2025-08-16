@@ -837,7 +837,7 @@ const EmployeeAttendance = ({ user }) => {
   );
 
   return (
-    <div className="flex-1 min-h-0 h-full dark:from-dark-bg dark:via-dark-surface dark:to-dark-card overflow-y-auto transition-colors duration-300">
+    <div className="flex-1 min-h-0 h-full dark:from-dark-bg dark:via-dark-surface dark:to-dark-card overflow-y-auto transition-colors duration-300 relative">
       {/* Top right header */}
       <TopRightHeader user={user} />
       
@@ -858,7 +858,7 @@ const EmployeeAttendance = ({ user }) => {
       )}
       
       {/* Main Content with proper spacing */}
-      <div className="pt-2 sm:pt-2 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
+      <div className="pt-2 sm:pt-2 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6 relative overflow-hidden">
         {/* Header */}
         <div className="bg-white dark:bg-dark-card rounded-xl shadow-md border border-gray-100 dark:border-dark-border p-3 sm:p-4 transition-colors duration-300">
           <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
@@ -952,7 +952,7 @@ const EmployeeAttendance = ({ user }) => {
 
         {/* Stats Cards */}
         {isAdmin() ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 relative">
             <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border hover:shadow-lg transition-all duration-300">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="p-2 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 text-blue-700 dark:text-blue-300 rounded-lg flex-shrink-0">
@@ -991,20 +991,20 @@ const EmployeeAttendance = ({ user }) => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border hover:shadow-lg transition-all duration-300">
+            <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border hover:shadow-lg transition-all duration-300 relative overflow-hidden">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="p-2 bg-gradient-to-r from-purple-100 to-purple-200 dark:from-purple-900/20 dark:to-purple-800/20 text-purple-700 dark:text-purple-300 rounded-lg flex-shrink-0">
                   <TrendingUp size={16} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="font-medium text-gray-700 dark:text-gray-200 text-xs truncate transition-colors duration-300">Monthly Total</h3>
-                  <p className="text-base sm:text-lg font-bold text-purple-600 dark:text-purple-400 mt-1 transition-colors duration-300">{analyticsData.monthly.totalHours}h</p>
+                  <p className="text-base sm:text-lg font-bold text-purple-600 dark:text-purple-400 mt-1 transition-colors duration-300 truncate">{analyticsData.monthly.totalHours}h</p>
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 relative">
             <div className="bg-white dark:bg-dark-card rounded-xl shadow-md p-3 sm:p-4 border border-gray-100 dark:border-dark-border hover:shadow-lg transition-all duration-300">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="p-2 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/20 dark:to-blue-800/20 text-blue-700 dark:text-blue-300 rounded-lg flex-shrink-0">
@@ -1506,14 +1506,14 @@ const EmployeeAttendance = ({ user }) => {
                     </div>
                   </div>
                   
-                  <div className="bg-purple-50 dark:bg-purple-900/10 border border-purple-200 dark:border-purple-700 rounded-xl p-4 transition-colors duration-300">
+                  <div className="bg-purple-50 dark:bg-purple-900/10 border border-purple-200 dark:border-purple-700 rounded-xl p-4 transition-colors duration-300 relative overflow-hidden">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-purple-100 dark:bg-purple-800/20 rounded-lg">
                         <TrendingUp size={20} className="text-purple-600 dark:text-purple-400" />
                       </div>
                       <div>
                         <p className="text-sm text-purple-600 dark:text-purple-400 font-medium transition-colors duration-300">Monthly Total</p>
-                        <p className="text-2xl font-bold text-purple-900 dark:text-purple-200 transition-colors duration-300">{analyticsData.monthly.totalHours}h</p>
+                        <p className="text-2xl font-bold text-purple-900 dark:text-purple-200 transition-colors duration-300 truncate">{analyticsData.monthly.totalHours}h</p>
                       </div>
                     </div>
                   </div>

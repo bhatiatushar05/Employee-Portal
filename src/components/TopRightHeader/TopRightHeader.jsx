@@ -44,29 +44,41 @@ const TopRightHeader = ({ user }) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Apply glass (frosted) effect when any scrollable container (or window) is scrolled
+  // Apply glass (frosted) effect when the page OR the main scroll container scrolls (throttled with rAF)
   useEffect(() => {
-    const getScrollState = () => {
-      // Window scroll
-      if (window.scrollY > 8) return true;
-      // Any scrollable area used in app layout
+    let ticking = false;
+
+    const computeScrolled = () => {
+      if (window.scrollY > 10) return true;
       const scrollers = document.querySelectorAll('.overflow-auto, .overflow-y-auto');
       for (const el of scrollers) {
-        if (el.scrollTop > 8) return true;
+        if ((el instanceof HTMLElement || el instanceof Element) && el.scrollTop > 10) {
+          return true;
+        }
       }
       return false;
     };
 
-    const update = () => setIsScrolled(getScrollState());
-    update();
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setIsScrolled(computeScrolled());
+        ticking = false;
+      });
+    };
 
-    window.addEventListener('scroll', update, { passive: true });
+    // Attach listeners
+    window.addEventListener('scroll', onScroll, { passive: true });
     const scrollers = Array.from(document.querySelectorAll('.overflow-auto, .overflow-y-auto'));
-    scrollers.forEach((el) => el.addEventListener('scroll', update, { passive: true }));
+    scrollers.forEach((el) => el.addEventListener('scroll', onScroll, { passive: true }));
+
+    // Initial state
+    setIsScrolled(computeScrolled());
 
     return () => {
-      window.removeEventListener('scroll', update);
-      scrollers.forEach((el) => el.removeEventListener('scroll', update));
+      window.removeEventListener('scroll', onScroll);
+      scrollers.forEach((el) => el.removeEventListener('scroll', onScroll));
     };
   }, []);
 
@@ -94,15 +106,15 @@ const TopRightHeader = ({ user }) => {
 
   return (
     <>
-      <div className={`fixed top-4 sm:top-6 right-3 sm:right-6 md:right-8 z-50 flex items-center gap-3 sm:gap-4 md:gap-6 transition-all duration-300 ${
+      <div className={`fixed top-4 sm:top-6 right-3 sm:right-6 md:right-8 z-50 flex items-center gap-3 sm:gap-4 md:gap-6 transition-all duration-500 ease-out overflow-hidden ${
         isScrolled
-          ? 'backdrop-blur-md bg-white/60 dark:bg-black/40 border border-white/30 dark:border-white/10 rounded-full px-2 py-1 shadow-lg'
-          : ''
+          ? 'backdrop-blur-[60px] bg-white/15 dark:bg-black/20 border border-white/20 dark:border-white/10 rounded-full px-3 py-2 shadow-lg'
+          : 'bg-white/90 dark:bg-black/80 border border-white/50 dark:border-white/30 rounded-full px-3 py-2 shadow-lg'
       }`}>
         {/* Dark Mode Toggle */}
         <button 
           onClick={toggleDarkMode}
-          className="p-1.5 sm:p-2 rounded-full bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border shadow-sm hover:bg-gray-50 dark:hover:bg-dark-card transition-colors"
+          className="p-1.5 sm:p-2 rounded-full bg-transparent hover:bg-white/20 dark:hover:bg-black/20 border-0 shadow-none transition-all duration-200"
           title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
           {isDarkMode ? (
@@ -114,20 +126,20 @@ const TopRightHeader = ({ user }) => {
 
         {/* Search */}
         <div 
-          className="flex items-center gap-1 sm:gap-2 bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border rounded-full px-2 sm:px-3 py-1 shadow-sm cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-card transition-colors"
+          className="flex items-center gap-1 sm:gap-2 bg-transparent hover:bg-white/20 dark:hover:bg-black/20 rounded-full px-2 sm:px-3 py-1 cursor-pointer transition-all duration-200"
           onClick={() => setShowSearch(true)}
         >
-          <Search size={16} className="text-gray-500 dark:text-gray-400 sm:w-[18px] sm:h-[18px]" />
-          <span className="text-xs text-gray-500 dark:text-gray-400 font-mono hidden sm:inline">⌘K</span>
+          <Search size={16} className="text-gray-600 dark:text-gray-300 sm:w-[18px] sm:h-[18px]" />
+          <span className="text-xs text-gray-600 dark:text-gray-300 font-mono hidden sm:inline">⌘K</span>
         </div>
 
         {/* Notification */}
         <button 
-          className="relative p-1.5 sm:p-2 rounded-full bg-white dark:bg-dark-surface border border-gray-200 dark:border-dark-border shadow-sm hover:bg-gray-50 dark:hover:bg-dark-card transition-colors"
+          className="relative p-1.5 sm:p-2 rounded-full bg-transparent hover:bg-white/20 dark:hover:bg-black/20 border-0 shadow-none transition-all duration-200"
           onClick={() => setShowNotifications(!showNotifications)}
         >
-          <Bell size={18} className="text-gray-500 dark:text-gray-400 sm:w-5 sm:h-5" />
-          <span className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
+          <Bell size={18} className="text-gray-600 dark:text-gray-300 sm:w-5 sm:h-5" />
+          <span className="absolute -top-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
             0
           </span>
         </button>
@@ -135,8 +147,8 @@ const TopRightHeader = ({ user }) => {
 
       {/* Search Overlay */}
       {showSearch && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-start justify-center pt-16 sm:pt-20">
-          <div ref={searchRef} className="bg-white dark:bg-dark-surface rounded-lg shadow-2xl w-full max-w-2xl mx-3 sm:mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-start justify-center pt-16 sm:pt-20 overflow-hidden">
+          <div ref={searchRef} className="bg-white dark:bg-dark-surface rounded-lg shadow-2xl w-full max-w-2xl mx-3 sm:mx-4 overflow-hidden">
             <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-dark-border">
               <div className="flex items-center gap-2 sm:gap-3">
                 <Search size={18} className="text-gray-500 dark:text-gray-400 sm:w-5 sm:h-5" />
@@ -189,8 +201,8 @@ const TopRightHeader = ({ user }) => {
 
       {/* Notifications Panel */}
       {showNotifications && (
-        <div className="fixed top-16 sm:top-20 right-3 sm:right-6 md:right-8 z-[100]">
-          <div ref={notificationsRef} className="bg-white dark:bg-dark-surface rounded-lg shadow-2xl border border-gray-200 dark:border-dark-border w-72 sm:w-80">
+        <div className="fixed top-16 sm:top-20 right-3 sm:right-6 md:right-8 z-[100] overflow-hidden">
+          <div ref={notificationsRef} className="bg-white dark:bg-dark-surface rounded-lg shadow-2xl border border-gray-200 dark:border-dark-border w-72 sm:w-80 overflow-hidden">
             <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-dark-border">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Notifications</h3>

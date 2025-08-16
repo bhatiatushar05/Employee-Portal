@@ -163,7 +163,7 @@ const Sidebar = ({
         ${isDarkMode ? 'text-white' : 'text-black'}
         rounded-2xl md:rounded-2xl
         m-4 md:m-4
-        h-[calc(100vh-2rem)]
+        h-[calc(100vh-2rem)] h-[calc(100dvh-2rem)]
       `}>
         {/* Subtle top-left orange accent (light mode only) */}
         {!isDarkMode && (

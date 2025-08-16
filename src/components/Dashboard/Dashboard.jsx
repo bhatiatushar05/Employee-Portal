@@ -163,9 +163,9 @@ const Dashboard = ({ user }) => {
         <TopRightHeader user={user} />
         
         {/* Main Content with proper spacing */}
-        <div className="pt-16 sm:pt-20 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
+        <div className="pt-1 sm:pt-1 pb-2 px-3 sm:px-4 md:px-6 lg:px-8 max-w-7xl mx-auto space-y-4 sm:space-y-6">
           {/* Header Section Skeleton */}
-          <div className="mb-8 mt-8">
+          <div className="mb-8 mt-9">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
               <div className="mb-6 lg:mb-0">
                 <Skeleton height={48} width="350px" className="mb-3" />
