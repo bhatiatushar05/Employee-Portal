@@ -47,7 +47,7 @@ const AppContent = () => {
   const renderContent = () => {
     switch(activeSection) {
       case 'dashboard':
-        return <Dashboard user={user} />;
+        return <Dashboard user={user} setActiveSection={setActiveSection} />;
       case 'employee':
         return <EmployeePortal user={user} />;
       case 'chat':
@@ -59,7 +59,7 @@ const AppContent = () => {
       case 'visitor':
         return <VisitorManagement user={user} />;
       default:
-        return <Dashboard user={user} />;
+        return <Dashboard user={user} setActiveSection={setActiveSection} />;
     }
   };
 
